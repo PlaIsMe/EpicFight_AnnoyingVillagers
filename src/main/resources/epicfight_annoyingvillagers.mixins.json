@@ -1,0 +1,31 @@
+{
+  "required": true,
+  "package": "com.pla.epicfight_annoyingvillagers.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "epicfight_annoyingvillagers.mixins.refmap.json",
+  "plugin": "com.pla.epicfight_annoyingvillagers.mixin.plugin.CompatMixinPlugin",
+  "mixins": [
+    "AttackAnimationMixin",
+    "BasicAttackMixin",
+    "ExecutionHandlerMixin",
+    "ExecutionTaskMixin",
+    "GuardSkillMixin",
+    "ImpactGuardSkillMixin",
+    "LivingEntityPatchMixin",
+    "MixinPHumanoidRenderer",
+    "MixinPIllagerRenderer",
+    "OpenMatrix4fInvertFixMixin",
+    "WeaponCapabilityAccessor",
+    "efclash_blade.ClashBladeMixin",
+    "efclash_blade.MobClashBladeMixin"
+  ],
+  "client": [
+    "client.ControlEngineMixin",
+    "client.FishingHookRendererMixin",
+    "client.PatchedArrowLayerMixin",
+    "client.PatchedItemInHandLayerMixin",
+    "client.WeaponInnateSkillMixin",
+    "client.WearableItemLayerMixin"
+  ],
+  "minVersion": "0.8"
+}
