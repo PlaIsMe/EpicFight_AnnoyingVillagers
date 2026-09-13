@@ -520,6 +520,10 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 capability.getLivingMotionModifier(this, hand);
         if (modifiers != null) {
             modifiers.forEach(target::put);
+            // Player weapon presets often define RUN without the mob-only CHASE motion.
+            if (!modifiers.containsKey(LivingMotions.CHASE) && modifiers.containsKey(LivingMotions.RUN)) {
+                target.put(LivingMotions.CHASE, modifiers.get(LivingMotions.RUN));
+            }
         }
     }
 

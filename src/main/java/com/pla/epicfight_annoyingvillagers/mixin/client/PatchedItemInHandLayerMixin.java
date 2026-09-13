@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.client.renderer.patched.item.RenderItemBase;
 import yesman.epicfight.client.renderer.patched.layer.PatchedItemInHandLayer;
-import yesman.epicfight.model.armature.HumanoidArmature;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 
 @Mixin(value = PatchedItemInHandLayer.class, remap = false)
@@ -53,7 +52,7 @@ public abstract class PatchedItemInHandLayerMixin {
             method = "renderLayer(Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/layers/RenderLayer;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I[Lyesman/epicfight/api/utils/math/OpenMatrix4f;FFFF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lyesman/epicfight/client/renderer/patched/item/RenderItemBase;renderItemInHand(Lnet/minecraft/world/item/ItemStack;Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lnet/minecraft/world/InteractionHand;Lyesman/epicfight/model/armature/HumanoidArmature;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;I)V"
+                    target = "Lyesman/epicfight/client/renderer/patched/item/RenderItemBase;renderItemInHand(Lnet/minecraft/world/item/ItemStack;Lyesman/epicfight/world/capabilities/entitypatch/LivingEntityPatch;Lnet/minecraft/world/InteractionHand;[Lyesman/epicfight/api/utils/math/OpenMatrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;IF)V"
             )
     )
     private void annoyingVillagers$renderHookGunWithHandContext(
@@ -61,11 +60,11 @@ public abstract class PatchedItemInHandLayerMixin {
             ItemStack stack,
             LivingEntityPatch<?> entityPatch,
             InteractionHand hand,
-            HumanoidArmature armature,
             OpenMatrix4f[] poses,
             MultiBufferSource buffer,
             PoseStack poseStack,
             int packedLight,
+            float partialTicks,
             Operation<Void> original
     ) {
         Entity entity = entityPatch.getOriginal();
@@ -74,7 +73,7 @@ public abstract class PatchedItemInHandLayerMixin {
         }
 
         try {
-            original.call(renderer, stack, entityPatch, hand, armature, poses, buffer, poseStack, packedLight);
+            original.call(renderer, stack, entityPatch, hand, poses, buffer, poseStack, packedLight, partialTicks);
         } finally {
             HookGunItemRenderer.clearRenderedHandContext();
         }

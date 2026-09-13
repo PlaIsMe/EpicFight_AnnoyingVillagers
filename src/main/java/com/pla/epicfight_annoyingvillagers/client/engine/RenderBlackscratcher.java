@@ -2,14 +2,10 @@ package com.pla.epicfight_annoyingvillagers.client.engine;
 
 import com.google.gson.JsonElement;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSpear;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,7 +32,11 @@ public class RenderBlackscratcher extends RenderItemBase {
                                  PoseStack poseStack,
                                  int packedLight,
                                  float partialTicks) {
-        if (livingEntityPatch == null || hand != InteractionHand.MAIN_HAND) {
+        if (livingEntityPatch == null) {
+            return;
+        }
+        if (hand == InteractionHand.OFF_HAND) {
+            super.renderItemInHand(stack, livingEntityPatch, hand, poses, buffer, poseStack, packedLight, partialTicks);
             return;
         }
 
@@ -55,7 +55,6 @@ public class RenderBlackscratcher extends RenderItemBase {
                     new ItemStack(AnnoyingVillagersModItems.BLACKSCRATCHER_TOP.get()),
                     livingEntityPatch,
                     InteractionHand.MAIN_HAND,
-                    ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                     poses,
                     buffer,
                     poseStack,
@@ -65,7 +64,6 @@ public class RenderBlackscratcher extends RenderItemBase {
                     new ItemStack(AnnoyingVillagersModItems.BLACKSCRATCHER_BOTTOM.get()),
                     livingEntityPatch,
                     InteractionHand.OFF_HAND,
-                    ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
                     poses,
                     buffer,
                     poseStack,
@@ -78,7 +76,6 @@ public class RenderBlackscratcher extends RenderItemBase {
                 heldStack,
                 livingEntityPatch,
                 InteractionHand.MAIN_HAND,
-                ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
                 poses,
                 buffer,
                 poseStack,
@@ -89,7 +86,6 @@ public class RenderBlackscratcher extends RenderItemBase {
     private void renderStack(ItemStack renderStack,
                              LivingEntityPatch<?> livingEntityPatch,
                              InteractionHand hand,
-                             ItemDisplayContext displayContext,
                              OpenMatrix4f[] poses,
                              MultiBufferSource buffer,
                              PoseStack poseStack,
@@ -98,16 +94,7 @@ public class RenderBlackscratcher extends RenderItemBase {
 
         poseStack.pushPose();
         MathUtils.mulStack(poseStack, correctionMatrix);
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                renderStack,
-                displayContext,
-                packedLight,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                buffer,
-                livingEntityPatch.getOriginal().level(),
-                0
-        );
+        AvItemRenderUtil.renderItem(renderStack, livingEntityPatch, hand, poseStack, buffer, packedLight);
         poseStack.popPose();
     }
 }

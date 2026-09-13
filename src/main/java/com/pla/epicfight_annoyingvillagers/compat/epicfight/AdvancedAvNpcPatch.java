@@ -206,6 +206,10 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
             } else if (playerNpc.isSprinting() && isMovingMotion()) {
                 this.currentLivingMotion = LivingMotions.RUN;
                 this.currentCompositeMotion = LivingMotions.RUN;
+            } else if (playerNpc.isAggressive() && this.currentLivingMotion == LivingMotions.WALK) {
+                // AdvancedChasingGoal sets aggression, not the vanilla sprint flag.
+                this.currentLivingMotion = LivingMotions.CHASE;
+                this.currentCompositeMotion = LivingMotions.CHASE;
             }
         }
     }

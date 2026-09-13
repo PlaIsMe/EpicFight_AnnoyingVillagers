@@ -2,14 +2,10 @@ package com.pla.epicfight_annoyingvillagers.client.engine;
 
 import com.google.gson.JsonElement;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianWeapon;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,9 +38,8 @@ public class RenderShadowObsidianPillar extends RenderItemBase {
                                  int packedLight,
                                  float partialTicks) {
         if (livingEntityPatch != null) {
-            if (livingEntityPatch.getOriginal().getMainHandItem().getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.get())) {
-                OpenMatrix4f openmatrix4fmainHand = new OpenMatrix4f(this.getCorrectionMatrix(livingEntityPatch, InteractionHand.MAIN_HAND, poses));
-                OpenMatrix4f openmatrix4foffHand = new OpenMatrix4f(this.getCorrectionMatrix(livingEntityPatch, InteractionHand.OFF_HAND, poses));
+            if (stack.is(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.get())) {
+                OpenMatrix4f openmatrix4fmainHand = new OpenMatrix4f(this.getCorrectionMatrix(livingEntityPatch, hand, poses));
                 AnimationPlayer animationPlayer = Objects.requireNonNull(livingEntityPatch.getAnimator().getPlayerFor(null));
                 AssetAccessor<? extends StaticAnimation> dynamicAnimation = animationPlayer.getRealAnimation();
                 float elapsedTimeFloat = animationPlayer.getElapsedTime();
@@ -60,7 +55,7 @@ public class RenderShadowObsidianPillar extends RenderItemBase {
                     itemstack = ItemStack.EMPTY;
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4fmainHand);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                    AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 } else if (((dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_4
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_SPECIAL
@@ -68,49 +63,29 @@ public class RenderShadowObsidianPillar extends RenderItemBase {
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_INNATE
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_DUAL_INNATE) {
                     itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_BURST.get());
-                    if (itemstack.getTag() != null) {
-                        itemstack.getTag().putBoolean("foil", livingEntityPatch.getOriginal().getMainHandItem().isEnchanted());
-                    }
+                    itemstack.getOrCreateTag().putBoolean("foil", stack.isEnchanted());
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4fmainHand);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                    AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 } else if ((dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_LEFT_3
                         || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_DASH
                         || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_1
                         || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_3)
                         && entityState.getLevel() > 1) {
-                    itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.get());
+                    itemstack = stack;
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4fmainHand);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                    AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                     poseStack.popPose();
 
-                    if (livingEntityPatch.getOriginal().getOffhandItem().getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get())) {
-                        itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_STRAIGHT.get());
-                        if (itemstack.getTag() != null) {
-                            itemstack.getTag().putBoolean("foil", livingEntityPatch.getOriginal().getOffhandItem().isEnchanted());
-                        }
-                        poseStack.pushPose();
-                        MathUtils.mulStack(poseStack, openmatrix4foffHand);
-                        Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_LEFT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
-                        poseStack.popPose();
-                    }
                 } else {
-                    itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.get());
+                    itemstack = stack;
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4fmainHand);
-                    Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                    AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                     poseStack.popPose();
 
-                    if (livingEntityPatch.getOriginal().getOffhandItem().getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get())) {
-                        itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get());
-                        poseStack.pushPose();
-                        MathUtils.mulStack(poseStack, openmatrix4foffHand);
-                        poseStack.mulPose(Axis.YP.rotationDegrees(45.0F));
-                        Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_LEFT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
-                        poseStack.popPose();
-                    }
                 }
             }
         }

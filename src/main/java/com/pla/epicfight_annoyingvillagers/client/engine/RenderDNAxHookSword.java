@@ -4,11 +4,8 @@ import com.google.gson.JsonElement;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSword;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -100,23 +97,10 @@ public class RenderDNAxHookSword extends RenderItemBase {
                 this.getCorrectionMatrix(livingEntityPatch, hand, poses)
         );
 
-        ItemDisplayContext displayContext = hand == InteractionHand.MAIN_HAND
-                ? ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
-                : ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
-
         poseStack.pushPose();
         MathUtils.mulStack(poseStack, correctionMatrix);
 
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                renderStack,
-                displayContext,
-                packedLight,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                buffer,
-                livingEntityPatch.getOriginal().level(),
-                0
-        );
+        AvItemRenderUtil.renderItem(renderStack, livingEntityPatch, hand, poseStack, buffer, packedLight);
 
         poseStack.popPose();
     }

@@ -1,14 +1,18 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import yesman.epicfight.api.animation.AnimationManager;
+import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;
 import yesman.epicfight.api.animation.types.*;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.model.armature.HumanoidArmature;
+import yesman.epicfight.particle.EpicFightParticles;
 
 @Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AVAnimations {
@@ -50,6 +54,12 @@ public class AVAnimations {
     public static AnimationManager.AnimationAccessor<StaticAnimation> LAYING_DEATH;
     public static AnimationManager.AnimationAccessor<LongHitAnimation> LAYING_DEATH_DEAD;
     public static AnimationManager.AnimationAccessor<ActionAnimation> HOOK_GUN;
+    public static AnimationManager.AnimationAccessor<StaticAnimation> ZIPLINE;
+    public static AnimationManager.AnimationAccessor<DodgeAnimation> FLY_UP;
+    public static AnimationManager.AnimationAccessor<StaticAnimation> DIG_MAINHAND;
+    public static AnimationManager.AnimationAccessor<StaticAnimation> USE_MAINHAND;
+    public static AnimationManager.AnimationAccessor<StaticAnimation> EAT_MAINHAND;
+    public static AnimationManager.AnimationAccessor<StaticAnimation> EAT_OFFHAND;
 
     @SubscribeEvent
     public static void registerAnimations(AnimationManager.AnimationRegistryEvent event) {
@@ -197,7 +207,39 @@ public class AVAnimations {
         HOOK_GUN = builder.nextAccessor("biped/living/hook_gun",
                 accessor -> new ActionAnimation(0.0F, 1.85F, accessor, humanoidArmature)
                         .addState(EntityState.CAN_BASIC_ATTACK, false));
-        // One builder per mod namespace; append the mob utility clips after existing ids.
-        com.pla.epicfight_annoyingvillagers.compat.epicfight.EpicFightCloneAnimations.build(builder);
+        DIG_MAINHAND = builder.nextAccessor("biped/living/dig_mainhand",
+                accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
+                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+        USE_MAINHAND = builder.nextAccessor("biped/living/use_mainhand",
+                accessor -> new StaticAnimation(0.1F, false, accessor, humanoidArmature)
+                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+        EAT_MAINHAND = builder.nextAccessor("biped/living/eat_mainhand",
+                accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
+                        .addProperty(AnimationProperty.StaticAnimationProperty.FIXED_HEAD_ROTATION, true)
+                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+        EAT_OFFHAND = builder.nextAccessor("biped/living/eat_offhand",
+                accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
+                        .addProperty(AnimationProperty.StaticAnimationProperty.FIXED_HEAD_ROTATION, true)
+                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+        ZIPLINE = builder.nextAccessor("biped/living/zipline", (accessor) ->
+                new StaticAnimation(false, accessor, Armatures.BIPED)
+                        .addProperty(AnimationProperty.StaticAnimationProperty.ON_ITEM_CHANGE_EVENT, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.SET_TOOLS_BACK_WHEN_ITEM_CHANGED, AnimationEvent.Side.CLIENT))
+                        .addEvents(AnimationProperty.StaticAnimationProperty.ON_END_EVENTS, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.REVERT_TO_HANDS, AnimationEvent.Side.CLIENT))
+                        .newTimePair(0.0F, 10000.0F)
+                        .addStateRemoveOld(EntityState.TURNING_LOCKED, true)
+                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.INACTION, true));
+        FLY_UP = builder.nextAccessor("biped/living/fly_up", accessor ->
+                new DodgeAnimation(0.0f, 0.15f, accessor, 0.4f, 1.4f, Armatures.BIPED)
+                        .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, true)
+                        .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, false)
+                        .addEvents(AnimationEvent.InTimeEvent.create(0.05f, Animations.ReusableSources.PLAY_SOUND, AnimationEvent.Side.CLIENT), AnimationEvent.InTimeEvent.create(
+                                0.05f, (livingEntityPatch, assetAccessor, animationParameters) ->
+                                {
+                                    LivingEntity entity = livingEntityPatch.getOriginal();
+                                    entity.level().addParticle(EpicFightParticles.WHITE_AFTERIMAGE.get(), entity.getX(), entity.getY(), entity.getZ(), Double.longBitsToDouble(entity.getId()), 0.0F, 0.0F);
+                                }, AnimationEvent.Side.CLIENT
+                        )));
     }
 }

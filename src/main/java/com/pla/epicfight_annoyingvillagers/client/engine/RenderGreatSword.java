@@ -3,11 +3,8 @@ package com.pla.epicfight_annoyingvillagers.client.engine;
 import com.google.gson.JsonElement;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSword;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -38,21 +35,21 @@ public class RenderGreatSword extends RenderItemBase {
                                  int packedLight,
                                  float partialTicks) {
         if (livingEntityPatch != null) {
-            OpenMatrix4f openmatrix4f = new OpenMatrix4f(this.getCorrectionMatrix(livingEntityPatch, InteractionHand.MAIN_HAND, poses));
+            OpenMatrix4f openmatrix4f = new OpenMatrix4f(this.getCorrectionMatrix(livingEntityPatch, hand, poses));
             AssetAccessor<? extends StaticAnimation> dynamicAnimation = Objects.requireNonNull(livingEntityPatch.getAnimator().getPlayerFor(null)).getRealAnimation();
             ItemStack itemstack;
 
             if (dynamicAnimation != AnimsAVSword.GREAT_SWORD_INNATE) {
-                itemstack = new ItemStack(AnnoyingVillagersModItems.GREAT_SWORD.get());
+                itemstack = stack;
                 poseStack.pushPose();
                 MathUtils.mulStack(poseStack, openmatrix4f);
-                Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                 poseStack.popPose();
             } else {
                 itemstack = new ItemStack(AnnoyingVillagersModItems.GREAT_SWORD_SKILL.get());
                 poseStack.pushPose();
                 MathUtils.mulStack(poseStack, openmatrix4f);
-                Minecraft.getInstance().getItemRenderer().renderStatic(itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, packedLight, OverlayTexture.NO_OVERLAY, poseStack, buffer, livingEntityPatch.getOriginal().level(), 0);
+                AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                 poseStack.popPose();
             }
         }
