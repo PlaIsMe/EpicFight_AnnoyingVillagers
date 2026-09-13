@@ -1,10 +1,8 @@
 package com.pla.epicfight_annoyingvillagers.util;
 
-import com.pla.annoyingvillagers.AnnoyingVillagers;
-import com.pla.annoyingvillagers.clazz.HookDisarmLaunch;
 import com.pla.annoyingvillagers.task.DelayedTask;
-import com.pla.annoyingvillagers.util.CommonUtil;
 import com.pla.annoyingvillagers.util.ScreenShakeUtil;
+import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedMobPatch;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
@@ -48,8 +46,6 @@ import yesman.epicfight.world.damagesource.StunType;
 
 import java.util.Objects;
 import java.util.Random;
-
-import static com.pla.epicfight_annoyingvillagers.util.CommonUtil.*;
 
 public class EpicfightUtil {
     public static void forceLookAt(Entity self, Entity target, float maxYawChange, float maxPitchChange) {
@@ -341,7 +337,7 @@ public class EpicfightUtil {
 
     private static void sendEpicFightCameraFx(LivingEntity entity, ClientboundEpicFightCameraFx packet) {
         if (entity instanceof ServerPlayer player) {
-            AnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), packet);
+            EpicFightAnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), packet);
         }
     }
 }
