@@ -152,6 +152,14 @@ public class EpicfightUtil {
         );
     }
 
+    public static boolean isStunned(LivingEntity entity) {
+        LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(entity, LivingEntityPatch.class);
+        if (patch == null) return false;
+        var player = patch.getAnimator().getPlayerFor(null);
+        return patch.isStunned() || player != null && !player.isEmpty() && !player.isEnd()
+                && isLongHitAnimation(player.getRealAnimation(), patch);
+    }
+
     public static boolean isLongHitAnimationNotExecutedAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
         return !(dynamicAnimation.get() instanceof ExecutionHitAnimation)
                 && (dynamicAnimation.get() instanceof KnockdownAnimation

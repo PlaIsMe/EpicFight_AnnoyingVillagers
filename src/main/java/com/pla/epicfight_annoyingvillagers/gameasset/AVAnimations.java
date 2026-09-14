@@ -1,6 +1,10 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
+import com.pla.annoyingvillagers.rig.RigAnimationId;
+import com.pla.epicfight_annoyingvillagers.util.GoalAnimationCompat;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
+import com.pla.annoyingvillagers.entity.goal.HerobrineEscapeHoleGoal;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -96,13 +100,22 @@ public class AVAnimations {
                 accessor -> new StaticAnimation(true, accessor, humanoidArmature));
         POINT_LEFT_HAND_TOWARD = builder.nextAccessor("biped/living/point_left_hand_toward",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
+                                GoalAnimationCompat.castPointAction(patch.getOriginal(),
+                                        RigAnimationId.POINT_LEFT_HAND_TOWARD), AnimationEvent.Side.SERVER)));
         POINT_LEFT_HAND_UP = builder.nextAccessor("biped/living/point_left_hand_up",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
+                                GoalAnimationCompat.castPointAction(patch.getOriginal(),
+                                        RigAnimationId.POINT_LEFT_HAND_UP), AnimationEvent.Side.SERVER)));
         POINT_LEFT_HAND_MIDDLE = builder.nextAccessor("biped/living/point_left_hand_middle",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
+                                GoalAnimationCompat.castPointAction(patch.getOriginal(),
+                                        RigAnimationId.POINT_LEFT_HAND_MIDDLE), AnimationEvent.Side.SERVER)));
         STUN_BACK = builder.nextAccessor("biped/living/stun_back",
                 accessor -> new LongHitAnimation(0.05F, accessor, humanoidArmature));
         SUPER_KNOCK_BACK = builder.nextAccessor("biped/living/super_knock_back",
@@ -222,7 +235,7 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.StaticAnimationProperty.FIXED_HEAD_ROTATION, true)
                         .addState(EntityState.CAN_BASIC_ATTACK, false));
         ZIPLINE = builder.nextAccessor("biped/living/zipline", (accessor) ->
-                new StaticAnimation(false, accessor, Armatures.BIPED)
+                new StaticAnimation(true, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.StaticAnimationProperty.ON_ITEM_CHANGE_EVENT, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.SET_TOOLS_BACK_WHEN_ITEM_CHANGED, AnimationEvent.Side.CLIENT))
                         .addEvents(AnimationProperty.StaticAnimationProperty.ON_END_EVENTS, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.REVERT_TO_HANDS, AnimationEvent.Side.CLIENT))
                         .newTimePair(0.0F, 10000.0F)
@@ -234,6 +247,19 @@ public class AVAnimations {
                 new DodgeAnimation(0.0f, 0.15f, accessor, 0.4f, 1.4f, Armatures.BIPED)
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, false)
+                        .addEvents(
+                                AnimationEvent.InTimeEvent.create(0.15F, (patch, animation, parameters) -> {
+                                    if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 0);
+                                }, AnimationEvent.Side.SERVER),
+                                AnimationEvent.InTimeEvent.create(0.30F, (patch, animation, parameters) -> {
+                                    if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 1);
+                                }, AnimationEvent.Side.SERVER),
+                                AnimationEvent.InTimeEvent.create(0.45F, (patch, animation, parameters) -> {
+                                    if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 2);
+                                }, AnimationEvent.Side.SERVER),
+                                AnimationEvent.InTimeEvent.create(0.60F, (patch, animation, parameters) -> {
+                                    if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 3);
+                                }, AnimationEvent.Side.SERVER))
                         .addEvents(AnimationEvent.InTimeEvent.create(0.05f, Animations.ReusableSources.PLAY_SOUND, AnimationEvent.Side.CLIENT), AnimationEvent.InTimeEvent.create(
                                 0.05f, (livingEntityPatch, assetAccessor, animationParameters) ->
                                 {

@@ -1,5 +1,7 @@
 package com.pla.epicfight_annoyingvillagers.compat.epicfight;
 
+import java.util.ArrayList;
+import yesman.epicfight.world.capabilities.entitypatch.mob.SkeletonPatch;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModEntities;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.world.entity.EntityType;
@@ -20,16 +22,26 @@ public final class AvNpcPatchRegistration {
                 AnnoyingVillagersModEntities.CHRIS.get(), AnnoyingVillagersModEntities.VILLAGER_SCOUT.get(),
                 AnnoyingVillagersModEntities.VILLAGER_SCOUT_CAPTAIN.get(),
                 AnnoyingVillagersModEntities.RED_VILLAGER_KNIGHT.get(), AnnoyingVillagersModEntities.BLUE_VILLAGER_KNIGHT.get(),
-                AnnoyingVillagersModEntities.GREEN_VILLAGER_KNIGHT.get(), AnnoyingVillagersModEntities.PURPLE_VILLAGER_KNIGHT.get());
+                AnnoyingVillagersModEntities.GREEN_VILLAGER_KNIGHT.get(), AnnoyingVillagersModEntities.PURPLE_VILLAGER_KNIGHT.get(),
+                // Shared animation goals need live patches; legacy mobpatch sources are excluded.
+                AnnoyingVillagersModEntities.AEGIS_HEROBRINE.get(), AnnoyingVillagersModEntities.GLAIVE_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.SLEDGEHAMMER_HEROBRINE.get(), AnnoyingVillagersModEntities.SWORDSMAN_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.REAPER_HEROBRINE.get(), AnnoyingVillagersModEntities.SHADOW_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.NULL.get(), AnnoyingVillagersModEntities.TRANSPORTER_HEROBRINE_CLONE.get(),
+                AnnoyingVillagersModEntities.BLUE_DEMON.get());
     }
 
     public static void register(EntityPatchRegistryEvent event) {
         for (var type : types()) event.getTypeEntry().put(type, entity -> AdvancedAvNpcPatch::new);
+        event.getTypeEntry().put(AnnoyingVillagersModEntities.NULL_SKELETON.get(),
+                entity -> SkeletonPatch::new);
     }
 
     @SubscribeEvent
     public static void attributes(EntityAttributeModificationEvent event) {
-        for (var type : types()) {
+        List<EntityType<? extends LivingEntity>> patchedTypes = new ArrayList<>(types());
+        patchedTypes.add(AnnoyingVillagersModEntities.NULL_SKELETON.get());
+        for (var type : patchedTypes) {
             event.add(type, EpicFightAttributes.WEIGHT.get());
             event.add(type, EpicFightAttributes.ARMOR_NEGATION.get());
             event.add(type, EpicFightAttributes.IMPACT.get());

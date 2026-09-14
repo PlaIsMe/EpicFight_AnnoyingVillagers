@@ -1,5 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
+import com.pla.annoyingvillagers.entity.goal.NullSummonSkeletonGoal;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.annoyingvillagers.entity.NullEntity;
 import com.pla.annoyingvillagers.entity.NullSkeletonEntity;
@@ -323,7 +324,12 @@ public class AnimsNullWeapon {
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.7F)
                         .addProperty(AnimationProperty.AttackAnimationProperty.ATTACK_SPEED_FACTOR, 1.0F)
                         .addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true)
-                        .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false));
+                        .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false)
+                        .addEvents(AnimationProperty.StaticAnimationProperty.ON_BEGIN_EVENTS,
+                                AnimationEvent.SimpleEvent.create((patch, self, params) -> {
+                                    if (patch.getOriginal() instanceof NullEntity nullEntity) nullEntity.releaseRandomNullWeapon(nullEntity.getTarget());
+                                }, AnimationEvent.Side.SERVER))
+        );
 
         NULL_WEAPON_INNATE_SPECIAL = builder.nextAccessor("biped/null_weapon/null_weapon_innate_special",
                 accessor -> new AttackAnimation(0.1F, accessor, humanoidArmature,
@@ -343,6 +349,15 @@ public class AnimsNullWeapon {
                         .addEvents(new AnimationEvent[]{
                                 AnimationEvent.InTimeEvent.create(1.5F, (livingEntityPatch, self, p) -> {
                                     if (livingEntityPatch.getOriginal().level() instanceof ServerLevel serverLevel) {
+                                        // AV owns slot/cooldown bookkeeping; the EF event owns timing.
+                                        if (livingEntityPatch.getOriginal() instanceof NullEntity nullEntity) {
+                                            NullSkeletonEntity skeleton = NullSummonSkeletonGoal.summonSkeleton(nullEntity);
+                                            if (skeleton != null) {
+                                                LivingEntityPatch<?> skeletonPatch = EpicFightCapabilities.getEntityPatch(skeleton, LivingEntityPatch.class);
+                                                if (skeletonPatch != null) skeletonPatch.playAnimationSynchronized(NULL_WEAPON_SKELETON_SPAWN, 0.0F);
+                                            }
+                                            return;
+                                        }
                                         NullSkeletonEntity nullSkeletonEntity = new NullSkeletonEntity(AnnoyingVillagersModEntities.NULL_SKELETON.get(), serverLevel);
                                         LivingEntity owner = livingEntityPatch.getOriginal();
 
@@ -365,8 +380,6 @@ public class AnimsNullWeapon {
                                         );
                                         if (owner instanceof Player player) {
                                             nullSkeletonEntity.setPlayer(player);
-                                        } else if (owner instanceof NullEntity nullEntity) {
-                                            nullSkeletonEntity.setNullEntity(nullEntity);
                                         }
 
                                         nullSkeletonEntity.finalizeSpawn(serverLevel,
@@ -374,10 +387,7 @@ public class AnimsNullWeapon {
                                                 MobSpawnType.MOB_SUMMONED,
                                                 null, null
                                         );
-                                        serverLevel.addFreshEntity(nullSkeletonEntity);
-                                        if (owner instanceof NullEntity nullEntity) {
-                                            nullEntity.claimWitherSkeletonSlot(nullSkeletonEntity);
-                                        }
+                                        if (!serverLevel.addFreshEntity(nullSkeletonEntity)) return;
                                         LivingEntityPatch<?> nullSkeletonPatch = EpicFightCapabilities.getEntityPatch(nullSkeletonEntity, LivingEntityPatch.class);
                                         if (nullSkeletonPatch != null) {
                                             nullSkeletonPatch.playAnimationSynchronized(NULL_WEAPON_SKELETON_SPAWN, 0.0F);

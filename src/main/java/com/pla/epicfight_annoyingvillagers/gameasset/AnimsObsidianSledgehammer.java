@@ -1,5 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
+import com.pla.annoyingvillagers.entity.SledgehammerHerobrineEntity;
 import com.hm.efn.gameasset.EFNAnimations;
 import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
 import com.merlin204.avalon.util.AvalonAnimationUtils;
@@ -200,6 +201,9 @@ public class AnimsObsidianSledgehammer {
                         .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
                         .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
                         .addEvents(
+                                AnimationEvent.InTimeEvent.create(0.6F, (patch, self, params) -> {
+                                    if (patch.getOriginal() instanceof SledgehammerHerobrineEntity sledgehammer) sledgehammer.consumeSecondFormAction();
+                                }, AnimationEvent.Side.SERVER),
                                 EpicfightUtil.cameraZoomInEvent(0.05F, -0.35F, 30),
                                 EpicfightUtil.cameraZoomOutBlurEvent(0.5F, 10.0F, 20),
                                 AnimationEvent.InTimeEvent.create(0.6F, Animations.ReusableSources.FRACTURE_GROUND_SIMPLE, AnimationEvent.Side.CLIENT)
@@ -210,6 +214,9 @@ public class AnimsObsidianSledgehammer {
                 .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
                 .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
                 .addEvents(
+                        AnimationEvent.InTimeEvent.create(1.5F, (patch, self, params) -> {
+                            if (patch.getOriginal() instanceof SledgehammerHerobrineEntity sledgehammer) sledgehammer.consumeSecondFormAction();
+                        }, AnimationEvent.Side.SERVER),
                         EpicfightUtil.cameraZoomInEvent(0.05F, -0.35F, 30),
                         EpicfightUtil.cameraZoomOutBlurEvent(1.5F, 10.0F, 20),
                         AnimationEvent.InTimeEvent.create(1.5F, Animations.ReusableSources.PLAY_SOUND, AnimationEvent.Side.SERVER).params(AnnoyingVillagersModSounds.SLEDGE_HAMMER.get()),

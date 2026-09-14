@@ -1,5 +1,12 @@
 package com.pla.epicfight_annoyingvillagers.compat.epicfight;
 
+import com.pla.annoyingvillagers.entity.NullEntity;
+import com.pla.annoyingvillagers.entity.goal.RandomCombatJumpGoal;
+import com.pla.annoyingvillagers.entity.goal.RigAnimatedMeleeAttackGoal;
+import com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal;
+import com.pla.annoyingvillagers.rig.RigAnimationController;
+import com.pla.epicfight_annoyingvillagers.gameasset.AnimsNullWeapon;
+import java.util.Set;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedCombatBehaviors;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedMobPatch;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedAnimationAttackGoal;
@@ -23,12 +30,12 @@ import java.util.EnumSet;
 
 public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatch<T> {
     @Override
-    protected void selectGoalToRemove(java.util.Set<Goal> toRemove) {
+    protected void selectGoalToRemove(Set<Goal> toRemove) {
         super.selectGoalToRemove(toRemove);
         for (WrappedGoal wrapped : this.getOriginal().goalSelector.getAvailableGoals()) {
-            if (wrapped.getGoal() instanceof com.pla.annoyingvillagers.entity.goal.RigAnimatedMeleeAttackGoal
-                    || wrapped.getGoal() instanceof com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal
-                    || wrapped.getGoal() instanceof com.pla.annoyingvillagers.entity.goal.RandomCombatJumpGoal) {
+            if (wrapped.getGoal() instanceof RigAnimatedMeleeAttackGoal
+                    || wrapped.getGoal() instanceof RigShieldGuardGoal
+                    || wrapped.getGoal() instanceof RandomCombatJumpGoal) {
                 toRemove.add(wrapped.getGoal());
             }
         }
@@ -61,9 +68,11 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
 
     @Override
     protected boolean isUtilityActionActive() {
+        // Some non-goal AV actions (such as Reaper's dragon summon) still own a rig action window.
+        if (RigAnimationController.hasActiveAnimation(this.getOriginal())) return true;
         if (this.getOriginal() instanceof AVNpc npc
                 && (npc.isLocked() || npc.isRecoveryActionActive() || npc.isHealing() || npc.isUsingItem() || npc.isRecoveryDigging() || npc.isSleeping()
-                || com.pla.annoyingvillagers.rig.RigAnimationController.hasActiveAnimation(npc))) {
+                || RigAnimationController.hasActiveAnimation(npc))) {
             return true;
         }
         // Include the recovery frames of atomic item uses after their goal stops.
@@ -110,6 +119,18 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,
                                           CapabilityItem offHandCap, Style style) {
+        if (this.getOriginal() instanceof NullEntity) {
+            builder.newBehaviorRoot(AdvancedCombatBehaviors.BehaviorRoot.builder()
+                    .priority(1.0D)
+                    .weight(4.0D)
+                    .maxCooldown(80)
+                    .waitForAnimationCompletion()
+                    .addFirstBehavior(AdvancedCombatBehaviors.Behavior.builder()
+                            .withinDistance(0.0D, 24.0D)
+                            .custom(patch -> patch.getOriginal() instanceof NullEntity nullEntity
+                                    && !nullEntity.getAvailableNullWeapons().isEmpty())
+                            .animationBehavior(AnimsNullWeapon.NULL_WEAPON_SPECIAL, 0.0F)));
+        }
         if (ModList.get().isLoaded("combat_evolution")) {
             CombatEvolutionBehaviorProvider.addTo(builder);
         }

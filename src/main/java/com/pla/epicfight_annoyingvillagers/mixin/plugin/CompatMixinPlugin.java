@@ -25,6 +25,9 @@ public final class CompatMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.startsWith("com.pla.epicfight_annoyingvillagers.mixin.annoyingvillagers.client.")) {
+            return isModLoadedEarly("aaa_particles");
+        }
         if (mixinClassName.startsWith("com.pla.epicfight_annoyingvillagers.mixin.compat.smartnpc.")) {
             return isModLoadedEarly("smart_npc");
         }

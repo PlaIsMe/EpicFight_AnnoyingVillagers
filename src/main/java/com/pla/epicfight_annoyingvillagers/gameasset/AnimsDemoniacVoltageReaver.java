@@ -215,6 +215,7 @@ public class AnimsDemoniacVoltageReaver {
                                 AnimationEvent.InTimeEvent.create(0.0F, (livingEntityPatch, self, p) -> {
                                     ItemStack stack = livingEntityPatch.getOriginal().getMainHandItem();
                                     DemoniacVoltageReaverItem.tryStartSnakeAnimation(stack, livingEntityPatch.getOriginal(), false);
+                                    if (livingEntityPatch.getOriginal() instanceof SwordsmanHerobrineEntity swordsman) swordsman.consumeSecondFormAction();
                                 }, AnimationEvent.Side.SERVER)
                         ));
         
@@ -231,6 +232,7 @@ public class AnimsDemoniacVoltageReaver {
                                     }
                                     ItemStack stack = livingEntityPatch.getOriginal().getMainHandItem();
                                     DemoniacVoltageReaverItem.tryStartSnakeAnimation(stack, livingEntityPatch.getOriginal(), true);
+                                    if (livingEntityPatch.getOriginal() instanceof SwordsmanHerobrineEntity swordsman) swordsman.consumeSecondFormAction();
                                 }, AnimationEvent.Side.SERVER)
                         ));
     }

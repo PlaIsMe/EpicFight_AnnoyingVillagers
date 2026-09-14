@@ -1,5 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
+import com.pla.annoyingvillagers.entity.AegisHerobrineEntity;
 import com.pla.annoyingvillagers.item.EnderAegisItem;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.core.BlockPos;
@@ -292,7 +293,11 @@ public class AnimsEnderAegis {
                 accessor -> new ActionAnimation(0.35F, accessor, humanoidArmature)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.1F, (livingEntityPatch, self, p) -> {
-                                    EnderAegisItem.shieldShoot(livingEntityPatch.getOriginal().level(), livingEntityPatch.getOriginal());
+                                    if (livingEntityPatch.getOriginal() instanceof AegisHerobrineEntity aegis) {
+                                        aegis.fireSecondFormShieldShot();
+                                    } else {
+                                        EnderAegisItem.shieldShoot(livingEntityPatch.getOriginal().level(), livingEntityPatch.getOriginal());
+                                    }
                                 }, AnimationEvent.Side.SERVER)
                         ));
 

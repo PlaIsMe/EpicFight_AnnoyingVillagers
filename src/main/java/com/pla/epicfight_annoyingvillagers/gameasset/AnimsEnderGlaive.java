@@ -6,6 +6,7 @@ import com.hm.efn.util.EffectConditionParticleTrail;
 import com.hm.efn.util.EffectEntityInvoker;
 import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
 import com.merlin204.avalon.util.AvalonAnimationUtils;
+import com.pla.annoyingvillagers.entity.GlaiveHerobrineEntity;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.annoyingvillagers.item.EnderGlaiveItem;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
@@ -218,6 +219,7 @@ public class AnimsEnderGlaive {
                                 AnimationEvent.InTimeEvent.create(1.15F, (livingEntityPatch, self, p) -> {
                                     if (livingEntityPatch.getOriginal().level() instanceof ServerLevel serverLevel) {
                                         EnderGlaiveItem.spawnVacumSlise(serverLevel, livingEntityPatch.getOriginal());
+                                        if (livingEntityPatch.getOriginal() instanceof GlaiveHerobrineEntity glaive) glaive.consumeSecondFormAction();
                                     }
                                 }, AnimationEvent.Side.SERVER),
                                 EpicfightUtil.cameraZoomOutBlurEvent(1.15F, 10.0F, 20)
@@ -244,6 +246,7 @@ public class AnimsEnderGlaive {
                                 AnimationEvent.InTimeEvent.create(1.35F, (livingEntityPatch, self, p) -> {
                                     if (livingEntityPatch.getOriginal().level() instanceof ServerLevel serverLevel) {
                                         EnderGlaiveItem.spawnVacumSlise(serverLevel, livingEntityPatch.getOriginal(), EnderGlaiveItem.DEFAULT_DAMAGE * 2);
+                                        if (livingEntityPatch.getOriginal() instanceof GlaiveHerobrineEntity glaive) glaive.consumeSecondFormAction();
                                     }
                                 }, AnimationEvent.Side.SERVER),
                                 EpicfightUtil.cameraZoomOutBlurEvent(1.35F, 10.0F, 20)
