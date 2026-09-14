@@ -81,6 +81,7 @@
   "client": [
     "client.ControlEngineMixin",
     "client.FishingHookRendererMixin",
+    "client.GameRendererImpactBlurMixin",
     "client.PatchedArrowLayerMixin",
     "client.PatchedItemInHandLayerMixin",
     "client.WeaponInnateSkillMixin",

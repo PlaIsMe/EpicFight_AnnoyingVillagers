@@ -3,6 +3,7 @@ package com.pla.epicfight_annoyingvillagers.mixin.annoyingvillagers;
 import com.pla.annoyingvillagers.entity.BlueDemonEntity;
 import com.pla.annoyingvillagers.item.BlueDemonTridentItem;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsBlueDemonTrident;
+import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import java.util.Objects;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -75,10 +76,22 @@ public abstract class BlueDemonEntityMixin {
     private void playTridentFestivalAnimation(CallbackInfo ci) {
         BlueDemonEntity self = (BlueDemonEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch != null) {
-            patch.playAnimationSynchronized(AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_FESTIVAL, 0.0F);
+        if (patch == null) {
+            return;
         }
+
+        patch.playAnimationSynchronized(AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_FESTIVAL, 0.0F);
         ci.cancel();
+    }
+
+    @Inject(method = "ensureTridentFestivalPhase", at = @At("HEAD"), cancellable = true)
+    private void keepEpicFightTridentFestivalRunning(CallbackInfo ci) {
+        BlueDemonEntity self = (BlueDemonEntity) (Object) this;
+        if (EpicfightUtil.isPlaying(self, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_FESTIVAL)) {
+            // AV's watchdog checks only RigAnimationController. Without this bridge it
+            // restarts the Epic Fight animation every tick, so no timed event can fire.
+            ci.cancel();
+        }
     }
 
     @Inject(method = "addEpicFightAttributes", at = @At("HEAD"))

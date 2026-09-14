@@ -15,6 +15,7 @@ import yesman.epicfight.api.animation.property.AnimationProperty;
 import yesman.epicfight.api.animation.types.*;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
+import yesman.epicfight.gameasset.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
 import yesman.epicfight.particle.EpicFightParticles;
 
@@ -248,19 +249,20 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, false)
                         .addEvents(
-                                AnimationEvent.InTimeEvent.create(0.15F, (patch, animation, parameters) -> {
+                                AnimationEvent.InTimeEvent.create(0.05F, (patch, animation, parameters) -> {
                                     if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 0);
                                 }, AnimationEvent.Side.SERVER),
-                                AnimationEvent.InTimeEvent.create(0.30F, (patch, animation, parameters) -> {
+                                AnimationEvent.InTimeEvent.create(0.1F, (patch, animation, parameters) -> {
                                     if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 1);
                                 }, AnimationEvent.Side.SERVER),
-                                AnimationEvent.InTimeEvent.create(0.45F, (patch, animation, parameters) -> {
+                                AnimationEvent.InTimeEvent.create(0.15F, (patch, animation, parameters) -> {
                                     if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 2);
                                 }, AnimationEvent.Side.SERVER),
-                                AnimationEvent.InTimeEvent.create(0.60F, (patch, animation, parameters) -> {
+                                AnimationEvent.InTimeEvent.create(0.2F, (patch, animation, parameters) -> {
                                     if (patch.getOriginal() instanceof Mob mob) HerobrineEscapeHoleGoal.placeFlyUpPillarBlock(mob, 3);
                                 }, AnimationEvent.Side.SERVER))
-                        .addEvents(AnimationEvent.InTimeEvent.create(0.05f, Animations.ReusableSources.PLAY_SOUND, AnimationEvent.Side.CLIENT), AnimationEvent.InTimeEvent.create(
+                        .addEvents(AnimationEvent.InTimeEvent.create(0.05f, Animations.ReusableSources.PLAY_SOUND, AnimationEvent.Side.CLIENT)
+                                .params(EpicFightSounds.ENTITY_MOVE.get()), AnimationEvent.InTimeEvent.create(
                                 0.05f, (livingEntityPatch, assetAccessor, animationParameters) ->
                                 {
                                     LivingEntity entity = livingEntityPatch.getOriginal();

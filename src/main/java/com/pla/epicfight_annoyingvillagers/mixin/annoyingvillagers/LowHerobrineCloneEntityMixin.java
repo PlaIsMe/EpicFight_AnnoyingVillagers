@@ -2,6 +2,7 @@ package com.pla.epicfight_annoyingvillagers.mixin.annoyingvillagers;
 
 import com.pla.annoyingvillagers.entity.LowHerobrineCloneEntity;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
+import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,7 +25,10 @@ public abstract class LowHerobrineCloneEntityMixin {
     private void playHerobrineHealingAnimations(CallbackInfo ci) {
         LowHerobrineCloneEntity self = (LowHerobrineCloneEntity) (Object) this;
         final LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch != null && !self.level().isClientSide()) {
+        if (patch == null) return;
+
+        if (!self.level().isClientSide()
+                && !EpicfightUtil.isPlaying(self, AVAnimations.HEROBRINE_SACRIFICING)) {
             patch.playAnimationSynchronized(AVAnimations.HEROBRINE_SACRIFICING, 0.0F);
         }
         ci.cancel();
@@ -44,7 +48,7 @@ public abstract class LowHerobrineCloneEntityMixin {
     private static void getHealingArmPosition(Entity entity, Vec3 translation, HumanoidArm arm, CallbackInfoReturnable<Vec3> cir) {
         Joint joint = arm == HumanoidArm.RIGHT ? Armatures.BIPED.get().toolR : Armatures.BIPED.get().toolL;
         float handToTip = 1.2F;
-        float yOffset = 0.0F;
+        float yOffset = -1.0F;
         LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(entity, LivingEntityPatch.class);
         if (livingEntityPatch == null) {
             cir.setReturnValue(null);

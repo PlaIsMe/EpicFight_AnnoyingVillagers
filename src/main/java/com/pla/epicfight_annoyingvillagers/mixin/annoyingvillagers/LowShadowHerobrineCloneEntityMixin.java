@@ -2,6 +2,7 @@ package com.pla.epicfight_annoyingvillagers.mixin.annoyingvillagers;
 
 import com.pla.annoyingvillagers.entity.LowShadowHerobrineCloneEntity;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
+import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,11 +35,17 @@ public abstract class LowShadowHerobrineCloneEntityMixin {
     private void playAssistanceOrSacrificingAnimation(CallbackInfo ci) {
         LowShadowHerobrineCloneEntity self = (LowShadowHerobrineCloneEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch != null && !self.isDeadOrDying() && self.isAlive()) {
+        if (patch == null) return;
+
+        if (!self.level().isClientSide() && !self.isDeadOrDying() && self.isAlive()) {
             if (self.isSacrificing()) {
-                patch.playAnimationSynchronized(AVAnimations.HEROBRINE_ASSISTANCE, 0.0F);
+                if (!EpicfightUtil.isPlaying(self, AVAnimations.HEROBRINE_ASSISTANCE)) {
+                    patch.playAnimationSynchronized(AVAnimations.HEROBRINE_ASSISTANCE, 0.0F);
+                }
             } else if (self.isHealing()) {
-                patch.playAnimationSynchronized(AVAnimations.HEROBRINE_SACRIFICING, 0.0F);
+                if (!EpicfightUtil.isPlaying(self, AVAnimations.HEROBRINE_SACRIFICING)) {
+                    patch.playAnimationSynchronized(AVAnimations.HEROBRINE_SACRIFICING, 0.0F);
+                }
             }
         }
         ci.cancel();
@@ -48,7 +55,10 @@ public abstract class LowShadowHerobrineCloneEntityMixin {
     private void playLowCloneEscapeAnimation(CallbackInfo ci) {
         LowShadowHerobrineCloneEntity self = (LowShadowHerobrineCloneEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch != null) {
+        if (patch == null) return;
+
+        if (!self.level().isClientSide()
+                && !EpicfightUtil.isPlaying(self, AVAnimations.LOW_CLONE_ESCAPE)) {
             patch.playAnimationSynchronized(AVAnimations.LOW_CLONE_ESCAPE, 0.0F);
         }
         ci.cancel();
@@ -58,7 +68,7 @@ public abstract class LowShadowHerobrineCloneEntityMixin {
     private static void getSacrificingArmPosition(Entity entity, Vec3 translation, HumanoidArm arm, CallbackInfoReturnable<Vec3> cir) {
         Joint joint = arm == HumanoidArm.RIGHT ? Armatures.BIPED.get().toolR : Armatures.BIPED.get().toolL;
         float handToTip = 0.6F;
-        float yOffset = 0.6F;
+        float yOffset = -0.6F;
         LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(entity, LivingEntityPatch.class);
         if (livingEntityPatch == null) {
             cir.setReturnValue(null);
@@ -94,7 +104,7 @@ public abstract class LowShadowHerobrineCloneEntityMixin {
     private static void getHealingArmPosition(Entity entity, Vec3 translation, HumanoidArm arm, CallbackInfoReturnable<Vec3> cir) {
         Joint joint = arm == HumanoidArm.RIGHT ? Armatures.BIPED.get().toolR : Armatures.BIPED.get().toolL;
         float handToTip = 1.2F;
-        float yOffset = 0.0F;
+        float yOffset = -1.0F;
         LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(entity, LivingEntityPatch.class);
         if (livingEntityPatch == null) {
             cir.setReturnValue(null);

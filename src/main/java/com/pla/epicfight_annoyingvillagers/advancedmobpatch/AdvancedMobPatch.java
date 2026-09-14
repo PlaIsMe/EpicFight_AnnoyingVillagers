@@ -1,6 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.advancedmobpatch;
 
-import com.pla.epicfight_annoyingvillagers.compat.epicfight.WeaponCapabilityRedirect;
+import com.pla.epicfight_annoyingvillagers.capabilities.WeaponCapabilityRedirect;
 import com.pla.epicfight_annoyingvillagers.mixin.WeaponCapabilityAccessor;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;

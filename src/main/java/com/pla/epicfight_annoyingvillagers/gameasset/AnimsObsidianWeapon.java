@@ -240,7 +240,7 @@ public class AnimsObsidianWeapon {
                                 AnimationEvent.InTimeEvent.create(0.1F, SUMMON_3_OBSIDIAN_HAND_LEFT, AnimationEvent.Side.SERVER)
                         ));
 
-        OBSIDIAN_WEAPON_LEFT_3 = builder.nextAccessor("biped/obsidian_weapon/obsidian_infernal_auto_3",
+        OBSIDIAN_WEAPON_LEFT_3 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_left_3",
                 accessor -> new BasicMultipleAttackAnimation(0.1F, 0.3F, 0.4F, 0.5F, AVCollider.SHADOW_OBSIDIAN_PILLAR, humanoidArmature.get().toolL, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)

@@ -20,6 +20,7 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     @Inject(method = "prepareRandomExitRoll", at = @At("HEAD"), cancellable = true)
     private void prepareRandomExitRoll(CallbackInfoReturnable<RigAnimationId> cir) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         RigAnimationId roll = self.mob.getRandom().nextBoolean() ? RigAnimationId.ROLL_FORWARD : RigAnimationId.ROLL_BACKWARD;
         double dx = self.exitPosition.x - self.mob.getX();
         double dz = self.exitPosition.z - self.mob.getZ();
@@ -40,14 +41,15 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void isEscapeAttackLocked(CallbackInfoReturnable<Boolean> cir) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         AdvancedMobPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, AdvancedMobPatch.class);
-        cir.setReturnValue(patch != null && patch.isCombatActionLocked());
+        if (patch != null) cir.setReturnValue(patch.isCombatActionLocked());
     }
 
     @Inject(method = "hasBlockingEscapeAnimation", at = @At("HEAD"), cancellable = true)
     private void hasBlockingEscapeAnimation(CallbackInfoReturnable<Boolean> cir) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class);
-        cir.setReturnValue(patch != null && patch.getEntityState().inaction()
+        if (patch == null) return;
+        cir.setReturnValue(patch.getEntityState().inaction()
                 && patch.getAnimator().getPlayerFor(null) != null
                 && !(patch.getAnimator().getPlayerFor(null).getRealAnimation().get() instanceof AttackAnimation));
     }
@@ -56,7 +58,8 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void acquireEscapeAttackLock(CallbackInfo ci) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         AdvancedMobPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, AdvancedMobPatch.class);
-        if (patch != null) patch.lockCombatActions(self);
+        if (patch == null) return;
+        patch.lockCombatActions(self);
         ci.cancel();
     }
 
@@ -64,7 +67,8 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void releaseEscapeAttackLock(CallbackInfo ci) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         AdvancedMobPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, AdvancedMobPatch.class);
-        if (patch != null) patch.unlockCombatActions(self);
+        if (patch == null) return;
+        patch.unlockCombatActions(self);
         ci.cancel();
     }
 
@@ -72,7 +76,8 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void stopEscapeShieldGuard(CallbackInfo ci) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         AdvancedMobPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, AdvancedMobPatch.class);
-        if (patch != null) patch.cancelGuard();
+        if (patch == null) return;
+        patch.cancelGuard();
         ci.cancel();
     }
 
@@ -80,7 +85,8 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void stopActiveEscapeProfileAttack(CallbackInfo ci) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class);
-        if (patch != null && patch.getAnimator().getPlayerFor(null) != null
+        if (patch == null) return;
+        if (patch.getAnimator().getPlayerFor(null) != null
                 && patch.getAnimator().getPlayerFor(null).getRealAnimation().get() instanceof AttackAnimation) {
             EscapeAnimationCompat.stop(self.mob, patch.getAnimator().getPlayerFor(null).getRealAnimation());
         }
@@ -91,17 +97,20 @@ public abstract class AdvancedEscapeHoleGoalMixin {
     private void isEscapeRigStunned(CallbackInfoReturnable<Boolean> cir) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class);
-        cir.setReturnValue(patch != null && patch.isStunned());
+        if (patch != null) cir.setReturnValue(patch.isStunned());
     }
 
     @Inject(method = "chooseEscapeRollAnimation", at = @At("HEAD"), cancellable = true)
     private void chooseEscapeRollAnimation(CallbackInfoReturnable<RigAnimationId> cir) {
         AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(self.mob.getRandom().nextBoolean() ? RigAnimationId.ROLL_FORWARD : RigAnimationId.ROLL_BACKWARD);
     }
 
     @Inject(method = "isBackwardEscapeRoll", at = @At("HEAD"), cancellable = true)
     private void isBackwardEscapeRoll(RigAnimationId animation, CallbackInfoReturnable<Boolean> cir) {
+        AdvancedEscapeHoleGoal<?> self = (AdvancedEscapeHoleGoal<?>) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(EscapeAnimationCompat.roll(animation) == Animations.BIPED_ROLL_BACKWARD);
     }
 }

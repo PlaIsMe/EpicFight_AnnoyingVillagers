@@ -1,7 +1,7 @@
 package com.pla.epicfight_annoyingvillagers.mixin.efclash_blade;
 
 import com.pla.annoyingvillagers.clazz.HookDisarmLaunch;
-import com.pla.epicfight_annoyingvillagers.compat.EfKick;
+import com.pla.epicfight_annoyingvillagers.compat.efkick.EFKickCompat;
 import com.pla.annoyingvillagers.entity.*;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
@@ -186,7 +186,7 @@ public class MobClashBladeMixin {
                 AssetAccessor<? extends StaticAnimation> attackerDynamicAnimation = Objects.requireNonNull(attackerLivingEntityPatch.getAnimator().getPlayerFor(null)).getRealAnimation();
                 if (attackerDynamicAnimation != null) {
                     if (ModList.get().isLoaded("efkick")) {
-                        EfKick.tryDealKickStaminaDamage(
+                        EFKickCompat.tryDealKickStaminaDamage(
                                 livingAttackEvent.getSource(),
                                 attackerLivingEntityPatch,
                                 attackerDynamicAnimation

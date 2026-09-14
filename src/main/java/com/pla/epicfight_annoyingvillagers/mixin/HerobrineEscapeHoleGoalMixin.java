@@ -1,6 +1,7 @@
 package com.pla.epicfight_annoyingvillagers.mixin;
 
 import com.pla.annoyingvillagers.entity.goal.HerobrineEscapeHoleGoal;
+import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import com.pla.epicfight_annoyingvillagers.util.EscapeAnimationCompat;
@@ -17,45 +18,60 @@ public abstract class HerobrineEscapeHoleGoalMixin {
     @Inject(method = "getFlyUpAnimationDurationTicks", at = @At("HEAD"), cancellable = true)
     private void getFlyUpAnimationDurationTicks(CallbackInfoReturnable<Integer> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(EscapeAnimationCompat.durationTicks(AVAnimations.FLY_UP));
     }
 
     @Inject(method = "playFlyUpAnimation", at = @At("HEAD"), cancellable = true)
     private void playFlyUpAnimation(CallbackInfo ci) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         EscapeAnimationCompat.play(self.mob, AVAnimations.FLY_UP);
-        if (!EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP)) self.finished = true;
+        boolean active = EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP);
+        EpicFightAnnoyingVillagers.LOGGER.info(
+                "[HerobrineEscape] Epic Fight FLY_UP requested for {}: active={}, durationTicks={}",
+                self.mob.getStringUUID(), active, EscapeAnimationCompat.durationTicks(AVAnimations.FLY_UP));
+        if (!active) self.finished = true;
         ci.cancel();
     }
 
     @Inject(method = "isFlyUpAnimationActive", at = @At("HEAD"), cancellable = true)
     private void isFlyUpAnimationActive(CallbackInfoReturnable<Boolean> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP));
     }
 
     @Inject(method = "getExitRollAnimationDurationTicks", at = @At("HEAD"), cancellable = true)
     private void getExitRollAnimationDurationTicks(CallbackInfoReturnable<Integer> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(EscapeAnimationCompat.durationTicks(EscapeAnimationCompat.roll(self.exitRoll)));
     }
 
     @Inject(method = "isExitRollAnimationActive", at = @At("HEAD"), cancellable = true)
     private void isExitRollAnimationActive(CallbackInfoReturnable<Boolean> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         cir.setReturnValue(EpicfightUtil.isPlaying(self.mob, EscapeAnimationCompat.roll(self.exitRoll)));
     }
 
     @Inject(method = "playExitRollAnimation", at = @At("HEAD"), cancellable = true)
     private void playExitRollAnimation(CallbackInfo ci) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
-        EscapeAnimationCompat.play(self.mob, EscapeAnimationCompat.roll(self.exitRoll));
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
+        var animation = EscapeAnimationCompat.roll(self.exitRoll);
+        EscapeAnimationCompat.play(self.mob, animation);
+        EpicFightAnnoyingVillagers.LOGGER.info(
+                "[HerobrineEscape] Epic Fight exit roll requested for {}: rigToken={}, animation={}, active={}",
+                self.mob.getStringUUID(), self.exitRoll, animation, EpicfightUtil.isPlaying(self.mob, animation));
         ci.cancel();
     }
 
     @Inject(method = "stopEscapeAnimation", at = @At("HEAD"), cancellable = true)
     private void stopEscapeAnimation(CallbackInfo ci) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         EscapeAnimationCompat.stop(self.mob, AVAnimations.FLY_UP);
         EscapeAnimationCompat.stop(self.mob, EscapeAnimationCompat.roll(self.exitRoll));
         ci.cancel();
@@ -65,7 +81,8 @@ public abstract class HerobrineEscapeHoleGoalMixin {
     private void getFlyUpAnimationStartTick(CallbackInfoReturnable<Integer> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class);
-        if (patch == null || !EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP)) {
+        if (patch == null) return;
+        if (!EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP)) {
             cir.setReturnValue(-1);
             return;
         }
@@ -75,6 +92,7 @@ public abstract class HerobrineEscapeHoleGoalMixin {
     @Inject(method = "getRemainingAuthoredFlyRise", at = @At("HEAD"), cancellable = true)
     private void getRemainingAuthoredFlyRise(float elapsed, CallbackInfoReturnable<Double> cir) {
         HerobrineEscapeHoleGoal self = (HerobrineEscapeHoleGoal) (Object) this;
+        if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         float end = AVAnimations.FLY_UP.get().getTotalTime();
         float time = Math.min(end, Math.max(0.0F, elapsed / 20.0F));
         var coord = AVAnimations.FLY_UP.get().getCoord();

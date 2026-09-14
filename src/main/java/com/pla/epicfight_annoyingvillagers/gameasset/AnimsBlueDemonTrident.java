@@ -145,7 +145,7 @@ public class AnimsBlueDemonTrident {
                                 AnimationEvent.InTimeEvent.create(0.6f, ReusableSources.FRACTURE_GROUND_SIMPLE, Side.SERVER)
                                         .params(new Vec3f(0.0F, -0.24F, -2.0F), Armatures.BIPED.get().rootJoint, 1.2, 1F)));
 
-        BLUE_DEMON_TRIDENT_AUTO4 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_aut4",
+        BLUE_DEMON_TRIDENT_AUTO4 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_auto4",
                 accessor -> new AttackAnimation(0.05F, accessor, Armatures.BIPED,
                         new AttackAnimation.Phase(0.0F, 0.167F, 0.167F, 0.38F, 1.0F, Float.MAX_VALUE, InteractionHand.MAIN_HAND, Armatures.BIPED.get().toolL, null))
                         .addProperty(AnimationProperty.AttackAnimationProperty.REMOVE_DELTA_MOVEMENT, false)

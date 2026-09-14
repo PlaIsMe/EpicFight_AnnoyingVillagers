@@ -1,5 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.mixin;
 
+import com.pla.annoyingvillagers.client.layer.HumanoidMobVanillaLayer;
 import com.pla.epicfight_annoyingvillagers.client.overlaylayer.HumanoidMobEpicFightOverlayLayer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +22,12 @@ public abstract class MixinPHumanoidRenderer {
                                  CallbackInfo ci) {
         PatchedLivingEntityRenderer<?, ?, ?, ?, ?> self =
                 (PatchedLivingEntityRenderer<?, ?, ?, ?, ?>)(Object)this;
-        self.addCustomLayer(new HumanoidMobEpicFightOverlayLayer<>((AssetAccessor) mesh));
+        // AV already attaches HumanoidMobVanillaLayer to the original renderer.
+        // Replace that layer with its skinned-mesh equivalent instead of adding a
+        // second eye pass (which is especially visible on Null's white eyes).
+        self.addPatchedLayer(
+                HumanoidMobVanillaLayer.class,
+                new HumanoidMobEpicFightOverlayLayer<>((AssetAccessor) mesh)
+        );
     }
 }
