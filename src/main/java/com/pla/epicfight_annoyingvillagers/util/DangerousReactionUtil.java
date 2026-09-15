@@ -3,8 +3,10 @@ package com.pla.epicfight_annoyingvillagers.util;
 import com.hm.efn.gameasset.EFNAnimations;
 import com.hm.efn.gameasset.animations.*;
 import com.pla.annoyingvillagers.clazz.HerobrineMob;
+import com.pla.annoyingvillagers.clazz.DangerousReaction;
 import com.pla.annoyingvillagers.entity.AngrySteveEntity;
 import com.pla.annoyingvillagers.entity.BlueDemonEntity;
+import com.pla.annoyingvillagers.entity.ReaperHerobrineEntity;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -35,6 +37,7 @@ public class DangerousReactionUtil {
                 AnimsEnderGlaive.ENDER_GLAIVE_INNATE_SPECIAL.get().getRegistryName().toString(),
                 AnimsEnderAegis.ENDER_AEGIS_INNATE.get().getRegistryName().toString(),
                 AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_INNATE.get().getRegistryName().toString(),
+                AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE.get().getRegistryName().toString(),
                 AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE_SPECIAL.get().getRegistryName().toString(),
                 AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_INNATE.get().getRegistryName().toString(),
                 AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_INNATE_SPECIAL.get().getRegistryName().toString(),
@@ -133,6 +136,32 @@ public class DangerousReactionUtil {
             return DANGEROUS_ANIMATIONS.contains(animation);
         }
         return false;
+    }
+
+    public static boolean isCurrentAnimationDangerous(LivingEntityPatch<?> patch) {
+        if (patch == null) return false;
+        var player = patch.getAnimator().getPlayerFor(null);
+        return player != null && !player.isEmpty() && isAnimationDangerous(player.getRealAnimation());
+    }
+
+    public static boolean canReact(Mob mob) {
+        if (DangerousReaction.canReact(mob)) return true;
+        LivingEntity target = mob == null ? null : mob.getTarget();
+        if (mob == null
+                || mob.level().isClientSide()
+                || !mob.isAlive()
+                || mob.isRemoved()
+                || mob.isDeadOrDying()
+                || mob.isNoAi()
+                || mob instanceof ReaperHerobrineEntity reaper && reaper.isSecondFormDragonRider()
+                || EpicfightUtil.isStunned(mob)
+                || !(target instanceof Mob targetMob)
+                || !target.isAlive()
+                || target.isRemoved()
+                || mob.distanceToSqr(target) > 64.0D) {
+            return false;
+        }
+        return isCurrentAnimationDangerous(EpicFightCapabilities.getEntityPatch(targetMob, LivingEntityPatch.class));
     }
 
     public static boolean checkEscape(Mob mob) {

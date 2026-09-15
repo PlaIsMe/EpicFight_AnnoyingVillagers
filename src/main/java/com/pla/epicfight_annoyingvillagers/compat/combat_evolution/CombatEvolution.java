@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -19,6 +20,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.fml.ModList;
+import net.shelmarow.combat_evolution.ai.CEHumanoidPatch;
+import net.shelmarow.combat_evolution.ai.util.CEPatchUtils;
 import net.shelmarow.combat_evolution.effect.CEMobEffects;
 import net.shelmarow.combat_evolution.execution.ExecutionHandler;
 import net.shelmarow.combat_evolution.execution.ExecutionTypeManager;
@@ -31,6 +34,7 @@ import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
+import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 
 import javax.annotation.Nullable;
@@ -316,5 +320,34 @@ public class CombatEvolution {
         self.yBodyRotO = yaw;
         self.yHeadRotO = yaw;
         self.getLookControl().setLookAt(target, 90.0F, 90.0F);
+    }
+
+    public static boolean isGuardBreak(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
+        return ExecutionHandler.isTargetGuardBreak(dynamicAnimation, livingEntityPatch);
+    }
+
+    public static boolean isExecuted(AssetAccessor<? extends StaticAnimation> dynamicAnimation) {
+        return dynamicAnimation.get() instanceof ExecutionHitAnimation;
+    }
+
+    public static boolean isCeMobPatch(LivingEntityPatch<?> livingEntityPatch) {
+        return livingEntityPatch instanceof CEHumanoidPatch;
+    }
+
+    public static float getDecreaseValue(LivingEntityPatch<?> livingEntityPatch, double percentage) {
+        float currentStamina = CEPatchUtils.getStamina(livingEntityPatch);
+        float maxStamina = CEPatchUtils.getMaxStamina(livingEntityPatch);
+        float staminaToDecrease = (float) (maxStamina * percentage);
+        return Math.min(staminaToDecrease, currentStamina);
+    }
+
+    public static void dealStaminaDamage(DamageSource damageSource, float amount, LivingEntityPatch<?> livingEntityPatch) {
+        if (livingEntityPatch instanceof CEHumanoidPatch<?> ceHumanoidPatch) {
+            ceHumanoidPatch.dealStaminaDamage(damageSource, amount);
+        }
+    }
+
+    public static void addFullStunImmunity(PlayerPatch<?> playerPatch) {
+        (playerPatch.getOriginal()).forceAddEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100), playerPatch.getOriginal());
     }
 }

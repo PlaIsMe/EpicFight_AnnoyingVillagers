@@ -89,6 +89,8 @@ public class AVAnimations {
         AnimsAVFist.build(builder);
         AnimsEnderAegis.build(builder);
         AnimsAVExecute.build(builder);
+        AnimsKick.build(builder);
+        AnimsEmote.build(builder);
 
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
         ELITE_HOLD_WEAPON = builder.nextAccessor("biped/living/elite_hold_weapon",

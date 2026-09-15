@@ -1,7 +1,7 @@
 package com.pla.epicfight_annoyingvillagers.capabilities;
 
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
-import com.pla.epicfight_annoyingvillagers.config.AvNpcEpicFightConfig;
+import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +28,7 @@ public final class WeaponCapabilityRedirect {
 
         Item sourceItem = heldStack.getItem();
         ResourceLocation sourceItemId = ForgeRegistries.ITEMS.getKey(sourceItem);
-        ResourceLocation targetPresetId = AvNpcEpicFightConfig.getWeaponCapabilityRedirect(sourceItemId);
+        ResourceLocation targetPresetId = EpicFightAnnoyingVillagersConfig.getWeaponCapabilityRedirect(sourceItemId);
         if (targetPresetId == null) {
             return originalCapability;
         }

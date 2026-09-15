@@ -13,13 +13,10 @@ import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 
 @Mixin(value = TransporterHerobrineCloneEntity.class, remap = false)
 public abstract class TransporterHerobrineCloneEntityMixin {
-    @Inject(method = "playPortalSupportAnimation", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "playPortalSupportAnimation", at = @At("HEAD"))
     private void playPortalSupportAnimation(RigAnimationId animationId, LivingEntity lookTarget, CallbackInfo ci) {
         TransporterHerobrineCloneEntity self = (TransporterHerobrineCloneEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (lookTarget != null && lookTarget.isAlive()) {
-            self.getLookControl().setLookAt(lookTarget, 30.0F, 30.0F);
-        }
         if (patch != null && !self.level().isClientSide()) {
             if (animationId == RigAnimationId.PORTAL_SUMMON) {
                 patch.playAnimationSynchronized(AVAnimations.PORTAL_SUMMON, 0.0F);
@@ -29,6 +26,5 @@ public abstract class TransporterHerobrineCloneEntityMixin {
                 patch.playAnimationSynchronized(AVAnimations.POINT_LEFT_HAND_MIDDLE, 0.0F);
             }
         }
-        ci.cancel();
     }
 }

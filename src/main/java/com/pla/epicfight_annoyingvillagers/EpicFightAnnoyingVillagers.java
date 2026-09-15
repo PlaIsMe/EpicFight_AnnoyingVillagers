@@ -9,8 +9,15 @@ import com.pla.annoyingvillagers.init.*;
 import com.pla.annoyingvillagers.network.*;
 import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
+import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillCategories;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillDataKeys;
+import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillSlots;
 import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
+import com.pla.epicfight_annoyingvillagers.network.KickMessage;
+import com.pla.epicfight_annoyingvillagers.init.EpicFightAnnoyingVillagersModMenus;
+import com.pla.epicfight_annoyingvillagers.network.BreakEmoteMessage;
+import com.pla.epicfight_annoyingvillagers.network.EmoteButtonMessage;
+import com.pla.epicfight_annoyingvillagers.network.OpenEmoteMenuMessage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -25,6 +32,8 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import yesman.epicfight.gameasset.Armatures;
+import yesman.epicfight.skill.SkillCategory;
+import yesman.epicfight.skill.SkillSlot;
 
 @Mod(EpicFightAnnoyingVillagers.MODID)
 public class EpicFightAnnoyingVillagers {
@@ -36,14 +45,13 @@ public class EpicFightAnnoyingVillagers {
 
     public EpicFightAnnoyingVillagers(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
+        SkillCategory.ENUM_MANAGER.registerEnumCls(MODID, AVSkillCategories.class);
+        SkillSlot.ENUM_MANAGER.registerEnumCls(MODID, AVSkillSlots.class);
         modEventBus.addListener(this::commonSetup);
-        context.registerConfig(ModConfig.Type.COMMON,
-                com.pla.epicfight_annoyingvillagers.config.AvNpcEpicFightConfig.SPEC,
-                "epicfight_annoyingvillagers-movesets.toml");
-
         modEventBus.addListener(AVWeaponCapabilityPresets::register);
         context.registerConfig(ModConfig.Type.COMMON, EpicFightAnnoyingVillagersConfig.SPEC, "epicfight_annoyingvillagers-server.toml");
         AVSkillDataKeys.DATA_KEYS.register(modEventBus);
+        EpicFightAnnoyingVillagersModMenus.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
@@ -65,6 +73,22 @@ public class EpicFightAnnoyingVillagers {
                     ClientboundEpicFightCameraFx::decode,
                     ClientboundEpicFightCameraFx::handle
             );
+
+            EpicFightAnnoyingVillagers.addNetworkMessage(
+                    KickMessage.class,
+                    KickMessage::buffer,
+                    KickMessage::new,
+                    KickMessage::handle
+            );
+            EpicFightAnnoyingVillagers.addNetworkMessage(
+                    EmoteButtonMessage.class, EmoteButtonMessage::encode,
+                    EmoteButtonMessage::decode, EmoteButtonMessage::handle);
+            EpicFightAnnoyingVillagers.addNetworkMessage(
+                    OpenEmoteMenuMessage.class, OpenEmoteMenuMessage::encode,
+                    OpenEmoteMenuMessage::decode, OpenEmoteMenuMessage::handle);
+            EpicFightAnnoyingVillagers.addNetworkMessage(
+                    BreakEmoteMessage.class, BreakEmoteMessage::encode,
+                    BreakEmoteMessage::decode, BreakEmoteMessage::handle);
         }
     }
 

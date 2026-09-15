@@ -13,13 +13,10 @@ import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 
 @Mixin(value = HerobrineGregEntity.class, remap = false)
 public abstract class HerobrineGregEntityMixin {
-    @Inject(method = "playPortalSupportAnimation", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "playPortalSupportAnimation", at = @At("HEAD"))
     private void playPortalSupportAnimation(RigAnimationId animationId, LivingEntity lookTarget, CallbackInfo ci) {
         HerobrineGregEntity self = (HerobrineGregEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (lookTarget != null && lookTarget.isAlive()) {
-            self.getLookControl().setLookAt(lookTarget, 30.0F, 30.0F);
-        }
         if (patch != null && !self.level().isClientSide()) {
             if (animationId == RigAnimationId.PORTAL_SUMMON) {
                 patch.playAnimationSynchronized(AVAnimations.PORTAL_SUMMON, 0.0F);
@@ -27,6 +24,5 @@ public abstract class HerobrineGregEntityMixin {
                 patch.playAnimationSynchronized(AVAnimations.POINT_LEFT_HAND_TOWARD, 0.0F);
             }
         }
-        ci.cancel();
     }
 }

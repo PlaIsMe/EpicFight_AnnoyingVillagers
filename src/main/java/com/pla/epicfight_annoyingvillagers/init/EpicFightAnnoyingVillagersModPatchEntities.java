@@ -78,6 +78,7 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
                 AnnoyingVillagersModEntities.HEROBRINE_CLONE.get(),
                 AnnoyingVillagersModEntities.SHADOW_HEROBRINE_CLONE.get(),
                 AnnoyingVillagersModEntities.NULL.get(),
+                AnnoyingVillagersModEntities.HEROBRINE_GREG.get(),
                 AnnoyingVillagersModEntities.TRANSPORTER_HEROBRINE_CLONE.get(),
                 AnnoyingVillagersModEntities.ARMORED_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.HEROBRINE_7.get(),

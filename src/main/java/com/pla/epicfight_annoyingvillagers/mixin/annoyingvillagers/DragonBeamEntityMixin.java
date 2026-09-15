@@ -16,7 +16,11 @@ public abstract class DragonBeamEntityMixin {
     private void dealEpicFightStaminaDamage(Entity target, CallbackInfo ci) {
         DragonBeamEntity self = (DragonBeamEntity) (Object) this;
         LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(target, LivingEntityPatch.class);
-        EpicfightUtil.dealStaminaDamage(self.level().damageSources().indirectMagic(self, self.caster.getSummoner()), 0.1F, livingEntityPatch, false);
+        EpicfightUtil.dealStaminaDamage(
+                self.level().damageSources().indirectMagic(self, self.caster.getSummoner()),
+                0.1F,
+                livingEntityPatch
+        );
         ci.cancel();
     }
 }

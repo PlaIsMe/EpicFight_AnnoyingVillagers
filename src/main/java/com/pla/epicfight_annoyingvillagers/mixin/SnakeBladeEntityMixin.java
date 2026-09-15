@@ -20,7 +20,7 @@ public abstract class SnakeBladeEntityMixin {
     @Inject(method = "dealStaminaDamage", at = @At("HEAD"), cancellable = true)
     private void dealStaminaDamage(LivingEntity target, DamageSource src, CallbackInfo ci) {
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(target, LivingEntityPatch.class);
-        if (patch != null) EpicfightUtil.dealStaminaDamage(src, 1.0F, patch, false);
+        EpicfightUtil.dealStaminaDamage(src, 1.0F, patch);
         ci.cancel();
     }
 
@@ -35,16 +35,19 @@ public abstract class SnakeBladeEntityMixin {
     private void dealStaminaDamageByPercentage(LivingEntity creator, Entity target, CallbackInfo ci) {
         SnakeBladeEntity self = (SnakeBladeEntity) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(target, LivingEntityPatch.class);
-        if (patch != null) {
-            EpicfightUtil.dealStaminaDamageByPercentage(
-                    self.level().damageSources().indirectMagic(self, creator), patch, 0.5D, true);
-        }
+        EpicfightUtil.dealStaminaDamageByPercentage(
+                self.level().damageSources().indirectMagic(self, creator), patch, 0.5D);
         ci.cancel();
     }
 
     @Inject(method = "cancelAnimation", at = @At("HEAD"), cancellable = true)
     private void cancelAnimation(Entity creator, CallbackInfo ci) {
-        LivingEntityPatch<?> patch = creator == null ? null : EpicFightCapabilities.getEntityPatch(creator, LivingEntityPatch.class);
+        ci.cancel();
+        // Retraction also ticks on clients. Only the server may finish the cast
+        // and synchronize IDLE_BREAK, for both players and Swordsman Herobrine.
+        if (creator == null || creator.level().isClientSide()) return;
+
+        LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(creator, LivingEntityPatch.class);
         if (patch != null && patch.getAnimator().getPlayerFor(null) != null) {
             var animation = patch.getAnimator().getPlayerFor(null).getRealAnimation();
             if (animation == AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE || animation == AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE_SPECIAL) {
@@ -54,6 +57,5 @@ public abstract class SnakeBladeEntityMixin {
         if (creator instanceof LivingEntity livingEntity) {
             DemoniacVoltageReaverItem.releaseSnakeProfileAttackLock(livingEntity);
         }
-        ci.cancel();
     }
 }

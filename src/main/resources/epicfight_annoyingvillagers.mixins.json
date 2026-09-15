@@ -52,6 +52,7 @@
     "annoyingvillagers.HerobrineDragonEntityMixin",
     "annoyingvillagers.HerobrineGregEntityMixin",
     "annoyingvillagers.HerobrineMobMixin",
+    "annoyingvillagers.HerobrinePortalDangerousReactionGoalMixin",
     "annoyingvillagers.HerobrineObsidianBlockMixin",
     "annoyingvillagers.HerobrineUtilMixin",
     "annoyingvillagers.HookGunCombatUtilMixin",
@@ -76,6 +77,7 @@
     "annoyingvillagers.TotemUsingEventMixin",
     "annoyingvillagers.TransporterHerobrineCloneEntityMixin",
     "annoyingvillagers.AnimatedMobGoalMixin",
+    "annoyingvillagers.AVNpcIdleAnimationMixin",
     "annoyingvillagers.RigStunControllerMixin"
   ],
   "client": [

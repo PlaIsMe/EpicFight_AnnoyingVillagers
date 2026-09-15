@@ -106,7 +106,12 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     @Override
     public void onStartTracking(ServerPlayer trackingPlayer) {
         super.onStartTracking(trackingPlayer);
-        this.modifyLivingMotionByCurrentItem(true);
+        this.modifyLivingMotionByCurrentItem(false);
+        // A new observer still needs the preset, even when it has not changed.
+        // Do not reset animation layers for players already watching this mob.
+        SPChangeLivingMotion packet = new SPChangeLivingMotion(this.getOriginal().getId());
+        packet.putEntries(this.getAnimator().getLivingAnimations().entrySet());
+        EpicFightNetworkManager.sendToPlayer(packet, trackingPlayer);
     }
 
     @Override
@@ -500,6 +505,13 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 this.getAdvancedHoldingItemCapability(InteractionHand.OFF_HAND),
                 InteractionHand.OFF_HAND
         );
+
+        // Item state tags (for example SnakeAnimation/SecondForm) can change without
+        // changing any motion. SPChangeLivingMotion turns off ALL client layers, so
+        // resending an identical preset would cancel an ongoing snake-blade cast.
+        if (livingMotions.equals(animator.getLivingAnimations())) {
+            return;
+        }
 
         animator.resetLivingAnimations();
         livingMotions.forEach(animator::addLivingAnimation);

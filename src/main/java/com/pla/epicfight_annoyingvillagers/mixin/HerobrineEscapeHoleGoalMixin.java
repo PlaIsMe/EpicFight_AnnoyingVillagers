@@ -1,7 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.mixin;
 
 import com.pla.annoyingvillagers.entity.goal.HerobrineEscapeHoleGoal;
-import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import com.pla.epicfight_annoyingvillagers.util.EscapeAnimationCompat;
@@ -28,9 +27,6 @@ public abstract class HerobrineEscapeHoleGoalMixin {
         if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         EscapeAnimationCompat.play(self.mob, AVAnimations.FLY_UP);
         boolean active = EpicfightUtil.isPlaying(self.mob, AVAnimations.FLY_UP);
-        EpicFightAnnoyingVillagers.LOGGER.info(
-                "[HerobrineEscape] Epic Fight FLY_UP requested for {}: active={}, durationTicks={}",
-                self.mob.getStringUUID(), active, EscapeAnimationCompat.durationTicks(AVAnimations.FLY_UP));
         if (!active) self.finished = true;
         ci.cancel();
     }
@@ -62,9 +58,6 @@ public abstract class HerobrineEscapeHoleGoalMixin {
         if (EpicFightCapabilities.getEntityPatch(self.mob, LivingEntityPatch.class) == null) return;
         var animation = EscapeAnimationCompat.roll(self.exitRoll);
         EscapeAnimationCompat.play(self.mob, animation);
-        EpicFightAnnoyingVillagers.LOGGER.info(
-                "[HerobrineEscape] Epic Fight exit roll requested for {}: rigToken={}, animation={}, active={}",
-                self.mob.getStringUUID(), self.exitRoll, animation, EpicfightUtil.isPlaying(self.mob, animation));
         ci.cancel();
     }
 

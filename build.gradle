@@ -107,8 +107,6 @@ dependencies {
     implementation fg.deobf("curse.maven:epicfight-awaken-1423319:8506984")
 
     implementation fg.deobf("curse.maven:epicfight-clash-blade-1408812:7973024")
-    implementation fg.deobf("curse.maven:epicfight-kick-skills-1521559:7966307")
-    implementation fg.deobf("curse.maven:epicfight-dancing-1521730:7967290")
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

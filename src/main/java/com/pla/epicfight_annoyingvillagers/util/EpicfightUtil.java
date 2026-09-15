@@ -3,9 +3,9 @@ package com.pla.epicfight_annoyingvillagers.util;
 import com.pla.annoyingvillagers.task.DelayedTask;
 import com.pla.annoyingvillagers.util.ScreenShakeUtil;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
-import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedMobPatch;
+import com.pla.epicfight_annoyingvillagers.capabilities.MobStamina;
+import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolution;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
-import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
@@ -23,9 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.PacketDistributor;
-import net.shelmarow.combat_evolution.ai.CEHumanoidPatch;
-import net.shelmarow.combat_evolution.ai.util.CEPatchUtils;
-import net.shelmarow.combat_evolution.effect.CEMobEffects;
 import net.shelmarow.combat_evolution.execution.ExecutionHandler;
 import net.shelmarow.combat_evolution.gameassets.animation.ExecutionHitAnimation;
 import yesman.epicfight.api.animation.Joint;
@@ -40,8 +37,10 @@ import yesman.epicfight.particle.EpicFightParticles;
 import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
+import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
+import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
 
 import java.util.Objects;
@@ -232,61 +231,6 @@ public class EpicfightUtil {
         };
     }
 
-    public static void dealStaminaDamageByPercentage(DamageSource damageSource, LivingEntityPatch<?> livingEntityPatch, double percentage, boolean playStunAnimation) {
-        float decrease = 0.0F;
-        if (livingEntityPatch instanceof AdvancedMobPatch<?> advancedMobPatch) {
-            float currentStamina = advancedMobPatch.getStamina();
-            float maxStamina = advancedMobPatch.getMaxStamina();
-            float staminaToDecrease = (float) (maxStamina * percentage);
-            decrease = Math.min(staminaToDecrease, currentStamina);
-        } else if (livingEntityPatch instanceof CEHumanoidPatch) {
-            float currentStamina = CEPatchUtils.getStamina(livingEntityPatch);
-            float maxStamina = CEPatchUtils.getMaxStamina(livingEntityPatch);
-            float staminaToDecrease = (float) (maxStamina * percentage);
-            decrease = Math.min(staminaToDecrease, currentStamina);
-        } else if (livingEntityPatch instanceof PlayerPatch<?> playerPatch) {
-            float currentStamina = playerPatch.getStamina();
-            float maxStamina = playerPatch.getMaxStamina();
-            float staminaToDecrease = (float) (maxStamina * percentage);
-            decrease = Math.min(staminaToDecrease, currentStamina);
-        }
-        dealStaminaDamage(damageSource, decrease, livingEntityPatch, playStunAnimation);
-    }
-
-    public static void dealStaminaDamage(DamageSource damageSource, float amount, LivingEntityPatch<?> livingEntityPatch, boolean playStunAnimation) {
-        if (livingEntityPatch instanceof CEHumanoidPatch<?> ceHumanoidPatch) {
-            if (!ceHumanoidPatch.dealStaminaDamage(damageSource, amount) && playStunAnimation) {
-                livingEntityPatch.playAnimationSynchronized(AVAnimations.STUN_BACK, 0.0F);
-            }
-        } else if (livingEntityPatch instanceof AdvancedMobPatch<?> advancedMobPatch) {
-            if (!advancedMobPatch.dealStaminaDamage(damageSource, amount) && playStunAnimation) {
-                livingEntityPatch.playAnimationSynchronized(AVAnimations.STUN_BACK, 0.0F);
-            }
-        } else if (livingEntityPatch instanceof PlayerPatch<?> playerPatch) {
-            float stamina = playerPatch.getStamina();
-            playerPatch.setStamina(stamina - amount);
-            if (amount >= stamina) {
-                EpicFightDamageSource efSource = damageSource instanceof EpicFightDamageSource ? (EpicFightDamageSource)damageSource : null;
-                if (efSource != null) {
-                    efSource.setStunType(StunType.NONE);
-                    Vec3 sourcePosition = efSource.getInitialPosition();
-                    if (sourcePosition != null) {
-                        playerPatch.getOriginal().lookAt(EntityAnchorArgument.Anchor.FEET, sourcePosition);
-                    }
-                }
-
-                if (playerPatch.applyStun(StunType.NEUTRALIZE, 0.0F)) {
-                    (playerPatch.getOriginal()).forceAddEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100), playerPatch.getOriginal());
-                    Vec3 eyePosition = (playerPatch.getOriginal()).getEyePosition();
-                    Vec3 viewVec = (playerPatch.getOriginal()).getLookAngle().scale(2.0F);
-                    Vec3 pos = new Vec3(eyePosition.x + viewVec.x, eyePosition.y + viewVec.y, eyePosition.z + viewVec.z);
-                    (playerPatch.getOriginal()).level().addParticle(EpicFightParticles.NEUTRALIZE.get(), pos.x, pos.y, pos.z, (double)0.0F, (double)0.0F, (double)0.0F);
-                    playerPatch.playSound(EpicFightSounds.NEUTRALIZE_MOBS.get(), 1.0F, 1.0F);
-                }
-            }
-        }
-    }
-
     public static void breakWeaponOnParryOpAttack(DamageSource damageSource) {
         Entity attacker = damageSource.getEntity();
         if (attacker instanceof Player player) {
@@ -347,5 +291,78 @@ public class EpicfightUtil {
         if (entity instanceof ServerPlayer player) {
             EpicFightAnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), packet);
         }
+    }
+
+    public static void dealStaminaDamageByPercentage(DamageSource damageSource, LivingEntityPatch<?> livingEntityPatch, double percentage) {
+        if (!Double.isFinite(percentage) || percentage <= 0.0D
+                || livingEntityPatch == null || livingEntityPatch.getOriginal().level().isClientSide()) {
+            return;
+        }
+        float decrease = 0.0F;
+        if (livingEntityPatch instanceof MobPatch<?> mobPatch) {
+            decrease = MobStamina.getDecreaseValue(mobPatch, percentage);
+        } else if (livingEntityPatch instanceof PlayerPatch<?> playerPatch) {
+            float currentStamina = playerPatch.getStamina();
+            float maxStamina = playerPatch.getMaxStamina();
+            float staminaToDecrease = (float) (maxStamina * percentage);
+            decrease = Math.min(staminaToDecrease, currentStamina);
+        }
+        dealStaminaDamage(damageSource, decrease, livingEntityPatch);
+    }
+
+    public static void dealStaminaDamage(DamageSource damageSource, float amount, LivingEntityPatch<?> livingEntityPatch) {
+        if (!Float.isFinite(amount) || amount <= 0.0F
+                || livingEntityPatch == null || livingEntityPatch.getOriginal().level().isClientSide()) {
+            return;
+        }
+        if (livingEntityPatch instanceof MobPatch<?> mobPatch) {
+            if (MobStamina.dealStaminaDamage(damageSource, amount, mobPatch)) {
+                neutralize(damageSource, mobPatch);
+            }
+        } else if (livingEntityPatch instanceof PlayerPatch<?> playerPatch) {
+            float stamina = playerPatch.getStamina();
+            if (!Float.isFinite(stamina) || stamina <= 0.0F) {
+                return;
+            }
+            playerPatch.setStamina(Math.max(0.0F, stamina - amount));
+            if (amount >= stamina) {
+                neutralize(damageSource, playerPatch);
+            }
+        }
+    }
+
+    private static void neutralize(DamageSource damageSource, LivingEntityPatch<?> patch) {
+        StunType stunType = StunType.NEUTRALIZE;
+        if (patch instanceof MobPatch<?> && patch.getHitAnimation(stunType) == null) {
+            // Non-humanoid patches may only supply their own long/short hit animations.
+            stunType = patch.getHitAnimation(StunType.LONG) != null ? StunType.LONG : StunType.SHORT;
+            if (patch.getHitAnimation(stunType) == null) {
+                return;
+            }
+        }
+        if (!patch.applyStun(stunType, stunType == StunType.SHORT ? 1.0F : 0.0F)) {
+            return;
+        }
+
+        Vec3 sourcePosition = damageSource == null ? null : damageSource.getSourcePosition();
+        if (damageSource instanceof EpicFightDamageSource epicSource) {
+            epicSource.setStunType(StunType.NONE);
+            epicSource.addRuntimeTag(EpicFightDamageTypeTags.NO_STUN);
+            if (epicSource.getInitialPosition() != null) {
+                sourcePosition = epicSource.getInitialPosition();
+            }
+        }
+        if (sourcePosition != null) {
+            patch.getOriginal().lookAt(EntityAnchorArgument.Anchor.FEET, sourcePosition);
+        }
+        if (patch instanceof PlayerPatch<?> playerPatch && ModList.get().isLoaded("combat_evolution")) {
+            CombatEvolution.addFullStunImmunity(playerPatch);
+        }
+        Vec3 pos = patch.getOriginal().getEyePosition().add(patch.getOriginal().getLookAngle().scale(2.0D));
+        if (patch.getOriginal().level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(EpicFightParticles.NEUTRALIZE.get(), pos.x, pos.y, pos.z,
+                    1, 0.0D, 0.0D, 0.0D, 0.0D);
+        }
+        patch.playSound(EpicFightSounds.NEUTRALIZE_MOBS.get(), 1.0F, 1.0F);
     }
 }

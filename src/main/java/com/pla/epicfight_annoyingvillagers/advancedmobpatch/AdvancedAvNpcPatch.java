@@ -18,8 +18,8 @@ import com.pla.annoyingvillagers.entity.goal.RigAnimatedMeleeAttackGoal;
 import com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal;
 import com.pla.annoyingvillagers.rig.RigAnimationController;
 import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolutionBehaviorProvider;
-import com.pla.epicfight_annoyingvillagers.compat.efkick.EFKickBehaviorProvider;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
+import com.pla.epicfight_annoyingvillagers.gameasset.AnimsKick;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsNullWeapon;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.PathfinderMob;
@@ -155,9 +155,53 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
 
         addDodgeBehaviorRoot(builder);
 
-        if (ModList.get().isLoaded("efkick")) {
-            EFKickBehaviorProvider.addTo(builder);
-        }
+        builder.newBehaviorRoot(
+                AdvancedCombatBehaviors.BehaviorRoot.builder()
+                        .priority(1.0D)
+                        .weight(5.0D)
+                        .maxCooldown(200)
+                        .waitForAnimationCompletion()
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_1, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_2, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_3, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_4, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_H, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_C, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_RUSH, 0.0F)
+                        )
+                        .addFirstBehavior(
+                                AdvancedCombatBehaviors.Behavior.builder()
+                                        .withinDistance(0.0D, 3.0D)
+                                        .animationBehavior(AnimsKick.KICK_COMBO, 0.0F)
+                        )
+        );
     }
 
     @Override

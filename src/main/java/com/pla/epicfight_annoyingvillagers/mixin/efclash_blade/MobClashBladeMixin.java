@@ -1,8 +1,8 @@
 package com.pla.epicfight_annoyingvillagers.mixin.efclash_blade;
 
 import com.pla.annoyingvillagers.clazz.HookDisarmLaunch;
-import com.pla.epicfight_annoyingvillagers.compat.efkick.EFKickCompat;
 import com.pla.annoyingvillagers.entity.*;
+import com.pla.epicfight_annoyingvillagers.animations.KickAttackAnimation;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import com.pla.annoyingvillagers.item.FlankerHookedSwordItem;
@@ -57,30 +57,6 @@ public class MobClashBladeMixin {
             cir.setReturnValue(true);
             return;
         }
-
-//        if (defender instanceof SwordsmanHerobrineEntity
-//                && defenderDynamicAnimation == WOMAnimations.TORMENT_BERSERK_CONVERT) {
-//            cir.setReturnValue(true);
-//            return;
-//        }
-//
-//        if (defender instanceof GlaiveHerobrineEntity
-//                && (defenderDynamicAnimation == AnimsWom.AGONY_GUARD_HIT_1)) {
-//            cir.setReturnValue(true);
-//            return;
-//        }
-//
-//        if (defender instanceof SledgehammerHerobrineEntity
-//                && (defenderDynamicAnimation == WOMAnimations.TORMENT_BERSERK_CONVERT)) {
-//            cir.setReturnValue(true);
-//            return;
-//        }
-//
-//        if (defender instanceof HerobrineChrisEntity
-//                && (defenderDynamicAnimation == AnimsMoonless.MOONLESS_GUARD_HIT_1)) {
-//            cir.setReturnValue(true);
-//            return;
-//        }
 
     }
 
@@ -185,11 +161,11 @@ public class MobClashBladeMixin {
             if (attackerLivingEntityPatch != null) {
                 AssetAccessor<? extends StaticAnimation> attackerDynamicAnimation = Objects.requireNonNull(attackerLivingEntityPatch.getAnimator().getPlayerFor(null)).getRealAnimation();
                 if (attackerDynamicAnimation != null) {
-                    if (ModList.get().isLoaded("efkick")) {
-                        EFKickCompat.tryDealKickStaminaDamage(
+                    if (attackerDynamicAnimation.get() instanceof KickAttackAnimation) {
+                        EpicfightUtil.dealStaminaDamageByPercentage(
                                 livingAttackEvent.getSource(),
                                 attackerLivingEntityPatch,
-                                attackerDynamicAnimation
+                                EpicFightAnnoyingVillagersConfig.KICK_STAMINA_DECREASE_PERCENTAGE.get()
                         );
                     }
                 }
