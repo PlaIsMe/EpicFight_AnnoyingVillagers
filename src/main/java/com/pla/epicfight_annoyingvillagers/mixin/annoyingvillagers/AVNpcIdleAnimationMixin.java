@@ -27,14 +27,15 @@ public abstract class AVNpcIdleAnimationMixin {
     @Inject(method = "isIdleAnimationGoalAvailable", at = @At("HEAD"), cancellable = true)
     private void idleAnimationAvailable(CallbackInfoReturnable<Boolean> cir) {
         AVNpc self = (AVNpc) (Object) this;
-        cir.setReturnValue(EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class) != null);
+        if (EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class) != null) cir.setReturnValue(true);
     }
 
-    @Inject(method = "canStartIdleAnimationGoal", at = @At("HEAD"))
+    @Inject(method = "canStartIdleAnimationGoal", at = @At("HEAD"), cancellable = true)
     private void canStartIdle(IdleAnimation choice, CallbackInfoReturnable<Boolean> cir) {
         AVNpc self = (AVNpc) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch == null || self.isStrolling() || self.isLocked() || self.isUsingItem()
+        if (patch == null) return;
+        if (self.isLocked() || self.isUsingItem()
                 || self.isSleeping() || self.isRecoveryActionActive() || self.isRecoveryDigging()
                 || RigAnimationController.hasActiveAnimation(self) || EpicfightUtil.isStunned(self)
                 || patch.getEntityState().inaction() || !patch.getEntityState().canBasicAttack()
@@ -50,7 +51,8 @@ public abstract class AVNpcIdleAnimationMixin {
     private void canContinueIdle(IdleAnimation choice, int ticksLeft, CallbackInfoReturnable<Boolean> cir) {
         AVNpc self = (AVNpc) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
-        if (patch == null || this.av_efm$idleAnimation == null || self.isLocked()
+        if (patch == null) return;
+        if (this.av_efm$idleAnimation == null || self.isLocked()
                 || self.isUsingItem() || self.isSleeping() || self.isStrolling()
                 || self.isRecoveryActionActive() || self.isRecoveryDigging()
                 || RigAnimationController.hasActiveAnimation(self) || EpicfightUtil.isStunned(self)) {
@@ -65,8 +67,9 @@ public abstract class AVNpcIdleAnimationMixin {
     private void startIdle(IdleAnimation choice, CallbackInfo ci) {
         AVNpc self = (AVNpc) (Object) this;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
+        if (patch == null) return;
         this.av_efm$idleAnimation = IdleAnimationUtil.resolveIdleAnimation(choice);
-        if (patch != null && this.av_efm$idleAnimation != null && !self.level().isClientSide()) {
+        if (this.av_efm$idleAnimation != null && !self.level().isClientSide()) {
             if (patch instanceof AdvancedMobPatch<?> advanced) advanced.lockCombatActions(this);
             patch.playAnimationSynchronized(this.av_efm$idleAnimation, 0.0F);
         }
@@ -76,16 +79,15 @@ public abstract class AVNpcIdleAnimationMixin {
     @Inject(method = "onIdleAnimationGoalTick", at = @At("HEAD"), cancellable = true)
     private void tickIdle(IdleAnimation choice, CallbackInfo ci) {
         // The selected idle emotes loop themselves. Do not replay over combat or hit reactions.
-        ci.cancel();
+        if (this.av_efm$idleAnimation != null) ci.cancel();
     }
 
     @Inject(method = "onIdleAnimationGoalStop", at = @At("HEAD"), cancellable = true)
     private void stopIdle(IdleAnimation choice, CallbackInfo ci) {
         AVNpc self = (AVNpc) (Object) this;
-        if (this.av_efm$idleAnimation != null) {
-            EscapeAnimationCompat.stop(self, this.av_efm$idleAnimation);
-            this.av_efm$idleAnimation = null;
-        }
+        if (this.av_efm$idleAnimation == null) return;
+        EscapeAnimationCompat.stop(self, this.av_efm$idleAnimation);
+        this.av_efm$idleAnimation = null;
         LivingEntityPatch<?> patch = EpicFightCapabilities.getEntityPatch(self, LivingEntityPatch.class);
         if (patch instanceof AdvancedMobPatch<?> advanced) advanced.unlockCombatActions(this);
         ci.cancel();

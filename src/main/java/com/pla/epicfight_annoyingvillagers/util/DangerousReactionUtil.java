@@ -6,7 +6,6 @@ import com.pla.annoyingvillagers.clazz.HerobrineMob;
 import com.pla.annoyingvillagers.clazz.DangerousReaction;
 import com.pla.annoyingvillagers.entity.AngrySteveEntity;
 import com.pla.annoyingvillagers.entity.BlueDemonEntity;
-import com.pla.annoyingvillagers.entity.ReaperHerobrineEntity;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -23,15 +22,19 @@ import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
 public class DangerousReactionUtil {
-    private static final Set<String> DANGEROUS_ANIMATIONS = new HashSet<>();
+    private static final Set<String> DANGEROUS_ANIMATIONS = ConcurrentHashMap.newKeySet();
 
-    static {
+    private static boolean defaultsLoaded;
+
+    private static synchronized void loadDefaultAnimations() {
+        if (defaultsLoaded) return;
         DANGEROUS_ANIMATIONS.addAll(Set.of(
                 AnimsEnderGlaive.ENDER_GLAIVE_INNATE.get().getRegistryName().toString(),
                 AnimsEnderGlaive.ENDER_GLAIVE_INNATE_SPECIAL.get().getRegistryName().toString(),
@@ -128,10 +131,24 @@ public class DangerousReactionUtil {
                 e.fillInStackTrace();
             }
         }
+        defaultsLoaded = true;
+    }
+
+    /** Accepts addon-provided Epic Fight animations after animation registration. */
+    public static void registerDangerousAnimations(Collection<? extends AssetAccessor<? extends StaticAnimation>> animations) {
+        for (AssetAccessor<? extends StaticAnimation> animation : animations) {
+            if (animation != null) DANGEROUS_ANIMATIONS.add(animation.get().getRegistryName().toString());
+        }
+    }
+
+    /** Registry names also allow configuration without loading animation classes. */
+    public static void registerDangerousAnimationIds(Collection<String> animationIds) {
+        DANGEROUS_ANIMATIONS.addAll(animationIds);
     }
 
     public static boolean isAnimationDangerous(AssetAccessor<? extends StaticAnimation> targetDynamicAnimation) {
         if (targetDynamicAnimation != null && targetDynamicAnimation.get().getRegistryName() != null) {
+            loadDefaultAnimations();
             String animation = targetDynamicAnimation.get().getRegistryName().toString();
             return DANGEROUS_ANIMATIONS.contains(animation);
         }
@@ -141,27 +158,13 @@ public class DangerousReactionUtil {
     public static boolean isCurrentAnimationDangerous(LivingEntityPatch<?> patch) {
         if (patch == null) return false;
         var player = patch.getAnimator().getPlayerFor(null);
-        return player != null && !player.isEmpty() && isAnimationDangerous(player.getRealAnimation());
+        return player != null && !player.isEmpty() && !player.isEnd()
+                && (isAnimationDangerous(player.getRealAnimation())
+                || player.getRealAnimation().get() instanceof ExecutionAttackAnimation);
     }
 
     public static boolean canReact(Mob mob) {
-        if (DangerousReaction.canReact(mob)) return true;
-        LivingEntity target = mob == null ? null : mob.getTarget();
-        if (mob == null
-                || mob.level().isClientSide()
-                || !mob.isAlive()
-                || mob.isRemoved()
-                || mob.isDeadOrDying()
-                || mob.isNoAi()
-                || mob instanceof ReaperHerobrineEntity reaper && reaper.isSecondFormDragonRider()
-                || EpicfightUtil.isStunned(mob)
-                || !(target instanceof Mob targetMob)
-                || !target.isAlive()
-                || target.isRemoved()
-                || mob.distanceToSqr(target) > 64.0D) {
-            return false;
-        }
-        return isCurrentAnimationDangerous(EpicFightCapabilities.getEntityPatch(targetMob, LivingEntityPatch.class));
+        return DangerousReaction.canReact(mob);
     }
 
     public static boolean checkEscape(Mob mob) {

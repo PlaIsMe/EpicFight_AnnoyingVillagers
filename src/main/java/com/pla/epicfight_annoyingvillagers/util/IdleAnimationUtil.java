@@ -15,20 +15,14 @@ public final class IdleAnimationUtil {
             case LAY -> AnimsEmote.LAY_EMOTE;
             case SLEEP -> AnimsEmote.DEATH_EMOTE;
             case SIT -> AnimsEmote.SIT_EMOTE;
-            case FUN_SIT -> AnimsEmote.FUNNY_EMOTE;
             case SLIGHT -> AnimsEmote.SLIGHT_EMOTE;
             case LAY_RELAX_EMOTE -> AnimsEmote.LAY_RELAX_EMOTE;
             case ONE_ARM_LAY_EMOTE -> AnimsEmote.ONE_ARM_LAY_EMOTE;
-            case SALUTE_LEFT_HAND_EMOTE -> AnimsEmote.SALUTE_LEFT_HAND_EMOTE;
             case SIT_NO_WEAPON_EMOTE -> AnimsEmote.SIT_NO_WEAPON_EMOTE;
             case SORROW_EMOTE -> AnimsEmote.SORROW_EMOTE;
-            case SURRENDER_EMOTE -> AnimsEmote.SURRENDER_EMOTE;
-            case ATTENTION_EMOTE -> AnimsEmote.ATTENTION_EMOTE;
-            case FLAPPING_EMOTE -> AnimsEmote.FLAPPING_EMOTE;
             case FUN_JUMP_EMOTE -> AnimsEmote.FUN_JUMP_EMOTE;
             case JUMP_EMOTE -> AnimsEmote.JUMP_EMOTE;
             case PRONE_EMOTE -> AnimsEmote.PRONE_EMOTE;
-            case SALUTE_EMOTE -> AnimsEmote.SALUTE_EMOTE;
         };
     }
 }
