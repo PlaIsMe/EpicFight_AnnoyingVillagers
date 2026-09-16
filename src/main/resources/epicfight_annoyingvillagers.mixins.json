@@ -17,6 +17,9 @@
     "MixinPIllagerRenderer",
     "OpenMatrix4fInvertFixMixin",
     "WeaponCapabilityAccessor",
+    "CapabilityItemBuilderPresetMixin",
+    "ItemCapabilityProviderPresetMixin",
+    "ItemCapabilityReloadListenerPresetMixin",
     "efclash_blade.ClashBladeMixin",
     "efclash_blade.MobClashBladeMixin",
     "AdvancedEscapeHoleGoalMixin",
@@ -29,6 +32,7 @@
     "annoyingvillagers.AlexEntityMixin",
     "annoyingvillagers.AngrySteveEntityMixin",
     "annoyingvillagers.ArmoredHerobrineEntityMixin",
+    "annoyingvillagers.ObsidianArmorPoseSamplerMixin",
     "annoyingvillagers.BlackFireEntityMixin",
     "annoyingvillagers.BlackFireSwordItemMixin",
     "annoyingvillagers.BlockProjectileEntityMixin",
@@ -79,6 +83,7 @@
     "annoyingvillagers.TransporterHerobrineCloneEntityMixin",
     "annoyingvillagers.AnimatedMobGoalMixin",
     "annoyingvillagers.AVNpcIdleAnimationMixin",
+    "annoyingvillagers.NullSummonSkeletonGoalMixin",
     "annoyingvillagers.RigStunControllerMixin"
   ],
   "client": [

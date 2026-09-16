@@ -8,6 +8,7 @@ import com.merlin204.avalon.util.AvalonAnimationUtils;
 import com.merlin204.avalon.util.AvalonEventUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.skill.EnderSlayerScytheSkill;
+import com.pla.annoyingvillagers.entity.ReaperHerobrineEntity;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -177,6 +178,8 @@ public class AnimsEnderSlayerScythe {
                                     entitypatch.playSound(SoundEvents.GENERIC_EXPLODE, 1.5F, 0.0F, 0.0F);
                                     if (entitypatch instanceof PlayerPatch<?> playerPatch) {
                                         EnderSlayerScytheSkill.activateFromInnateAnimation(playerPatch);
+                                    } else if (entitypatch.getOriginal() instanceof ReaperHerobrineEntity reaper) {
+                                        reaper.completePendingDragonSummon();
                                     }
                                 }, AnimationEvent.Side.SERVER),
                                 AvalonEventUtils.simpleGroundSplit(57, 0.0F, 0.0F, 0.0F, 0.0F, 5.0F, true),

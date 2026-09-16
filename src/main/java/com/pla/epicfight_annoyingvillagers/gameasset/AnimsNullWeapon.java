@@ -349,7 +349,6 @@ public class AnimsNullWeapon {
                         .addEvents(new AnimationEvent[]{
                                 AnimationEvent.InTimeEvent.create(1.5F, (livingEntityPatch, self, p) -> {
                                     if (livingEntityPatch.getOriginal().level() instanceof ServerLevel serverLevel) {
-                                        // AV owns slot/cooldown bookkeeping; the EF event owns timing.
                                         if (livingEntityPatch.getOriginal() instanceof NullEntity nullEntity) {
                                             NullSkeletonEntity skeleton = NullSummonSkeletonGoal.summonSkeleton(nullEntity);
                                             if (skeleton != null) {

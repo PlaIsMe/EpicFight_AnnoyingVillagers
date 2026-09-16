@@ -4,6 +4,7 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsDemoniacVoltageReaver;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderAegis;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderGlaive;
+import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderSlayerScythe;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsNullWeapon;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianSledgehammer;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianWeapon;
@@ -30,6 +31,7 @@ public final class GoalAnimationCompat {
             case SLEDGEHAMMER_HEROBRINE_EXTRA_ULT -> AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_INNATE_SPECIAL;
             case SWORDSMAN_HEROBRINE_ULT -> AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE;
             case SWORDSMAN_HEROBRINE_EXTRA_ULT -> AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_INNATE_SPECIAL;
+            case REAPER_HEROBRINE_EXTRA_ULT -> AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_SPECIAL_INNATE;
             case POINT_LEFT_HAND_TOWARD -> AVAnimations.POINT_LEFT_HAND_TOWARD;
             case POINT_LEFT_HAND_MIDDLE -> AVAnimations.POINT_LEFT_HAND_MIDDLE;
             case POINT_LEFT_HAND_UP -> AVAnimations.POINT_LEFT_HAND_UP;

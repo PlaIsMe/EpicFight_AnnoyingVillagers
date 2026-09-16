@@ -6,6 +6,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pla.annoyingvillagers.client.renderer.ColoredGlintRenderTypes;
 import com.pla.annoyingvillagers.client.renderer.ColoredGlintState;
+import com.pla.epicfight_annoyingvillagers.client.renderer.ObsidianArmorRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -60,6 +62,12 @@ public abstract class WearableItemLayerMixin<
             CallbackInfo ci
     ) {
         ColoredGlintState.clear();
+        // The shared world pass draws the local player's extensions in first person,
+        // including the helmet that Epic Fight's hand armor layer normally skips.
+        Minecraft minecraft = Minecraft.getInstance();
+        if (entityliving != minecraft.player || !minecraft.options.getCameraType().isFirstPerson()) {
+            ObsidianArmorRenderer.render(entitypatch, poseStack, buf, packedLight, poses);
+        }
     }
 
     @ModifyExpressionValue(
@@ -71,8 +79,6 @@ public abstract class WearableItemLayerMixin<
             )
     )
     private RenderType colorEpicFightArmorGlint(RenderType original) {
-        return ColoredGlintState.getMode() == ColoredGlintState.CYAN
-                ? ColoredGlintRenderTypes.ARMOR_ENTITY_GLINT_CYAN
-                : original;
+        return ColoredGlintRenderTypes.getArmorEntityGlint(ColoredGlintState.getMode(), original);
     }
 }

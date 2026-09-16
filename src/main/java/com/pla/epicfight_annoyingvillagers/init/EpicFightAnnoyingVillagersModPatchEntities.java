@@ -8,6 +8,7 @@ import com.pla.annoyingvillagers.rig.RigCombatProfiles;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedAnimationAttackGoal;
 import com.pla.epicfight_annoyingvillagers.advancedmobpatch.AdvancedAvNpcPatch;
+import com.pla.epicfight_annoyingvillagers.mobpatch.*;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,7 +33,20 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         for (EntityType<? extends LivingEntity> type : advancedNpcTypes()) {
             event.getTypeEntry().put(type, entity -> AdvancedAvNpcPatch::new);
         }
+
+        for (EntityType<? extends LivingEntity> type : stepDodgeNpcTypes()) {
+            event.getTypeEntry().put(type, entity -> StepDodgeAvNpcPatch::new);
+        }
+
+        for (EntityType<? extends LivingEntity> type : fullDodgeNpcTypes()) {
+            event.getTypeEntry().put(type, entity -> FullDodgeAvNpcPatch::new);
+        }
+
+        event.getTypeEntry().put(AnnoyingVillagersModEntities.NULL.get(), entity -> NullPatch::new);
         event.getTypeEntry().put(AnnoyingVillagersModEntities.NULL_SKELETON.get(), entity -> SkeletonPatch::new);
+        event.getTypeEntry().put(AnnoyingVillagersModEntities.AEGIS_HEROBRINE.get(), entity -> AegisHerobrinePatch::new);
+        event.getTypeEntry().put(AnnoyingVillagersModEntities.ANGRY_STEVE.get(), entity -> AngryStevePatch::new);
+        event.getTypeEntry().put(AnnoyingVillagersModEntities.BLUE_DEMON.get(), entity -> BlueDemonPatch::new);
     }
 
     @SubscribeEvent
@@ -59,7 +73,6 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
                 AnnoyingVillagersModEntities.ALEX.get(),
                 AnnoyingVillagersModEntities.JEV.get(),
                 AnnoyingVillagersModEntities.STEVE.get(),
-                AnnoyingVillagersModEntities.ANGRY_STEVE.get(),
                 AnnoyingVillagersModEntities.CHRIS.get(),
                 AnnoyingVillagersModEntities.VILLAGER_SCOUT.get(),
                 AnnoyingVillagersModEntities.VILLAGER_SCOUT_CAPTAIN.get(),
@@ -69,7 +82,6 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
                 AnnoyingVillagersModEntities.PURPLE_VILLAGER_KNIGHT.get(),
                 AnnoyingVillagersModEntities.LOW_HEROBRINE_CLONE.get(),
                 AnnoyingVillagersModEntities.LOW_SHADOW_HEROBRINE_CLONE.get(),
-                AnnoyingVillagersModEntities.AEGIS_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.GLAIVE_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.SLEDGEHAMMER_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.SWORDSMAN_HEROBRINE.get(),
@@ -83,6 +95,32 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
                 AnnoyingVillagersModEntities.ARMORED_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.HEROBRINE_7.get(),
                 AnnoyingVillagersModEntities.BLUE_DEMON.get()
+        );
+    }
+
+    private static List<EntityType<? extends LivingEntity>> stepDodgeNpcTypes() {
+        return List.of(
+                AnnoyingVillagersModEntities.STEVE.get(),
+                AnnoyingVillagersModEntities.ALEX.get(),
+                AnnoyingVillagersModEntities.RED_VILLAGER_KNIGHT.get(),
+                AnnoyingVillagersModEntities.BLUE_VILLAGER_KNIGHT.get(),
+                AnnoyingVillagersModEntities.GREEN_VILLAGER_KNIGHT.get(),
+                AnnoyingVillagersModEntities.PURPLE_VILLAGER_KNIGHT.get()
+        );
+    }
+
+    private static List<EntityType<? extends LivingEntity>> fullDodgeNpcTypes() {
+        return List.of(
+                AnnoyingVillagersModEntities.GLAIVE_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.SLEDGEHAMMER_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.SWORDSMAN_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.REAPER_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.TRANSPORTER_HEROBRINE_CLONE.get(),
+                AnnoyingVillagersModEntities.ARMORED_HEROBRINE.get(),
+                AnnoyingVillagersModEntities.HEROBRINE_7.get(),
+                AnnoyingVillagersModEntities.SHADOW_HEROBRINE_CLONE.get(),
+                AnnoyingVillagersModEntities.HEROBRINE_CLONE.get(),
+                AnnoyingVillagersModEntities.SHADOW_HEROBRINE.get()
         );
     }
 

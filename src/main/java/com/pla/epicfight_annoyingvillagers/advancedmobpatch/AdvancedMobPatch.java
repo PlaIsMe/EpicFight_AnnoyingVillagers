@@ -81,6 +81,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     private int guardCooldownTicks;
     private AssetAccessor<? extends StaticAnimation> activeGuardAnimation;
     private final Set<Object> combatActionLocks = Collections.newSetFromMap(new IdentityHashMap<>());
+    private boolean stunnedLastTick;
     private final Map<LivingMotion, AssetAccessor<? extends StaticAnimation>> defaultLivingMotions = new HashMap<>();
     private boolean defaultLivingMotionsCaptured;
     private float stamina;
@@ -120,6 +121,11 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         if (this.isLogicalClient()) {
             return;
         }
+        boolean stunned = this.isStunned();
+        if (stunned && (!this.stunnedLastTick || !this.combatActionLocks.isEmpty())) {
+            this.interruptCombatActionsForStun();
+        }
+        this.stunnedLastTick = stunned;
         this.tickLocalGuard();
 
         float maxStamina = this.getMaxStamina();
@@ -328,7 +334,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 .priority(1.0D)
                 .weight(40.0D)
                 .maxCooldown(20);
-        List<AdditionalAttackGroup> additionalGroups = this.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
+    List<AdditionalAttackGroup> additionalGroups = this.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
         Random random = new Random(
                 GENERATED_CHAIN_SEED
                         + moveset.normalAttacks().size() * 31L
@@ -601,9 +607,23 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         return !this.combatActionLocks.isEmpty();
     }
 
+    /**
+     * Epic Fight stun replaces the animation owned by AV goals before their normal
+     * completion callback can run. Release every compatibility-side owner here;
+     * later goal cleanup remains safe because unlockCombatActions is idempotent.
+     */
+    private void interruptCombatActionsForStun() {
+        this.combatActionLocks.clear();
+        this.stopLocalGuard();
+        if (this.combatBehaviors != null) {
+            this.combatBehaviors.clearCurrentBehavior();
+        }
+        this.getOriginal().getNavigation().stop();
+    }
+
     private boolean areCombatActionsAllowed() {
         return this.isCombatEnabled() && this.staminaStatus != AdvancedStaminaStatus.BREAK
-                && !this.guardingLocally && !this.isCombatActionLocked()
+                && !this.isStunned() && !this.guardingLocally && !this.isCombatActionLocked()
                 && !this.isUtilityActionActive();
     }
 
@@ -826,11 +846,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
 
         this.staminaStatus = AdvancedStaminaStatus.BREAK;
         this.recoverTickCount = 0;
-        this.stopLocalGuard();
-        if (this.combatBehaviors != null) {
-            this.combatBehaviors.clearCurrentBehavior();
-        }
-        this.getOriginal().getNavigation().stop();
+        this.interruptCombatActionsForStun();
 
         // The triggering hit must not replace neutralize with its ordinary hit stun.
         if (damageSource instanceof EpicFightDamageSource source) {
@@ -841,6 +857,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
             this.getOriginal().lookAt(EntityAnchorArgument.Anchor.FEET, damageSource.getSourcePosition());
         }
         if (super.applyStun(StunType.NEUTRALIZE, 0.0F)) {
+            this.stunnedLastTick = true;
             this.playGuardBreakSound();
             if (this.getOriginal().level() instanceof ServerLevel serverLevel) {
                 Vec3 position = this.getOriginal().getEyePosition().add(this.getOriginal().getLookAngle().scale(2.0D));
@@ -859,7 +876,8 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         }
         boolean applied = super.applyStun(stunType, stunTime);
         if (applied) {
-            this.stopLocalGuard();
+            this.interruptCombatActionsForStun();
+            this.stunnedLastTick = true;
         }
         return applied;
     }
@@ -883,6 +901,11 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                     damageSource.getEntity()
             );
         }
+        this.onSuccessfulGuard(damageSource);
+    }
+
+    /** Called after a guard absorbs a hit without exhausting stamina. */
+    protected void onSuccessfulGuard(DamageSource damageSource) {
     }
 
     @Override

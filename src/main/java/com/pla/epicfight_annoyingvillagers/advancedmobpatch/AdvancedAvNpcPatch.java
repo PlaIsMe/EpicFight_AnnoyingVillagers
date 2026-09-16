@@ -1,31 +1,23 @@
 package com.pla.epicfight_annoyingvillagers.advancedmobpatch;
 
+import com.hm.efn.gameasset.animations.EFNSwordAnimations;
 import com.pla.annoyingvillagers.clazz.AVNpc;
-import com.pla.annoyingvillagers.clazz.HerobrineMob;
-import com.pla.annoyingvillagers.entity.AlexEntity;
-import com.pla.annoyingvillagers.entity.AngrySteveEntity;
-import com.pla.annoyingvillagers.entity.BlueDemonEntity;
-import com.pla.annoyingvillagers.entity.BlueVillagerKnightEntity;
-import com.pla.annoyingvillagers.entity.GreenVillagerKnightEntity;
 import com.pla.annoyingvillagers.entity.LowHerobrineCloneEntity;
 import com.pla.annoyingvillagers.entity.LowShadowHerobrineCloneEntity;
-import com.pla.annoyingvillagers.entity.NullEntity;
-import com.pla.annoyingvillagers.entity.PurpleVillagerKnightEntity;
-import com.pla.annoyingvillagers.entity.RedVillagerKnightEntity;
-import com.pla.annoyingvillagers.entity.SteveEntity;
 import com.pla.annoyingvillagers.entity.goal.RandomCombatJumpGoal;
 import com.pla.annoyingvillagers.entity.goal.RigAnimatedMeleeAttackGoal;
 import com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal;
 import com.pla.annoyingvillagers.rig.RigAnimationController;
+import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
+import com.pla.epicfight_annoyingvillagers.capabilities.WeaponCapabilityPresetTracking;
 import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolutionBehaviorProvider;
-import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
-import com.pla.epicfight_annoyingvillagers.gameasset.AnimsKick;
-import com.pla.epicfight_annoyingvillagers.gameasset.AnimsNullWeapon;
+import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraftforge.fml.ModList;
+import net.shelmarow.ef_awaken.efassets.animations.StraightSwordAnimations;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
@@ -35,7 +27,7 @@ import yesman.epicfight.world.capabilities.entitypatch.Factions;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.Style;
-import reascer.wom.gameasset.WOMAnimations;
+import yesman.epicfight.world.capabilities.item.WeaponCapabilityPresets;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -137,18 +129,6 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,
                                           CapabilityItem offHandCap, Style style) {
-        if (this.getOriginal() instanceof NullEntity) {
-            builder.newBehaviorRoot(AdvancedCombatBehaviors.BehaviorRoot.builder()
-                    .priority(1.0D)
-                    .weight(4.0D)
-                    .maxCooldown(80)
-                    .waitForAnimationCompletion()
-                    .addFirstBehavior(AdvancedCombatBehaviors.Behavior.builder()
-                            .withinDistance(0.0D, 24.0D)
-                            .custom(patch -> patch.getOriginal() instanceof NullEntity nullEntity
-                                    && !nullEntity.getAvailableNullWeapons().isEmpty())
-                            .animationBehavior(AnimsNullWeapon.NULL_WEAPON_SPECIAL, 0.0F)));
-        }
         if (ModList.get().isLoaded("combat_evolution")) {
             CombatEvolutionBehaviorProvider.addTo(builder);
         }
@@ -214,42 +194,126 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
         return 12;
     }
 
+//    mixin this method at head for more compat moveset, do not ci.cancel
+    public List<AdditionalAttackGroup> addMoreAttackGroupss(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
+        return super.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
+    }
+
     @Override
     protected List<AdditionalAttackGroup> getAdditionalAttackGroups(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.SWORD) {
+        var preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);
+        if (preset == WeaponCapabilityPresets.SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.SWEEPING_EDGE))
-                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.DANCING_EDGE)
+                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.DANCING_EDGE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.SWEEPING_EDGE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.AXE) {
-            return List.of(AdditionalAttackGroup.random(0.25F, Animations.THE_GUILLOTINE));
+        if (preset == WeaponCapabilityPresets.AXE) {
+            return List.of(AdditionalAttackGroup.random(0.25F, Animations.THE_GUILLOTINE, EFNSwordAnimations.NF_SWORD_SKILL));
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.SPEAR) {
+        if (preset == WeaponCapabilityPresets.TACHI) {
+            return List.of(AdditionalAttackGroup.random(0.25F, Animations.RUSHING_TEMPO1,
+                    Animations.RUSHING_TEMPO2, Animations.RUSHING_TEMPO3, AnimsAVTachi.AV_TACHI_SPECIAL));
+        }
+        if (preset == WeaponCapabilityPresets.SPEAR) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.GRASPING_SPIRAL_FIRST, Animations.GRASPING_SPIRAL_SECOND))
-                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.HEARTPIERCER)
+                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.GRASPING_SPIRAL_FIRST,
+                    Animations.GRASPING_SPIRAL_SECOND, AnimsAVSpear.AV_SPEAR_SPECIAL))
+                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.HEARTPIERCER, AnimsAVSpear.AV_SPEAR_SPECIAL)
             );
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.GREATSWORD) {
-            return List.of(AdditionalAttackGroup.random(0.25F, Animations.STEEL_WHIRLWIND));
+        if (preset == WeaponCapabilityPresets.GREATSWORD) {
+            return List.of(AdditionalAttackGroup.random(0.25F, Animations.STEEL_WHIRLWIND, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.UCHIGATANA) {
+        if (preset == WeaponCapabilityPresets.UCHIGATANA) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.BATTOJUTSU, Animations.BATTOJUTSU_DASH));
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.LONGSWORD) {
-            return List.of(AdditionalAttackGroup.random(0.25F, Animations.SHARP_STAB));
-        }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.DAGGER) {
+        if (preset == WeaponCapabilityPresets.LONGSWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.BLADE_RUSH_COMBO1, Animations.BLADE_RUSH_COMBO2, Animations.BLADE_RUSH_COMBO3))
-                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.EVISCERATE_FIRST, Animations.EVISCERATE_SECOND)
+                    ? List.of(AdditionalAttackGroup.random(0.25F, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_PURSUIT))
+                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.SHARP_STAB, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1)
             );
         }
-        if (mainHandCap.getWeaponCategory() == CapabilityItem.WeaponCategories.FIST) {
-            return List.of(AdditionalAttackGroup.random(0.25F, Animations.RELENTLESS_COMBO));
+        if (preset == WeaponCapabilityPresets.DAGGER) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.BLADE_RUSH_COMBO1, Animations.BLADE_RUSH_COMBO2, Animations.BLADE_RUSH_COMBO3, EFNSwordAnimations.NF_SWORD_SKILL_SECOND))
+                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.EVISCERATE_FIRST, Animations.EVISCERATE_SECOND, EFNSwordAnimations.NF_SWORD_SKILL_SECOND)
+            );
         }
-        return super.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
+        if (preset == WeaponCapabilityPresets.FIST) {
+            return List.of(AdditionalAttackGroup.random(0.25F, Animations.RELENTLESS_COMBO, AnimsAVFist.WHIRLWIND_KICK,
+                    AnimsAVFist.FIST_LEFT, AnimsAVFist.FIST_UP, AnimsAVFist.FIST_DASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.OBSIDIAN_WEAPON) {
+            return List.of(AdditionalAttackGroup.random(0.25F,
+                    AnimsObsidianWeapon.OBSIDIAN_WEAPON_INNATE_SPECIAL,
+                    AnimsObsidianWeapon.OBSIDIAN_WEAPON_SPECIAL,
+                    AnimsObsidianWeapon.OBSIDIAN_WEAPON_TWOHAND_2));
+        }
+        if (preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_PILLAR) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(
+                    AdditionalAttackGroup.random(
+                            0.25F,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_SPECIAL,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_DUAL_INNATE,
+                            AnimsObsidianWeapon.OBSIDIAN_WEAPON_INNATE_SPECIAL
+                    ))
+                    : List.of(
+                    AdditionalAttackGroup.random(
+                            0.25F,
+                            AnimsObsidianWeapon.OBSIDIAN_WEAPON_TWOHAND_1,
+                            AnimsObsidianWeapon.OBSIDIAN_WEAPON_INNATE_SPECIAL,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_SPECIAL
+                    )
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_SWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(
+                    AdditionalAttackGroup.random(
+                            0.25F,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_SPECIAL,
+                            AnimsObsidianWeapon.OBSIDIAN_WEAPON_SPECIAL,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_INNATE
+                    ))
+                    : List.of(
+                    AdditionalAttackGroup.random(
+                            0.25F,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_SPECIAL,
+                            AnimsObsidianWeapon.OBSIDIAN_WEAPON_SPECIAL,
+                            AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_INNATE
+                    )
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.ENDER_AEGIS) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderAegis.ENDER_AEGIS_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.ENDER_GLAIVE) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderGlaive.ENDER_GLAIVE_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.ENDER_SLAYER_SCYTHE) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.DEMONIAC_VOLTAGE_REAVER) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.OBSIDIAN_SLEDGEHAMMER) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.LEGENDARY_SWORD) {
+            return List.of(AdditionalAttackGroup.random(0.15F, AnimsLegendarySword.LEGENDARY_SWORD_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.BLUE_DEMON_TRIDENT) {
+            return List.of(
+                    AdditionalAttackGroup.random(0.25F, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_1, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_2,
+                            AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_3, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_4,
+                            AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_5, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_DASH,
+                            AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_AIRSLASH, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_SPECIAL),
+                    AdditionalAttackGroup.random(0.15F, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_ELECTRIC_FIELD, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THUNDER_ATTACK)
+            );
+        }
+        return addMoreAttackGroupss(mainHandCap, offHandCap, style);
     }
 
     @Override
@@ -325,48 +389,7 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
         builder.newBehaviorRoot(root);
     }
 
-    private List<AnimationManager.AnimationAccessor<? extends StaticAnimation>> getDodgeAnimations() {
-        PathfinderMob npc = this.getOriginal();
-        if (npc instanceof NullEntity) {
-            return List.of(
-                    WOMAnimations.SHADOWSTEP_FORWARD,
-                    WOMAnimations.SHADOWSTEP_BACKWARD,
-                    WOMAnimations.SHADOWSTEP_RIGHT,
-                    WOMAnimations.SHADOWSTEP_LEFT
-            );
-        }
-
-        if (npc instanceof AngrySteveEntity
-                || npc instanceof BlueDemonEntity
-                || npc instanceof HerobrineMob) {
-            return List.of(
-                    WOMAnimations.ENDERSTEP_FORWARD,
-                    WOMAnimations.ENDERSTEP_BACKWARD,
-                    WOMAnimations.ENDERSTEP_LEFT,
-                    WOMAnimations.ENDERSTEP_RIGHT,
-                    Animations.BIPED_STEP_BACKWARD,
-                    Animations.BIPED_STEP_FORWARD,
-                    Animations.BIPED_STEP_LEFT,
-                    Animations.BIPED_STEP_RIGHT,
-                    Animations.BIPED_ROLL_BACKWARD,
-                    Animations.BIPED_ROLL_FORWARD
-            );
-        }
-
-        if (npc instanceof SteveEntity
-                || npc instanceof AlexEntity
-                || npc instanceof RedVillagerKnightEntity
-                || npc instanceof BlueVillagerKnightEntity
-                || npc instanceof GreenVillagerKnightEntity
-                || npc instanceof PurpleVillagerKnightEntity) {
-            return List.of(
-                    Animations.BIPED_STEP_BACKWARD,
-                    Animations.BIPED_STEP_FORWARD,
-                    Animations.BIPED_STEP_LEFT,
-                    Animations.BIPED_STEP_RIGHT
-            );
-        }
-
+    protected List<AnimationManager.AnimationAccessor<? extends StaticAnimation>> getDodgeAnimations() {
         return List.of(
                 Animations.BIPED_ROLL_BACKWARD,
                 Animations.BIPED_ROLL_FORWARD

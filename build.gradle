@@ -64,10 +64,6 @@ sourceSets {
                 def path = details.path.replace('\\', '/')
                 // Legacy helper belongs to the excluded pre-port combatbehaviour sources.
                 if (path == 'com/pla/epicfight_annoyingvillagers/util/MobPatchCommon.java') return true
-                if (path.startsWith('com/pla/epicfight_annoyingvillagers/mobpatch/')) {
-                    return path != 'com/pla/epicfight_annoyingvillagers/mobpatch/AlexPatch.java' &&
-                            path != 'com/pla/epicfight_annoyingvillagers/mobpatch/AdvancedAvNpcPatch.java'
-                }
                 if (path.startsWith('com/pla/epicfight_annoyingvillagers/combatbehaviour/')) {
                     return true
                 }

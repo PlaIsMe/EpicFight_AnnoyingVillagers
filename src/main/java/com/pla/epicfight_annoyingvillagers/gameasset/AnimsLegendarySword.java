@@ -10,6 +10,8 @@ import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.animations.HeavyAttackAnimation;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
 import com.pla.annoyingvillagers.item.LegendarySwordItem;
+import com.pla.annoyingvillagers.entity.AngrySteveEntity;
+import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import com.pla.epicfight_annoyingvillagers.skill.LegendarySwordSkill;
 import com.pla.annoyingvillagers.task.DelayedTask;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
@@ -369,6 +371,9 @@ public class AnimsLegendarySword {
                         legendarySwordSkill.getResourceType().consumer
                                 .consume(skillContainer, serverPlayerPatch, legendarySwordSkill.getDefaultConsumptionAmount(serverPlayerPatch));
                         legendarySwordSkill.startAwakening(skillContainer);
+                    } else if (entitypatch.getOriginal() instanceof AngrySteveEntity steve
+                            && steve.getMainHandItem().is(AnnoyingVillagersModItems.LEGENDARY_SWORD.get())) {
+                        steve.startLegendaryAwakening();
                     }
                 }, AnimationEvent.Side.SERVER)}));
 
