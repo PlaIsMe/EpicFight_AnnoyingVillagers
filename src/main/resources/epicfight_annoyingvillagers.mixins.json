@@ -22,6 +22,7 @@
     "ItemCapabilityReloadListenerPresetMixin",
     "efclash_blade.ClashBladeMixin",
     "efclash_blade.MobClashBladeMixin",
+    "compat.smartnpc.AdvancedPlayerNpcPatchMixin",
     "AdvancedEscapeHoleGoalMixin",
     "BlueDemonEscapeHoleGoalMixin",
     "DemoniacVoltageReaverAttackLockMixin",

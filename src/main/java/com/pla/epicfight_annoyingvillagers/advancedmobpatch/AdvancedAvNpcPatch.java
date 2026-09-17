@@ -1,5 +1,6 @@
 package com.pla.epicfight_annoyingvillagers.advancedmobpatch;
 
+import com.hm.efn.gameasset.animations.EFNDualSwordAnimations;
 import com.hm.efn.gameasset.animations.EFNSwordAnimations;
 import com.pla.annoyingvillagers.clazz.AVNpc;
 import com.pla.annoyingvillagers.entity.LowHerobrineCloneEntity;
@@ -16,7 +17,9 @@ import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.ModList;
+import net.shelmarow.ef_awaken.efassets.animations.DarkNightPursuitersAnimations;
 import net.shelmarow.ef_awaken.efassets.animations.StraightSwordAnimations;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.api.animation.AnimationManager;
@@ -32,6 +35,8 @@ import yesman.epicfight.world.capabilities.item.WeaponCapabilityPresets;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatch<T> {
     @Override
@@ -195,13 +200,134 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     }
 
 //    mixin this method at head for more compat moveset, do not ci.cancel
-    public List<AdditionalAttackGroup> addMoreAttackGroupss(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
+    public List<AdditionalAttackGroup> addMoreAttackGroups(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
         return super.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
+    }
+
+    @FunctionalInterface
+    public interface AttackGroupFactory<G> {
+        @SuppressWarnings("unchecked")
+        G random(float chance, AnimationManager.AnimationAccessor<? extends StaticAnimation>... animations);
+    }
+
+//    Smart npc mod with epicfight mod installed reuse this
+    public List<AdditionalAttackGroup> addAvModAttackGroups(Function<Item, CapabilityItem.Builder> preset, CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
+        return addAvModAttackGroups(
+                preset,
+                style,
+                AdditionalAttackGroup::random,
+                () -> addMoreAttackGroups(mainHandCap, offHandCap, style)
+        );
+    }
+
+    public static <G> List<G> addAvModAttackGroups(
+            Function<Item, CapabilityItem.Builder> preset,
+            Style style,
+            AttackGroupFactory<G> groupFactory,
+            Supplier<List<G>> fallback
+    ) {
+        if (preset == AVWeaponCapabilityPresets.AV_SWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, DarkNightPursuitersAnimations.HOOK_SLASH_GROUND, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(groupFactory.random(0.15F, EFNDualSwordAnimations.NF_DUAL_DODGE, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.WOOPIE_THE_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.WOOPIE_INNATE_SPECIAL, AnimsAVSword.WOOPIE_INNATE));
+        }
+        if (preset == AVWeaponCapabilityPresets.GREAT_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.GREAT_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.THUNDER_DIAMOND_BLADE) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.THUNDER_DIAMOND_BLADE_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(groupFactory.random(0.15F, AnimsAVSword.THUNDER_DIAMOND_BLADE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.BLACK_FIRE_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.BLACK_FIRE_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.DIAMOND_ATTRACTOR_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_ATTRACTOR_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.DIAMOND_BLASTER_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_BLASTER_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.HACKER_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.HACKER_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        }
+        if (preset == AVWeaponCapabilityPresets.HOOK_SWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_INNATE1, AnimsAVSword.HOOK_SWORD_INNATE2, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.FLANKER_HOOK_SWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(groupFactory.random(0.15F, AnimsAVSword.FLANKER_HOOK_SWORD_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.DNAX_HOOK_SWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.DNAX_HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    : List.of(groupFactory.random(0.15F, AnimsAVSword.DNAX_HOOK_SWORD_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_TACHI) {
+            return List.of(groupFactory.random(0.15F, AnimsAVTachi.AV_TACHI_INNATE, AnimsAVTachi.AV_TACHI_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_LONGSWORD) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, DarkNightPursuitersAnimations.DP_DUSK_REAVER_2, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1))
+                    : List.of(groupFactory.random(0.15F, StraightSwordAnimations.STRAIGHTSWORD_HEAVY_AUTO5, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_GREATSWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATSWORD_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_GREATAXE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATAXE_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.CRAFTING_TABLE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATSWORD_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_AXE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL));
+        }
+        if (preset == AVWeaponCapabilityPresets.RED_AXE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATAXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL));
+        }
+        if (preset == AVWeaponCapabilityPresets.EARTH_AXE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVAxe.EARTH_AXE_INNATE, AnimsAVAxe.EARTH_AXE_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_DUAL_AXE) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL))
+                    : List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_DUAL_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_DAGGER) {
+            return style == CapabilityItem.Styles.TWO_HAND
+                    ? List.of(groupFactory.random(0.15F, Animations.BLADE_RUSH_COMBO1, Animations.BLADE_RUSH_COMBO2, Animations.BLADE_RUSH_COMBO3, EFNSwordAnimations.NF_SWORD_SKILL_SECOND))
+                    : List.of(groupFactory.random(0.15F, AnimsAVSword.AV_DAGGER_INNATE, EFNSwordAnimations.NF_SWORD_SKILL_SECOND)
+            );
+        }
+        if (preset == AVWeaponCapabilityPresets.AV_SPEAR) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSpear.AV_SPEAR_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.STAFF) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSpear.STAFF_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
+        }
+        if (preset == AVWeaponCapabilityPresets.SICKLE) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSpear.SICKLE_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
+        }
+        return fallback.get();
     }
 
     @Override
     protected List<AdditionalAttackGroup> getAdditionalAttackGroups(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
-        var preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);
+        Function<Item, CapabilityItem.Builder> preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);
         if (preset == WeaponCapabilityPresets.SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(AdditionalAttackGroup.random(0.25F, Animations.DANCING_EDGE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
@@ -313,7 +439,7 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
                     AdditionalAttackGroup.random(0.15F, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_ELECTRIC_FIELD, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THUNDER_ATTACK)
             );
         }
-        return addMoreAttackGroupss(mainHandCap, offHandCap, style);
+        return addAvModAttackGroups(preset, mainHandCap, offHandCap, style);
     }
 
     @Override
