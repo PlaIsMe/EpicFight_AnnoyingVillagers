@@ -39,7 +39,7 @@ public class IllagerMobEpicFightOverlayLayer<
     private ResourceLocation pickTexture(E entity) {
         if (entity instanceof AbstractIllager
                 && ObedienceMobEffect.canBeObedientMob(entity)
-                && entity.hasEffect(AnnoyingVillagersModMobEffects.OBEDIENCE.get())) {
+                && entity.hasEffect(AnnoyingVillagersModMobEffects.OBEDIENCE)) {
             return ILLAGER_EYES;
         }
 

@@ -85,9 +85,9 @@ public abstract class AdvancedPlayerNpcPatchMixin {
     ) {
         List<AdditionalAttackGroup> originalGroups = cir.getReturnValue();
         cir.setReturnValue(AdvancedAvNpcPatch.addAvModAttackGroups(
-                WeaponCapabilityPresetTracking.getPreset(mainHandCap),
+                item -> (CapabilityItem.Builder<?>) WeaponCapabilityPresetTracking.getPreset(mainHandCap).apply(item),
                 style,
-                AdditionalAttackGroup::random,
+                (chance, animations) -> AdditionalAttackGroup.random(chance, animations),
                 () -> originalGroups
         ));
     }

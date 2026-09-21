@@ -1,37 +1,24 @@
 package com.pla.epicfight_annoyingvillagers;
 
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.pla.annoyingvillagers.init.*;
-import com.pla.annoyingvillagers.network.*;
 import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillCategories;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillDataKeys;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillSlots;
-import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
-import com.pla.epicfight_annoyingvillagers.network.KickMessage;
-import com.pla.epicfight_annoyingvillagers.init.EpicFightAnnoyingVillagersModMenus;
-import com.pla.epicfight_annoyingvillagers.network.BreakEmoteMessage;
-import com.pla.epicfight_annoyingvillagers.network.EmoteButtonMessage;
-import com.pla.epicfight_annoyingvillagers.network.OpenEmoteMenuMessage;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkEvent.Context;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import com.pla.epicfight_annoyingvillagers.gameasset.AVSkills;
+import com.pla.epicfight_annoyingvillagers.init.EpicFightAnnoyingVillagersModPatchEntities;
+import com.pla.epicfight_annoyingvillagers.network.NetworkRegister;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import yesman.epicfight.gameasset.Armatures;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.SkillCategory;
 import yesman.epicfight.skill.SkillSlot;
 
@@ -39,57 +26,22 @@ import yesman.epicfight.skill.SkillSlot;
 public class EpicFightAnnoyingVillagers {
     public static final Logger LOGGER = LogManager.getLogger(EpicFightAnnoyingVillagers.class);
     public static final String MODID = "epicfight_annoyingvillagers";
-    public static final SimpleChannel PACKET_HANDLER = NetworkRegistry
-            .newSimpleChannel(ResourceLocation.fromNamespaceAndPath(EpicFightAnnoyingVillagers.MODID, "main"), () -> "1", "1"::equals, "1"::equals);
-    private static int messageID = 0;
-
-    public EpicFightAnnoyingVillagers(FMLJavaModLoadingContext context) {
-        IEventBus modEventBus = context.getModEventBus();
+    public EpicFightAnnoyingVillagers(IEventBus modEventBus, ModContainer modContainer) {
         SkillCategory.ENUM_MANAGER.registerEnumCls(MODID, AVSkillCategories.class);
         SkillSlot.ENUM_MANAGER.registerEnumCls(MODID, AVSkillSlots.class);
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(AVWeaponCapabilityPresets::register);
-        context.registerConfig(ModConfig.Type.COMMON, EpicFightAnnoyingVillagersConfig.SPEC, "epicfight_annoyingvillagers-server.toml");
+        EpicFightEventHooks.Registry.WEAPON_CAPABILITY_PRESET.registerEvent(
+                AVWeaponCapabilityPresets::register, MODID);
+        EpicFightEventHooks.Registry.ENTITY_PATCH.registerEvent(
+                EpicFightAnnoyingVillagersModPatchEntities::setPatch, MODID);
+        modEventBus.addListener(NetworkRegister::register);
+        modContainer.registerConfig(ModConfig.Type.COMMON, EpicFightAnnoyingVillagersConfig.SPEC, "epicfight_annoyingvillagers-server.toml");
         AVSkillDataKeys.DATA_KEYS.register(modEventBus);
-        EpicFightAnnoyingVillagersModMenus.register(modEventBus);
+        AVSkills.SKILLS.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(EpicFightAnnoyingVillagers::registerArmatures);
-    }
-
-    public static <T> void addNetworkMessage(Class<T> oclass, BiConsumer<T, FriendlyByteBuf> biconsumer, Function<FriendlyByteBuf, T> function, BiConsumer<T, Supplier<Context>> biconsumer1) {
-        EpicFightAnnoyingVillagers.PACKET_HANDLER.registerMessage(EpicFightAnnoyingVillagers.messageID, oclass, biconsumer, function, biconsumer1);
-        ++EpicFightAnnoyingVillagers.messageID;
-    }
-
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class initer {
-        @SubscribeEvent
-        public static void init(FMLCommonSetupEvent fmlCommonSetupEvent) {
-            EpicFightAnnoyingVillagers.addNetworkMessage(
-                    ClientboundEpicFightCameraFx.class,
-                    ClientboundEpicFightCameraFx::encode,
-                    ClientboundEpicFightCameraFx::decode,
-                    ClientboundEpicFightCameraFx::handle
-            );
-
-            EpicFightAnnoyingVillagers.addNetworkMessage(
-                    KickMessage.class,
-                    KickMessage::buffer,
-                    KickMessage::new,
-                    KickMessage::handle
-            );
-            EpicFightAnnoyingVillagers.addNetworkMessage(
-                    EmoteButtonMessage.class, EmoteButtonMessage::encode,
-                    EmoteButtonMessage::decode, EmoteButtonMessage::handle);
-            EpicFightAnnoyingVillagers.addNetworkMessage(
-                    OpenEmoteMenuMessage.class, OpenEmoteMenuMessage::encode,
-                    OpenEmoteMenuMessage::decode, OpenEmoteMenuMessage::handle);
-            EpicFightAnnoyingVillagers.addNetworkMessage(
-                    BreakEmoteMessage.class, BreakEmoteMessage::encode,
-                    BreakEmoteMessage::decode, BreakEmoteMessage::handle);
-        }
     }
 
     public static void registerArmatures() {

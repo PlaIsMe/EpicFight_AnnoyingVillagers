@@ -16,11 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 
 @Mixin(value = BlueDemonEntity.class, remap = false)
 public abstract class BlueDemonEntityMixin {
@@ -96,12 +96,12 @@ public abstract class BlueDemonEntityMixin {
 
     @Inject(method = "addEpicFightAttributes", at = @At("HEAD"))
     private static void addEpicFightAttributes(Builder builder, CallbackInfoReturnable<Builder> cir) {
-        builder.add(EpicFightAttributes.IMPACT.get(), 4.0D)
-                .add(EpicFightAttributes.ARMOR_NEGATION.get(), 10.0D)
-                .add(EpicFightAttributes.STUN_ARMOR.get(), 20.0D)
-                .add(EpicFightAttributes.MAX_STRIKES.get(), 100.0D)
-                .add(EpicFightAttributes.MAX_STAMINA.get(), 60.0D)
-                .add(EpicFightAttributes.STAMINA_REGEN.get(), 1.5D);
+        builder.add(EpicFightAttributes.IMPACT, 4.0D)
+                .add(EpicFightAttributes.ARMOR_NEGATION, 10.0D)
+                .add(EpicFightAttributes.STUN_ARMOR, 20.0D)
+                .add(EpicFightAttributes.MAX_STRIKES, 100.0D)
+                .add(EpicFightAttributes.MAX_STAMINA, 60.0D)
+                .add(EpicFightAttributes.STAMINA_REGEN, 1.5D);
     }
 
     @Inject(method = "conditionToAbsorbNearbyGroundedTridents", at = @At("HEAD"), cancellable = true)

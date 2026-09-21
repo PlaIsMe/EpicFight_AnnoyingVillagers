@@ -6,8 +6,8 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSword;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import yesman.epicfight.api.animation.types.StaticAnimation;

@@ -10,10 +10,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import reascer.wom.world.entity.mob.EnderHand;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
@@ -22,7 +23,7 @@ import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 
 import java.util.Objects;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class ExplosionDamageEvent {
     @SubscribeEvent
     public static void onExplode(ExplosionEvent.Detonate detonate) {
@@ -31,7 +32,7 @@ public class ExplosionDamageEvent {
         }
 
         LivingEntity livingEntity = detonate.getExplosion().getIndirectSourceEntity();
-        final Vec3 center = detonate.getExplosion().getPosition();
+        final Vec3 center = detonate.getExplosion().center();
 
         if (livingEntity != null && livingEntity.isAlive() && livingEntity.level() instanceof ServerLevel serverLevel) {
             LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(livingEntity, LivingEntityPatch.class);

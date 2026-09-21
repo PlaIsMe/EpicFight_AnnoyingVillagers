@@ -19,8 +19,8 @@ public abstract class ItemCapabilityReloadListenerPresetMixin {
             require = 2
     )
     private static Object annoyingvillagers$rememberPreset(
-            Function<Item, CapabilityItem.Builder> preset, Object item, Operation<Object> original) {
+            Function<Item, ? extends CapabilityItem.Builder<?>> preset, Object item, Operation<Object> original) {
         return WeaponCapabilityPresetTracking.recordBuilder(
-                (CapabilityItem.Builder) original.call(preset, item), preset);
+                (CapabilityItem.Builder<?>) original.call(preset, item), preset);
     }
 }

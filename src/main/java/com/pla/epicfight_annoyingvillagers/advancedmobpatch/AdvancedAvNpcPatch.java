@@ -11,16 +11,14 @@ import com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal;
 import com.pla.annoyingvillagers.rig.RigAnimationController;
 import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
 import com.pla.epicfight_annoyingvillagers.capabilities.WeaponCapabilityPresetTracking;
-import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolutionBehaviorProvider;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.fml.ModList;
-import net.shelmarow.ef_awaken.efassets.animations.DarkNightPursuitersAnimations;
-import net.shelmarow.ef_awaken.efassets.animations.StraightSwordAnimations;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.component.DataComponents;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
@@ -30,7 +28,7 @@ import yesman.epicfight.world.capabilities.entitypatch.Factions;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.Style;
-import yesman.epicfight.world.capabilities.item.WeaponCapabilityPresets;
+import yesman.epicfight.world.capabilities.item.WeaponTypeReloadListener;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -50,8 +48,8 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
             }
         }
     }
-    public AdvancedAvNpcPatch() {
-        super(Factions.NEUTRAL);
+    public AdvancedAvNpcPatch(T original) {
+        super(original, Factions.NEUTRAL);
         this.setChasingSpeed(1.0D);
     }
 
@@ -134,9 +132,6 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,
                                           CapabilityItem offHandCap, Style style) {
-        if (ModList.get().isLoaded("combat_evolution")) {
-            CombatEvolutionBehaviorProvider.addTo(builder);
-        }
 
         addDodgeBehaviorRoot(builder);
 
@@ -211,7 +206,7 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     }
 
 //    Smart npc mod with epicfight mod installed reuse this
-    public List<AdditionalAttackGroup> addAvModAttackGroups(Function<Item, CapabilityItem.Builder> preset, CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
+    public List<AdditionalAttackGroup> addAvModAttackGroups(Function<Item, ? extends CapabilityItem.Builder<?>> preset, CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
         return addAvModAttackGroups(
                 preset,
                 style,
@@ -221,105 +216,105 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     }
 
     public static <G> List<G> addAvModAttackGroups(
-            Function<Item, CapabilityItem.Builder> preset,
+            Function<Item, ? extends CapabilityItem.Builder<?>> preset,
             Style style,
             AttackGroupFactory<G> groupFactory,
             Supplier<List<G>> fallback
     ) {
-        if (preset == AVWeaponCapabilityPresets.AV_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, DarkNightPursuitersAnimations.HOOK_SLASH_GROUND, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(groupFactory.random(0.15F, AnimsEpicFightAwaken.HOOK_SLASH_GROUND, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(groupFactory.random(0.15F, EFNDualSwordAnimations.NF_DUAL_DODGE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.WOOPIE_THE_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.WOOPIE_THE_SWORD) {
             return List.of(groupFactory.random(0.15F, AnimsAVSword.WOOPIE_INNATE_SPECIAL, AnimsAVSword.WOOPIE_INNATE));
         }
-        if (preset == AVWeaponCapabilityPresets.GREAT_SWORD) {
-            return List.of(groupFactory.random(0.15F, AnimsAVSword.GREAT_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        if ((Object) preset == AVWeaponCapabilityPresets.GREAT_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.GREAT_SWORD_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH));
         }
-        if (preset == AVWeaponCapabilityPresets.THUNDER_DIAMOND_BLADE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.THUNDER_DIAMOND_BLADE) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.THUNDER_DIAMOND_BLADE_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.THUNDER_DIAMOND_BLADE_DUAL_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(groupFactory.random(0.15F, AnimsAVSword.THUNDER_DIAMOND_BLADE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.BLACK_FIRE_SWORD) {
-            return List.of(groupFactory.random(0.15F, AnimsAVSword.BLACK_FIRE_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        if ((Object) preset == AVWeaponCapabilityPresets.BLACK_FIRE_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.BLACK_FIRE_SWORD_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH));
         }
-        if (preset == AVWeaponCapabilityPresets.DIAMOND_ATTRACTOR_SWORD) {
-            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_ATTRACTOR_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        if ((Object) preset == AVWeaponCapabilityPresets.DIAMOND_ATTRACTOR_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_ATTRACTOR_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH));
         }
-        if (preset == AVWeaponCapabilityPresets.DIAMOND_BLASTER_SWORD) {
-            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_BLASTER_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        if ((Object) preset == AVWeaponCapabilityPresets.DIAMOND_BLASTER_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.DIAMOND_BLASTER_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH));
         }
-        if (preset == AVWeaponCapabilityPresets.HACKER_SWORD) {
-            return List.of(groupFactory.random(0.15F, AnimsAVSword.HACKER_SWORD_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH));
+        if ((Object) preset == AVWeaponCapabilityPresets.HACKER_SWORD) {
+            return List.of(groupFactory.random(0.15F, AnimsAVSword.HACKER_SWORD_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH));
         }
-        if (preset == AVWeaponCapabilityPresets.HOOK_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.HOOK_SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_INNATE1, AnimsAVSword.HOOK_SWORD_INNATE2, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.FLANKER_HOOK_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.FLANKER_HOOK_SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.HOOK_SWORD_DUAL_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(groupFactory.random(0.15F, AnimsAVSword.FLANKER_HOOK_SWORD_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.DNAX_HOOK_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.DNAX_HOOK_SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.DNAX_HOOK_SWORD_DUAL_INNATE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(groupFactory.random(0.15F, AnimsAVSword.DNAX_HOOK_SWORD_DUAL_INNATE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(groupFactory.random(0.15F, AnimsAVSword.DNAX_HOOK_SWORD_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.AV_TACHI) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_TACHI) {
             return List.of(groupFactory.random(0.15F, AnimsAVTachi.AV_TACHI_INNATE, AnimsAVTachi.AV_TACHI_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.AV_LONGSWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_LONGSWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(groupFactory.random(0.15F, DarkNightPursuitersAnimations.DP_DUSK_REAVER_2, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1))
-                    : List.of(groupFactory.random(0.15F, StraightSwordAnimations.STRAIGHTSWORD_HEAVY_AUTO5, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1)
+                    ? List.of(groupFactory.random(0.15F, AnimsEpicFightAwaken.DP_DUSK_REAVER_2, AnimsEpicFightAwaken.STRAIGHTSWORD_DODGE_SLASH1))
+                    : List.of(groupFactory.random(0.15F, AnimsEpicFightAwaken.STRAIGHTSWORD_HEAVY_AUTO5, AnimsEpicFightAwaken.STRAIGHTSWORD_DODGE_SLASH1)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.AV_GREATSWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_GREATSWORD) {
             return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATSWORD_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.AV_GREATAXE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_GREATAXE) {
             return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATAXE_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.CRAFTING_TABLE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.CRAFTING_TABLE) {
             return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATSWORD_INNATE, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.AV_AXE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_AXE) {
             return List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL));
         }
-        if (preset == AVWeaponCapabilityPresets.RED_AXE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.RED_AXE) {
             return List.of(groupFactory.random(0.15F, AnimsAVGreatsword.AV_GREATAXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL));
         }
-        if (preset == AVWeaponCapabilityPresets.EARTH_AXE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.EARTH_AXE) {
             return List.of(groupFactory.random(0.15F, AnimsAVAxe.EARTH_AXE_INNATE, AnimsAVAxe.EARTH_AXE_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.AV_DUAL_AXE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_DUAL_AXE) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_INNATE, EFNSwordAnimations.NF_SWORD_SKILL))
                     : List.of(groupFactory.random(0.15F, AnimsAVAxe.AV_AXE_DUAL_INNATE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.AV_DAGGER) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_DAGGER) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(groupFactory.random(0.15F, Animations.BLADE_RUSH_COMBO1, Animations.BLADE_RUSH_COMBO2, Animations.BLADE_RUSH_COMBO3, EFNSwordAnimations.NF_SWORD_SKILL_SECOND))
                     : List.of(groupFactory.random(0.15F, AnimsAVSword.AV_DAGGER_INNATE, EFNSwordAnimations.NF_SWORD_SKILL_SECOND)
             );
         }
-        if (preset == AVWeaponCapabilityPresets.AV_SPEAR) {
+        if ((Object) preset == AVWeaponCapabilityPresets.AV_SPEAR) {
             return List.of(groupFactory.random(0.15F, AnimsAVSpear.AV_SPEAR_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.STAFF) {
+        if ((Object) preset == AVWeaponCapabilityPresets.STAFF) {
             return List.of(groupFactory.random(0.15F, AnimsAVSpear.STAFF_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.SICKLE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.SICKLE) {
             return List.of(groupFactory.random(0.15F, AnimsAVSpear.SICKLE_INNATE, AnimsAVSpear.AV_SPEAR_SPECIAL));
         }
         return fallback.get();
@@ -327,56 +322,56 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
 
     @Override
     protected List<AdditionalAttackGroup> getAdditionalAttackGroups(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
-        Function<Item, CapabilityItem.Builder> preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);
-        if (preset == WeaponCapabilityPresets.SWORD) {
+        Function<Item, ? extends CapabilityItem.Builder<?>> preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);
+        if (isEpicFightPreset(preset, "sword")) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.DANCING_EDGE, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH))
+                    ? List.of(AdditionalAttackGroup.random(0.25F, Animations.DANCING_EDGE, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH))
                     : List.of(AdditionalAttackGroup.random(0.25F, Animations.SWEEPING_EDGE, EFNSwordAnimations.NF_SWORD_SKILL)
             );
         }
-        if (preset == WeaponCapabilityPresets.AXE) {
+        if (isEpicFightPreset(preset, "axe")) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.THE_GUILLOTINE, EFNSwordAnimations.NF_SWORD_SKILL));
         }
-        if (preset == WeaponCapabilityPresets.TACHI) {
+        if (isEpicFightPreset(preset, "tachi")) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.RUSHING_TEMPO1,
                     Animations.RUSHING_TEMPO2, Animations.RUSHING_TEMPO3, AnimsAVTachi.AV_TACHI_SPECIAL));
         }
-        if (preset == WeaponCapabilityPresets.SPEAR) {
+        if (isEpicFightPreset(preset, "spear")) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(AdditionalAttackGroup.random(0.25F, Animations.GRASPING_SPIRAL_FIRST,
                     Animations.GRASPING_SPIRAL_SECOND, AnimsAVSpear.AV_SPEAR_SPECIAL))
                     : List.of(AdditionalAttackGroup.random(0.25F, Animations.HEARTPIERCER, AnimsAVSpear.AV_SPEAR_SPECIAL)
             );
         }
-        if (preset == WeaponCapabilityPresets.GREATSWORD) {
+        if (isEpicFightPreset(preset, "greatsword")) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.STEEL_WHIRLWIND, AnimsAVGreatsword.AV_GREATSWORD_SPECIAL));
         }
-        if (preset == WeaponCapabilityPresets.UCHIGATANA) {
+        if (isEpicFightPreset(preset, "uchigatana")) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.BATTOJUTSU, Animations.BATTOJUTSU_DASH));
         }
-        if (preset == WeaponCapabilityPresets.LONGSWORD) {
+        if (isEpicFightPreset(preset, "longsword")) {
             return style == CapabilityItem.Styles.TWO_HAND
-                    ? List.of(AdditionalAttackGroup.random(0.25F, StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_PURSUIT))
-                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.SHARP_STAB, StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1)
+                    ? List.of(AdditionalAttackGroup.random(0.25F, AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_PURSUIT))
+                    : List.of(AdditionalAttackGroup.random(0.25F, Animations.SHARP_STAB, AnimsEpicFightAwaken.STRAIGHTSWORD_DODGE_SLASH1)
             );
         }
-        if (preset == WeaponCapabilityPresets.DAGGER) {
+        if (isEpicFightPreset(preset, "dagger")) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(AdditionalAttackGroup.random(0.25F, Animations.BLADE_RUSH_COMBO1, Animations.BLADE_RUSH_COMBO2, Animations.BLADE_RUSH_COMBO3, EFNSwordAnimations.NF_SWORD_SKILL_SECOND))
                     : List.of(AdditionalAttackGroup.random(0.25F, Animations.EVISCERATE_FIRST, Animations.EVISCERATE_SECOND, EFNSwordAnimations.NF_SWORD_SKILL_SECOND)
             );
         }
-        if (preset == WeaponCapabilityPresets.FIST) {
+        if (isEpicFightPreset(preset, "fist")) {
             return List.of(AdditionalAttackGroup.random(0.25F, Animations.RELENTLESS_COMBO, AnimsAVFist.WHIRLWIND_KICK,
                     AnimsAVFist.FIST_LEFT, AnimsAVFist.FIST_UP, AnimsAVFist.FIST_DASH));
         }
-        if (preset == AVWeaponCapabilityPresets.OBSIDIAN_WEAPON) {
+        if ((Object) preset == AVWeaponCapabilityPresets.OBSIDIAN_WEAPON) {
             return List.of(AdditionalAttackGroup.random(0.25F,
                     AnimsObsidianWeapon.OBSIDIAN_WEAPON_INNATE_SPECIAL,
                     AnimsObsidianWeapon.OBSIDIAN_WEAPON_SPECIAL,
                     AnimsObsidianWeapon.OBSIDIAN_WEAPON_TWOHAND_2));
         }
-        if (preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_PILLAR) {
+        if ((Object) preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_PILLAR) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(
                     AdditionalAttackGroup.random(
@@ -394,7 +389,7 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
                     )
             );
         }
-        if (preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.SHADOW_OBSIDIAN_SWORD) {
             return style == CapabilityItem.Styles.TWO_HAND
                     ? List.of(
                     AdditionalAttackGroup.random(
@@ -412,25 +407,25 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
                     )
             );
         }
-        if (preset == AVWeaponCapabilityPresets.ENDER_AEGIS) {
+        if ((Object) preset == AVWeaponCapabilityPresets.ENDER_AEGIS) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderAegis.ENDER_AEGIS_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.ENDER_GLAIVE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.ENDER_GLAIVE) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderGlaive.ENDER_GLAIVE_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.ENDER_SLAYER_SCYTHE) {
+        if ((Object) preset == AVWeaponCapabilityPresets.ENDER_SLAYER_SCYTHE) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.DEMONIAC_VOLTAGE_REAVER) {
+        if ((Object) preset == AVWeaponCapabilityPresets.DEMONIAC_VOLTAGE_REAVER) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.OBSIDIAN_SLEDGEHAMMER) {
+        if ((Object) preset == AVWeaponCapabilityPresets.OBSIDIAN_SLEDGEHAMMER) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.LEGENDARY_SWORD) {
+        if ((Object) preset == AVWeaponCapabilityPresets.LEGENDARY_SWORD) {
             return List.of(AdditionalAttackGroup.random(0.15F, AnimsLegendarySword.LEGENDARY_SWORD_SPECIAL));
         }
-        if (preset == AVWeaponCapabilityPresets.BLUE_DEMON_TRIDENT) {
+        if ((Object) preset == AVWeaponCapabilityPresets.BLUE_DEMON_TRIDENT) {
             return List.of(
                     AdditionalAttackGroup.random(0.25F, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_1, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_2,
                             AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_3, AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_THROW_4,
@@ -447,7 +442,7 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
         super.updateMotion(considerInaction);
         if (this.getOriginal() instanceof AVNpc playerNpc) {
             boolean eating = !playerNpc.isSleeping() && playerNpc.isAlive()
-                    && playerNpc.isHealing() && playerNpc.isUsingItem() && playerNpc.getUseItem().isEdible();
+                    && playerNpc.isHealing() && playerNpc.isUsingItem() && playerNpc.getUseItem().has(DataComponents.FOOD);
             AvNpcAnimationCompat.updateClientEatingAnimation(this, eating);
             if (playerNpc.isSleeping()) {
                 this.currentLivingMotion = LivingMotions.SLEEP;
@@ -478,6 +473,12 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
             this.currentLivingMotion = LivingMotions.CHASE;
             this.currentCompositeMotion = LivingMotions.CHASE;
         }
+    }
+
+    private static boolean isEpicFightPreset(
+            Function<Item, ? extends CapabilityItem.Builder<?>> preset, String name) {
+        return preset != null && (Object) preset == WeaponTypeReloadListener.get(
+                ResourceLocation.fromNamespaceAndPath("epicfight", name));
     }
 
     private boolean canApplyCrouchMotion() {

@@ -1,15 +1,13 @@
 package com.pla.epicfight_annoyingvillagers.capabilities;
 
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
-import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolution;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraftforge.fml.ModList;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,11 +34,6 @@ public final class MobStamina {
     }
 
     public static float getDecreaseValue(MobPatch<?> patch, double percentage) {
-        // CE keeps its stamina in CEPatchUtils rather than exposing patch getters.
-        if (ModList.get().isLoaded("combat_evolution") && CombatEvolution.isCeMobPatch(patch)) {
-            return CombatEvolution.getDecreaseValue(patch, percentage);
-        }
-
         StaminaMethods methods = METHODS.get(patch.getClass());
         if (methods.supported()) {
             try {
@@ -62,11 +55,6 @@ public final class MobStamina {
      * own their break/recovery state and effects, so they must not be neutralized twice.
      */
     public static boolean dealStaminaDamage(DamageSource source, float amount, MobPatch<?> patch) {
-        if (ModList.get().isLoaded("combat_evolution") && CombatEvolution.isCeMobPatch(patch)) {
-            CombatEvolution.dealStaminaDamage(source, amount, patch);
-            return false;
-        }
-
         StaminaMethods methods = METHODS.get(patch.getClass());
         if (methods.supported()) {
             try {
@@ -113,7 +101,7 @@ public final class MobStamina {
     }
 
     private static float getFallbackMaxStamina(MobPatch<?> patch) {
-        AttributeInstance attribute = patch.getOriginal().getAttribute(EpicFightAttributes.MAX_STAMINA.get());
+        AttributeInstance attribute = patch.getOriginal().getAttribute(EpicFightAttributes.MAX_STAMINA);
         float maximum = attribute == null ? DEFAULT_MAX_STAMINA : (float) attribute.getValue();
         return Float.isFinite(maximum) && maximum > 0.0F ? maximum : DEFAULT_MAX_STAMINA;
     }

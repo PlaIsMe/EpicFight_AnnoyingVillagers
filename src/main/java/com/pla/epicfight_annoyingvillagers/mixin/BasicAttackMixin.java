@@ -6,9 +6,9 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import yesman.epicfight.skill.BasicAttack;
+import yesman.epicfight.skill.common.ComboAttacks;
 
-@Mixin(BasicAttack.class)
+@Mixin(ComboAttacks.class)
 public abstract class BasicAttackMixin {
     @Redirect(
             method = "executeOnServer",

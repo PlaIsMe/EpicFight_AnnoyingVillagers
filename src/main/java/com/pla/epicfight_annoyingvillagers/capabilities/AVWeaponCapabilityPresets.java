@@ -13,14 +13,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
-import net.shelmarow.ef_awaken.efassets.animations.DarkNightPursuitersAnimations;
-import net.shelmarow.ef_awaken.efassets.animations.StraightSwordAnimations;
+import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEpicFightAwaken;
+
 import reascer.wom.gameasset.WOMAnimations;
 import reascer.wom.gameasset.animations.weapons.*;
 import reascer.wom.gameasset.colliders.WOMWeaponColliders;
 import yesman.epicfight.api.animation.LivingMotions;
-import yesman.epicfight.api.forgeevent.WeaponCapabilityPresetRegistryEvent;
+import yesman.epicfight.api.event.types.registry.WeaponCapabilityPresetRegistryEvent;
 import yesman.epicfight.gameasset.*;
+import yesman.epicfight.registry.entries.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSkills;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.CapabilityItem.Builder;
 import yesman.epicfight.world.capabilities.item.CapabilityItem.Styles;
@@ -29,7 +31,7 @@ import yesman.epicfight.world.capabilities.item.WeaponCapability;
 
 @SuppressWarnings({"deprecation", "removal"})
 public class AVWeaponCapabilityPresets {
-    public static final Function<Item, CapabilityItem.Builder> ENDER_AEGIS = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> ENDER_AEGIS = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SWORD)
                     .styleProvider((livingEntityPatch) -> Styles.TWO_HAND)
                     .collider(ColliderPreset.SWORD)
@@ -46,7 +48,7 @@ public class AVWeaponCapabilityPresets {
                     .newStyleCombo(Styles.MOUNT,
                             Animations.SPEAR_MOUNT_ATTACK)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.ENDER_AEGIS)
+                            (itemstack) -> AVSkills.ENDER_AEGIS.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsEnderAegis.ENDER_AEGIS_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, EFNDualSwordAnimations.NF_DUAL_WALK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AVAnimations.HOLD_ONEHAND_RUN)
@@ -54,7 +56,7 @@ public class AVWeaponCapabilityPresets {
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsEnderAegis.ENDER_AEGIS_GUARD)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK_SHIELD, AnimsEnderAegis.ENDER_AEGIS_GUARD);
 
-    public static final Function<Item, CapabilityItem.Builder> ENDER_GLAIVE = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> ENDER_GLAIVE = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SPEAR)
                     .styleProvider((livingEntityPatch) -> Styles.TWO_HAND)
                     .collider(WOMWeaponColliders.AGONY)
@@ -71,14 +73,14 @@ public class AVWeaponCapabilityPresets {
                     .newStyleCombo(Styles.MOUNT,
                             Animations.SPEAR_MOUNT_ATTACK)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.ENDER_GLAIVE)
+                            (itemstack) -> AVSkills.ENDER_GLAIVE.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AVAnimations.ELITE_HOLD_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AVAnimations.ELITE_WALK_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsAVSpear.AV_SPEAR_GUARD);
 
-    public static final Function<Item, CapabilityItem.Builder> ENDER_SLAYER_SCYTHE = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> ENDER_SLAYER_SCYTHE = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SPEAR)
                     .styleProvider((entityPatch) -> Styles.TWO_HAND)
                     .collider(WOMWeaponColliders.ANTITHEUS)
@@ -93,8 +95,8 @@ public class AVWeaponCapabilityPresets {
                             AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_AUTO5,
                             AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_DASH,
                             AnimsEnderSlayerScythe.ENDER_SLAYER_SCYTHE_AIRSLASH)
-                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.ENDER_SLAYER_SCYTHE)
-                    .innateSkill(Styles.MOUNT, (itemstack) -> AVSkills.ENDER_SLAYER_SCYTHE)
+                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.ENDER_SLAYER_SCYTHE.get())
+                    .innateSkill(Styles.MOUNT, (itemstack) -> AVSkills.ENDER_SLAYER_SCYTHE.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsEnderblaster.ENDERBLASTER_TWOHAND_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AnimsEnderblaster.ENDERBLASTER_TWOHAND_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AnimsEnderblaster.ENDERBLASTER_TWOHAND_IDLE)
@@ -104,7 +106,7 @@ public class AVWeaponCapabilityPresets {
                     .livingMotionModifier(Styles.MOUNT, LivingMotions.IDLE, Animations.BIPED_MOUNT)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsAVSpear.AV_SPEAR_GUARD);
 
-    public static final Function<Item, Builder> DEMONIAC_VOLTAGE_REAVER = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> DEMONIAC_VOLTAGE_REAVER = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .styleProvider(
@@ -123,14 +125,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsDemoniacVoltageReaver.DEMONIAC_VOLTAGE_REAVER_AIRSLASH
                     ).newStyleCombo(Styles.MOUNT,
                             Animations.SWORD_MOUNT_ATTACK)
-                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.DEMONIAC_VOLTAGE_REAVER)
+                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.DEMONIAC_VOLTAGE_REAVER.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AVAnimations.ELITE_HOLD_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AVAnimations.ELITE_WALK_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsSolar.SOLAR_GUARD);
 
-    public static final Function<Item, Builder> OBSIDIAN_SLEDGEHAMMER = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> OBSIDIAN_SLEDGEHAMMER = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .styleProvider(
@@ -149,14 +151,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsObsidianSledgehammer.OBSIDIAN_SLEDGEHAMMER_AIRSLASH
                     ).newStyleCombo(Styles.MOUNT,
                             Animations.SWORD_MOUNT_ATTACK)
-                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.OBSIDIAN_SLEDGEHAMMER)
+                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.OBSIDIAN_SLEDGEHAMMER.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AVAnimations.ELITE_HOLD_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AVAnimations.ELITE_WALK_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AVAnimations.ELITE_RUN_WEAPON)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsRuine.RUINE_GUARD);
 
-    public static final Function<Item, CapabilityItem.Builder> NULL_WEAPON = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> NULL_WEAPON = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SWORD)
                     .styleProvider((livingEntityPatch) -> Styles.TWO_HAND)
                     .collider(ColliderPreset.FIST)
@@ -171,14 +173,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsNullWeapon.NULL_WEAPON_DASH,
                             AnimsNullWeapon.NULL_WEAPON_AIRSLASH)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.NULL_WEAPON)
+                            (itemstack) -> AVSkills.NULL_WEAPON.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsNullWeapon.NULL_WEAPON_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AnimsNullWeapon.NULL_WEAPON_WALK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AnimsNullWeapon.NULL_WEAPON_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AnimsNullWeapon.NULL_WEAPON_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AVAnimations.FIST_GUARD);
 
-    public static final Function<Item, CapabilityItem.Builder> OBSIDIAN_WEAPON = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> OBSIDIAN_WEAPON = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SWORD)
                     .styleProvider((livingEntityPatch) -> Styles.TWO_HAND)
                     .collider(ColliderPreset.FIST)
@@ -193,14 +195,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsObsidianWeapon.OBSIDIAN_WEAPON_DASH,
                             AnimsObsidianWeapon.OBSIDIAN_WEAPON_AIRSLASH)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.OBSIDIAN_WEAPON)
+                            (itemstack) -> AVSkills.OBSIDIAN_WEAPON.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, EFNDualSwordAnimations.NF_DUAL_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, EFNDualSwordAnimations.NF_DUAL_WALK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AVAnimations.HEROBRINE_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AVAnimations.HEROBRINE_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AVAnimations.FIST_GUARD);
 
-    public static final Function<Item, CapabilityItem.Builder> SHADOW_OBSIDIAN_PILLAR = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> SHADOW_OBSIDIAN_PILLAR = (item) ->
             WeaponCapability.builder().category(WeaponCategories.SWORD)
                     .styleProvider(
                             (livingentitypatch) -> livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get()) ? Styles.OCHS : Styles.TWO_HAND)
@@ -224,9 +226,9 @@ public class AVWeaponCapabilityPresets {
                             AnimsObsidianWeapon.OBSIDIAN_WEAPON_DASH,
                             AnimsObsidianWeapon.OBSIDIAN_WEAPON_AIRSLASH)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_PILLAR)
+                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_PILLAR.get())
                     .innateSkill(Styles.OCHS,
-                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_PILLAR_SWORD)
+                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_PILLAR_SWORD.get())
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, EFNDualSwordAnimations.NF_DUAL_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, EFNDualSwordAnimations.NF_DUAL_WALK)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, AVAnimations.HEROBRINE_RUN)
@@ -235,7 +237,7 @@ public class AVWeaponCapabilityPresets {
                     .weaponCombinationPredicator(
                             (livingentitypatch) -> livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get()));;
 
-    public static final Function<Item, Builder> SHADOW_OBSIDIAN_SWORD = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> SHADOW_OBSIDIAN_SWORD = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.SWORD)
                     .canBePlacedOffhand(true)
@@ -260,9 +262,9 @@ public class AVWeaponCapabilityPresets {
                             AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_DASH,
                             AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AIRSLASH)
                     .innateSkill(Styles.ONE_HAND,
-                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_SWORD)
+                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_SWORD.get())
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_SWORD_DUAL)
+                            (itemstack) -> AVSkills.SHADOW_OBSIDIAN_SWORD_DUAL.get())
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, EFNDualSwordAnimations.NF_DUAL_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, EFNDualSwordAnimations.NF_DUAL_WALK)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, AVAnimations.HEROBRINE_RUN)
@@ -272,7 +274,7 @@ public class AVWeaponCapabilityPresets {
                     .weaponCombinationPredicator(
                             (livingentitypatch) -> livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.get()));
 
-    public static final Function<Item, Builder> LEGENDARY_SWORD = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> LEGENDARY_SWORD = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .styleProvider(
@@ -291,15 +293,17 @@ public class AVWeaponCapabilityPresets {
                             AnimsLegendarySword.LEGENDARY_SWORD_AIRSLASH
                     ).newStyleCombo(Styles.OCHS,
                             AnimsLegendarySword.LEGENDARY_SWORD_WOOPIE_AUTO1,
-                            StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO1,
-                            StraightSwordAnimations.STRAIGHTSWORD_DUAL_DASH_LIGHT,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO1,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DASH_LIGHT,
                             AnimsLegendarySword.LEGENDARY_SWORD_AUTO4,
                             AnimsLegendarySword.LEGENDARY_SWORD_AUTO5,
                             AnimsLegendarySword.LEGENDARY_SWORD_DASH,
                             AnimsLegendarySword.LEGENDARY_SWORD_AIRSLASH
                     ).newStyleCombo(Styles.MOUNT, Animations.SWORD_MOUNT_ATTACK)
-                    .innateSkill(Styles.COMMON,
-                            (itemstack) -> AVSkills.LEGENDARY_SWORD)
+                    .innateSkill(Styles.TWO_HAND,
+                            (itemstack) -> AVSkills.LEGENDARY_SWORD.get())
+                    .innateSkill(Styles.OCHS,
+                            (itemstack) -> AVSkills.LEGENDARY_SWORD.get())
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, AnimsLegendarySword.LEGENDARY_SWORD_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, WOMAnimations.TORMENT_BERSERK_WALK)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, WOMAnimations.TORMENT_RUN)
@@ -308,7 +312,7 @@ public class AVWeaponCapabilityPresets {
                     .weaponCombinationPredicator(
                             (livingentitypatch) -> livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof BlueDemonTridentItem || livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof WoopieTheSwordItem);
 
-    public static final Function<Item, Builder> BLUE_DEMON_TRIDENT = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> BLUE_DEMON_TRIDENT = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.SPEAR)
                     .canBePlacedOffhand(true)
@@ -332,9 +336,9 @@ public class AVWeaponCapabilityPresets {
                             AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_DASH,
                             AnimsBlueDemonTrident.BLUE_DEMON_TRIDENT_AIRSLASH)
                     .innateSkill(Styles.ONE_HAND,
-                            (itemstack) -> EpicFightSkills.WRATHFUL_LIGHTING)
+                            (itemstack) -> EpicFightSkills.WRATHFUL_LIGHTING.get())
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.TRIDENT_FESTIVAL)
+                            (itemstack) -> AVSkills.TRIDENT_FESTIVAL.get())
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, EFNDualSwordAnimations.NF_DUAL_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, EFNDualSwordAnimations.NF_DUAL_WALK)
                     .livingMotionModifier(Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
@@ -358,17 +362,17 @@ public class AVWeaponCapabilityPresets {
                 .newStyleCombo(Styles.ONE_HAND,
                         EFNSwordAnimations.NF_SWORD_AUTO1,
                         EFNSwordAnimations.NF_SWORD_AUTO2,
-                        StraightSwordAnimations.STRAIGHTSWORD_AUTO4,
-                        StraightSwordAnimations.STRAIGHTSWORD_AUTO3,
-                        StraightSwordAnimations.STRAIGHTSWORD_AUTO5,
-                        StraightSwordAnimations.STRAIGHTSWORD_DODGE_PURSUIT,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_AUTO4,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_AUTO3,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_AUTO5,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_DODGE_PURSUIT,
                         EFNSwordAnimations.NF_SWORD_AIRSLASH)
                 .newStyleCombo(Styles.TWO_HAND,
-                        StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO1,
-                        StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO2,
-                        StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO3,
-                        DarkNightPursuitersAnimations.DP_AUTO_1,
-                        DarkNightPursuitersAnimations.DP_AUTO_2,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO1,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO2,
+                        AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO3,
+                        AnimsEpicFightAwaken.DP_AUTO_1,
+                        AnimsEpicFightAwaken.DP_AUTO_2,
                         EFNDualSwordAnimations.NF_DUAL_DASH,
                         EFNDualSwordAnimations.NF_DUAL_AIRSLASH)
                 .newStyleCombo(Styles.MOUNT,
@@ -390,61 +394,73 @@ public class AVWeaponCapabilityPresets {
                                 || (livingentitypatch.getHoldingItemCapability(InteractionHand.OFF_HAND).getWeaponCategory() == WeaponCategories.TACHI)));
     }
 
-    public static final Function<Item, Builder> AV_SWORD = (item) -> avSwordTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_SWORD = (item) -> avSwordTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.SWORD)
+                    (itemstack) -> AVSkills.SWORD.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_SWORD);
+                    (itemstack) -> AVSkills.DUAL_SWORD.get());
 
-    public static final Function<Item, Builder> WOOPIE_THE_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.WOOPIE_THE_SWORD);
-
-    public static final Function<Item, Builder> GREAT_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.GREAT_SWORD);
-
-    public static final Function<Item, Builder> THUNDER_DIAMOND_BLADE = (item) -> avSwordTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> WOOPIE_THE_SWORD = (item) -> avSwordTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.THUNDER_DIAMOND_BLADE)
+                    (itemstack) -> AVSkills.WOOPIE_THE_SWORD.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_THUNDER_DIAMOND_BLADE);
+                    (itemstack) -> AVSkills.WOOPIE_THE_SWORD.get());
 
-    public static final Function<Item, Builder> BLACK_FIRE_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.BLACK_FIRE_SWORD);
-
-    public static final Function<Item, Builder> DIAMOND_ATTRACTOR_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.DIAMOND_ATTRACTOR_SWORD);
-
-    public static final Function<Item, Builder> DIAMOND_BLASTER_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.DIAMOND_BLASTER_SWORD);
-
-    public static final Function<Item, Builder> HACKER_SWORD = (item) -> avSwordTemplate()
-            .innateSkill(Styles.COMMON,
-                    (itemstack) -> AVSkills.HACKER_SWORD);
-
-    public static final Function<Item, Builder> HOOK_SWORD = (item) -> avSwordTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> GREAT_SWORD = (item) -> avSwordTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.HOOK_SWORD)
+                    (itemstack) -> AVSkills.GREAT_SWORD.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_HOOK_SWORD);
+                    (itemstack) -> AVSkills.GREAT_SWORD.get());
 
-    public static final Function<Item, Builder> FLANKER_HOOK_SWORD = (item) -> avSwordTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> THUNDER_DIAMOND_BLADE = (item) -> avSwordTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.FLANKER_HOOK_SWORD)
+                    (itemstack) -> AVSkills.THUNDER_DIAMOND_BLADE.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_HOOK_SWORD);
+                    (itemstack) -> AVSkills.DUAL_THUNDER_DIAMOND_BLADE.get());
 
-    public static final Function<Item, Builder> DNAX_HOOK_SWORD = (item) -> avSwordTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> BLACK_FIRE_SWORD = (item) -> avSwordTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.DNAX_HOOK_SWORD)
+                    (itemstack) -> AVSkills.BLACK_FIRE_SWORD.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_DNAX_HOOK_SWORD);
+                    (itemstack) -> AVSkills.BLACK_FIRE_SWORD.get());
 
-    public static final Function<Item, Builder> AV_TACHI = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> DIAMOND_ATTRACTOR_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.DIAMOND_ATTRACTOR_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.DIAMOND_ATTRACTOR_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> DIAMOND_BLASTER_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.DIAMOND_BLASTER_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.DIAMOND_BLASTER_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> HACKER_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.HACKER_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.HACKER_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> HOOK_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.HOOK_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.DUAL_HOOK_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> FLANKER_HOOK_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.FLANKER_HOOK_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.DUAL_HOOK_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> DNAX_HOOK_SWORD = (item) -> avSwordTemplate()
+            .innateSkill(Styles.ONE_HAND,
+                    (itemstack) -> AVSkills.DNAX_HOOK_SWORD.get())
+            .innateSkill(Styles.TWO_HAND,
+                    (itemstack) -> AVSkills.DUAL_DNAX_HOOK_SWORD.get());
+
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_TACHI = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.TACHI)
                     .collider(ColliderPreset.TACHI)
@@ -460,7 +476,7 @@ public class AVWeaponCapabilityPresets {
                             EFNTachiAnimations.NF_TACHI_DASH,
                             AnimsAVTachi.AV_TACHI_AIRSLASH)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.TACHI)
+                            (itemstack) -> AVSkills.TACHI.get())
                     .newStyleCombo(Styles.MOUNT,
                             Animations.SWORD_MOUNT_ATTACK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, EFNTachiAnimations.NF_TACHI_IDLE)
@@ -469,7 +485,7 @@ public class AVWeaponCapabilityPresets {
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, EFNTachiAnimations.NF_TACHI_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, Animations.LONGSWORD_GUARD);
 
-    public static final Function<Item, Builder> AV_LONGSWORD = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_LONGSWORD = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.LONGSWORD)
                     .styleProvider(
@@ -478,27 +494,27 @@ public class AVWeaponCapabilityPresets {
                     .collider(ColliderPreset.LONGSWORD)
                     .swingSound(EpicFightSounds.WHOOSH_SMALL.get())
                     .newStyleCombo(Styles.ONE_HAND,
-                            StraightSwordAnimations.STRAIGHTSWORD_HEAVY_AUTO1,
-                            StraightSwordAnimations.STRAIGHTSWORD_HEAVY_AUTO3,
-                            StraightSwordAnimations.STRAIGHTSWORD_HEAVY_AUTO4,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_HEAVY_AUTO1,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_HEAVY_AUTO3,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_HEAVY_AUTO4,
                             EFNSwordAnimations.NF_SWORD_AUTO3,
                             EFNSwordAnimations.NF_SWORD_AUTO4,
-                            StraightSwordAnimations.STRAIGHTSWORD_DASH_HEAVY,
-                            StraightSwordAnimations.STRAIGHTSWORD_AIR_SLASH_LIGHT)
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_DASH_HEAVY,
+                            AnimsEpicFightAwaken.STRAIGHTSWORD_AIR_SLASH_LIGHT)
                     .innateSkill(Styles.ONE_HAND,
-                            (itemstack) -> AVSkills.LONGSWORD)
+                            (itemstack) -> AVSkills.LONGSWORD.get())
                     .newStyleCombo(Styles.TWO_HAND,
-                            DarkNightPursuitersAnimations.DP_HEAVY_AUTO_3,
+                            AnimsEpicFightAwaken.DP_HEAVY_AUTO_3,
                             AnimsAVLongsword.AV_LONGSWORD_DUAL_AUTO2,
                             AnimsAVLongsword.AV_LONGSWORD_DUAL_AUTO3,
                             AnimsAVLongsword.AV_LONGSWORD_DUAL_AUTO4,
                             AnimsAVLongsword.AV_LONGSWORD_DUAL_AUTO5,
                             AnimsAVLongsword.AV_LONGSWORD_DUAL_DASH,
-                            DarkNightPursuitersAnimations.DP_NIGHT_FALL)
+                            AnimsEpicFightAwaken.DP_NIGHT_FALL)
                     .newStyleCombo(Styles.MOUNT,
                             Animations.SWORD_MOUNT_ATTACK)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.DUAL_LONGSWORD)
+                            (itemstack) -> AVSkills.DUAL_LONGSWORD.get())
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, EFNSwordAnimations.NF_SWORD_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, EFNSwordAnimations.NF_SWORD_WALK)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, EFNSwordAnimations.NF_SWORD_RUN)
@@ -508,7 +524,7 @@ public class AVWeaponCapabilityPresets {
                     .weaponCombinationPredicator(
                             (livingentitypatch) -> livingentitypatch.getHoldingItemCapability(InteractionHand.OFF_HAND).getWeaponCategory() == WeaponCategories.LONGSWORD);
 
-    public static final Function<Item, Builder> AV_GREATSWORD = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_GREATSWORD = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .styleProvider((livingentitypatch) -> Styles.TWO_HAND)
@@ -523,14 +539,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsAVGreatsword.AV_GREATSWORD_AUTO5,
                             EFNGreatSwordAnimations.NG_GREATSWORD_DASH,
                             AnimsAVGreatsword.AV_GREATSWORD_AIRSLASH)
-                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.HELICOPTER)
+                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.HELICOPTER.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, EFNGreatSwordAnimations.NG_GREATSWORD_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, EFNGreatSwordAnimations.NG_GREATSWOED_WALK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, EFNGreatSwordAnimations.NG_GREATSWORD_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, EFNGreatSwordAnimations.NG_GREATSWORD_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsSolar.SOLAR_GUARD);
 
-    public static final Function<Item, Builder> AV_GREATAXE = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_GREATAXE = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .styleProvider((livingentitypatch) -> Styles.TWO_HAND)
@@ -545,14 +561,14 @@ public class AVWeaponCapabilityPresets {
                             AnimsAVGreatsword.AV_GREATAXE_AUTO5,
                             AnimsAVGreatsword.AV_GREATAXE_DASH,
                             EFNGreatSwordAnimations.NG_GREATSWORD_AIRSLASH)
-                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.GREATAXE)
+                    .innateSkill(Styles.TWO_HAND, (itemstack) -> AVSkills.GREATAXE.get())
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, EFNGreatSwordAnimations.NG_GREATSWORD_IDLE)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, EFNGreatSwordAnimations.NG_GREATSWOED_WALK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, EFNGreatSwordAnimations.NG_GREATSWORD_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, EFNGreatSwordAnimations.NG_GREATSWORD_RUN)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsSolar.SOLAR_GUARD);
 
-    public static final Function<Item, Builder> CRAFTING_TABLE = (item) ->
+    public static final Function<Item, CapabilityItem.Builder<?>> CRAFTING_TABLE = (item) ->
             WeaponCapability.builder()
                     .category(WeaponCategories.GREATSWORD)
                     .collider(ColliderPreset.TACHI)
@@ -568,7 +584,7 @@ public class AVWeaponCapabilityPresets {
                             EFNGreatSwordAnimations.NG_GREATSWORD_DASH,
                             AnimsAVGreatsword.AV_GREATSWORD_AIRSLASH)
                     .innateSkill(Styles.TWO_HAND,
-                            (itemstack) -> AVSkills.HELICOPTER)
+                            (itemstack) -> AVSkills.HELICOPTER.get())
                     .newStyleCombo(Styles.MOUNT,
                             Animations.SWORD_MOUNT_ATTACK)
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsAVGreatsword.CARRY)
@@ -601,19 +617,19 @@ public class AVWeaponCapabilityPresets {
                 .livingMotionModifier(Styles.ONE_HAND, LivingMotions.WALK, AnimsAVAxe.AV_AXE_WALK);
     }
 
-    public static final Function<Item, Builder> AV_AXE = (item) -> avAxeTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_AXE = (item) -> avAxeTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.AXE);
+                    (itemstack) -> AVSkills.AXE.get());
 
-    public static final Function<Item, Builder> EARTH_AXE = (item) -> avAxeTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> EARTH_AXE = (item) -> avAxeTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.EARTH_AXE);
+                    (itemstack) -> AVSkills.EARTH_AXE.get());
 
-    public static final Function<Item, Builder> RED_AXE = (item) -> avAxeTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> RED_AXE = (item) -> avAxeTemplate()
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.GREATAXE);
+                    (itemstack) -> AVSkills.GREATAXE.get());
 
-    public static final Function<Item, Builder> AV_DUAL_AXE = (item) -> WeaponCapability.builder()
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_DUAL_AXE = (item) -> WeaponCapability.builder()
             .category(WeaponCategories.AXE)
             .swingSound(EpicFightSounds.WHOOSH_ROD.get())
             .styleProvider(
@@ -635,11 +651,11 @@ public class AVWeaponCapabilityPresets {
                     AnimsAVAxe.AV_AXE_DASH,
                     AnimsAVAxe.AV_AXE_AIRSLASH)
             .newStyleCombo(Styles.TWO_HAND,
-                    StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO1,
-                    StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO2,
-                    StraightSwordAnimations.STRAIGHTSWORD_DUAL_AUTO3,
-                    DarkNightPursuitersAnimations.DP_AUTO_1,
-                    DarkNightPursuitersAnimations.DP_AUTO_2,
+                    AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO1,
+                    AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO2,
+                    AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_AUTO3,
+                    AnimsEpicFightAwaken.DP_AUTO_1,
+                    AnimsEpicFightAwaken.DP_AUTO_2,
                     EFNDualSwordAnimations.NF_DUAL_DASH,
                     EFNDualSwordAnimations.NF_DUAL_AIRSLASH)
             .newStyleCombo(Styles.MOUNT,
@@ -648,9 +664,9 @@ public class AVWeaponCapabilityPresets {
                     Animations.SWORD_DUAL_AUTO3,
                     Animations.SWORD_MOUNT_ATTACK)
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.AXE)
+                    (itemstack) -> AVSkills.AXE.get())
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.DUAL_AXE_SPIN)
+                    (itemstack) -> AVSkills.DUAL_AXE_SPIN.get())
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.IDLE, AnimsAVAxe.AV_AXE_IDLE)
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.RUN, AnimsAVAxe.AV_AXE_RUN)
@@ -671,7 +687,7 @@ public class AVWeaponCapabilityPresets {
                             && (livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AnnoyingVillagersModItems.GOLDEN_MACE.get())
                             || livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem().equals(AnnoyingVillagersModItems.DIAMOND_MACE.get()))));
 
-    public static final Function<Item, Builder> AV_DAGGER = (item) -> WeaponCapability.builder()
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_DAGGER = (item) -> WeaponCapability.builder()
             .category(WeaponCategories.DAGGER)
             .swingSound(EpicFightSounds.WHOOSH_ROD.get())
             .styleProvider((livingentitypatch) -> Styles.ONE_HAND)
@@ -685,7 +701,7 @@ public class AVWeaponCapabilityPresets {
                     EFNShortSwordAnimations.NF_SHORTSWORD_DASH,
                     EFNShortSwordAnimations.NF_SHORTSWORD_AIRSLASH)
             .innateSkill(Styles.ONE_HAND,
-                    (itemstack) -> AVSkills.DAGGER)
+                    (itemstack) -> AVSkills.DAGGER.get())
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.IDLE, EFNSwordAnimations.NF_SWORD_IDLE)
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
             .livingMotionModifier(Styles.ONE_HAND, LivingMotions.RUN, AVAnimations.HOLD_ONEHAND_RUN)
@@ -716,19 +732,19 @@ public class AVWeaponCapabilityPresets {
                 .livingMotionModifier(Styles.TWO_HAND, LivingMotions.WALK, AnimsAVSpear.AV_SPEAR_WALK);
     }
 
-    public static final Function<Item, Builder> AV_SPEAR = (item) -> avSpearTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> AV_SPEAR = (item) -> avSpearTemplate()
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.SPEAR);
+                    (itemstack) -> AVSkills.SPEAR.get());
 
-    public static final Function<Item, Builder> STAFF = (item) -> avSpearTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> STAFF = (item) -> avSpearTemplate()
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.STAFF);
+                    (itemstack) -> AVSkills.STAFF.get());
 
-    public static final Function<Item, Builder> SICKLE = (item) -> avSpearTemplate()
+    public static final Function<Item, CapabilityItem.Builder<?>> SICKLE = (item) -> avSpearTemplate()
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.SICKLE);
+                    (itemstack) -> AVSkills.SICKLE.get());
 
-    public static final Function<Item, CapabilityItem.Builder> BOLT = (item) -> WeaponCapability.builder()
+    public static final Function<Item, CapabilityItem.Builder<?>> BOLT = (item) -> WeaponCapability.builder()
             .category(WeaponCategories.SPEAR)
             .styleProvider(
                     (livingentitypatch) -> Styles.TWO_HAND)
@@ -746,7 +762,7 @@ public class AVWeaponCapabilityPresets {
                     AnimsAVSpear.AV_SPEAR_DASH,
                     AnimsAVSpear.AV_SPEAR_AIRSLASH)
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.SPEAR)
+                    (itemstack) -> AVSkills.SPEAR.get())
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsAVSpear.AV_SPEAR_IDLE)
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, AnimsAVSpear.AV_SPEAR_RUN)
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, AnimsAVSpear.AV_SPEAR_RUN)
@@ -755,7 +771,7 @@ public class AVWeaponCapabilityPresets {
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.SHOT, Animations.BIPED_JAVELIN_THROW)
             .constructor(AVThrowableSpearCapability::new);
 
-    public static final Function<Item, CapabilityItem.Builder> BLACK_SCRATCHER = (item) -> WeaponCapability.builder()
+    public static final Function<Item, CapabilityItem.Builder<?>> BLACK_SCRATCHER = (item) -> WeaponCapability.builder()
             .category(WeaponCategories.SWORD)
             .styleProvider(
                     (livingentitypatch) -> Styles.TWO_HAND)
@@ -768,7 +784,7 @@ public class AVWeaponCapabilityPresets {
                     AnimsAVSpear.BLACKSCRATCHER_ATTACK,
                     AnimsAVSpear.BLACKSCRATCHER_ATTACK)
             .innateSkill(Styles.TWO_HAND,
-                    (itemstack) -> AVSkills.BLACKSCRATCHER)
+                    (itemstack) -> AVSkills.BLACKSCRATCHER.get())
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.IDLE, AnimsAVSpear.BLACKSCRATCHER_IDLE)
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.RUN, Animations.BIPED_RUN)
             .livingMotionModifier(Styles.TWO_HAND, LivingMotions.CHASE, Animations.BIPED_RUN)

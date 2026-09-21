@@ -7,8 +7,10 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsLegendarySword;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomModelData;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
@@ -50,7 +52,7 @@ public class RenderLegendarySword extends RenderItemBase {
                 itemstack = stack;
                 if (livingEntityPatch.getOriginal() instanceof AngrySteveEntity steve && steve.isLegendaryAwakened()) {
                     itemstack = stack.copy();
-                    itemstack.getOrCreateTag().putInt("CustomModelData", 1);
+                    itemstack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(1));
                 }
                 poseStack.pushPose();
                 MathUtils.mulStack(poseStack, openmatrix4f);

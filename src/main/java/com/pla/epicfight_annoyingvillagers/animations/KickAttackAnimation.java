@@ -7,8 +7,8 @@ import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConf
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.Joint;
 import yesman.epicfight.api.animation.Keyframe;
@@ -27,7 +27,7 @@ import yesman.epicfight.api.client.animation.property.JointMask;
 import yesman.epicfight.api.client.animation.property.JointMaskEntry;
 import yesman.epicfight.api.collider.Collider;
 import yesman.epicfight.api.model.Armature;
-import yesman.epicfight.api.utils.datastruct.TypeFlexibleHashMap;
+import yesman.epicfight.api.utils.datastructure.ParameterizedHashMap;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
@@ -154,14 +154,14 @@ public class KickAttackAnimation extends AttackAnimation {
 
     }
 
-    public TypeFlexibleHashMap<StateFactor<?>> getStatesMap(LivingEntityPatch<?> livingentitypatch, float f) {
-        TypeFlexibleHashMap<StateFactor<?>> typeflexiblehashmap = super.getStatesMap(livingentitypatch, f);
+    public ParameterizedHashMap<StateFactor<?>> getStatesMap(LivingEntityPatch<?> livingentitypatch, float f) {
+        ParameterizedHashMap<StateFactor<?>> states = super.getStatesMap(livingentitypatch, f);
 
         if (!livingentitypatch.getOriginal().level().getGameRules().getRule(EpicFightGameRules.STIFF_COMBO_ATTACKS.getRuleKey()).get()) {
-            typeflexiblehashmap.put((StateFactor<?>) EntityState.MOVEMENT_LOCKED, Boolean.FALSE);
+            states.put((StateFactor<?>) EntityState.MOVEMENT_LOCKED, Boolean.FALSE);
         }
 
-        return typeflexiblehashmap;
+        return states;
     }
 
     public Vec3 getCoordVector(LivingEntityPatch<?> livingentitypatch, AssetAccessor<? extends DynamicAnimation> nextAnimation) {
@@ -174,7 +174,7 @@ public class KickAttackAnimation extends AttackAnimation {
         return vec3;
     }
 
-    public boolean isBasicAttackAnimation() {
+    public boolean isComboAttackAnimation() {
         return true;
     }
 }

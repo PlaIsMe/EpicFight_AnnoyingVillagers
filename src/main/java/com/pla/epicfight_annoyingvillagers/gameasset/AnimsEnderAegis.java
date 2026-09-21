@@ -11,7 +11,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Math;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
@@ -27,9 +26,9 @@ import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.StunType;
 
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +38,6 @@ import yesman.epicfight.api.utils.math.Vec3f;
 
 import java.util.Random;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsEnderAegis {
     public static AnimationManager.AnimationAccessor<StaticAnimation> ENDER_AEGIS_IDLE;
     public static AnimationManager.AnimationAccessor<StaticAnimation> ENDER_AEGIS_GUARD;
@@ -192,7 +190,7 @@ public class AnimsEnderAegis {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.NO_GRAVITY_TIME, TimePairList.create(0.0F, 0.35F))
                         .newTimePair(0.0F, 1.25F)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, entitypatch, speed, prevElapsedTime, elapsedTime) -> {
                             if (elapsedTime >= 0.55F && elapsedTime < 0.65F) {
                                 float dpx = (float) entitypatch.getOriginal().getX();

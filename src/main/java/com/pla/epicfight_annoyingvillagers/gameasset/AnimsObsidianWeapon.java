@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.animation.attacks.SpecialAttackAnimation;
@@ -43,9 +42,9 @@ import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.gameasset.ColliderPreset;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
@@ -54,19 +53,18 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsObsidianWeapon {
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> OBSIDIAN_WEAPON_RIGHT_1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> OBSIDIAN_WEAPON_RIGHT_2;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> OBSIDIAN_WEAPON_RIGHT_3;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> OBSIDIAN_WEAPON_RIGHT_1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> OBSIDIAN_WEAPON_RIGHT_2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> OBSIDIAN_WEAPON_RIGHT_3;
     public static AnimationManager.AnimationAccessor<AirSlashAnimation> OBSIDIAN_WEAPON_RIGHT_4;
     public static AnimationManager.AnimationAccessor<AttackAnimation> OBSIDIAN_WEAPON_TWOHAND_1;
     public static AnimationManager.AnimationAccessor<AttackAnimation> OBSIDIAN_WEAPON_TWOHAND_2;
     public static AnimationManager.AnimationAccessor<AttackAnimation> OBSIDIAN_MACHINE_GUN;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_WEAPON_DASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_WEAPON_AIRSLASH;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> OBSIDIAN_WEAPON_LEFT_1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> OBSIDIAN_WEAPON_LEFT_2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> OBSIDIAN_WEAPON_LEFT_1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> OBSIDIAN_WEAPON_LEFT_2;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_WEAPON_LEFT_3;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_WEAPON_SPECIAL;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_WEAPON_INNATE_SPECIAL;
@@ -80,8 +78,8 @@ public class AnimsObsidianWeapon {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_AIRSLASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_INNATE;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO3;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO3;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AUTO4;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_DASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> SHADOW_OBSIDIAN_SWORD_DUAL_AIRSLASH;
@@ -91,7 +89,7 @@ public class AnimsObsidianWeapon {
     public static void build(AnimationManager.AnimationBuilder builder) {
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
         OBSIDIAN_WEAPON_RIGHT_1 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_right_1",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 3.2F)
                         .addEvents(
@@ -99,7 +97,7 @@ public class AnimsObsidianWeapon {
                         ));
 
         OBSIDIAN_WEAPON_RIGHT_2 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_right_2",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 3.2F)
                         .addEvents(
@@ -107,7 +105,7 @@ public class AnimsObsidianWeapon {
                         ));
 
         OBSIDIAN_WEAPON_RIGHT_3 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_right_3",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.5F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.5F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 3.2F)
                         .addEvents(
@@ -124,7 +122,7 @@ public class AnimsObsidianWeapon {
         OBSIDIAN_WEAPON_TWOHAND_1 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_twohand_1",
                 accessor -> new AttackAnimation(0.0F, 0.0F, 0.0F, 0.0F, Float.MAX_VALUE, null, Armatures.BIPED.get().head, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 2.0F)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.1F, SUMMON_OBSIDIAN_PILLAR, AnimationEvent.Side.SERVER)
@@ -140,7 +138,7 @@ public class AnimsObsidianWeapon {
         OBSIDIAN_MACHINE_GUN = builder.nextAccessor("biped/obsidian_weapon/obsidian_machine_gun",
                 accessor -> new AttackAnimation(0.0F, 0.0F, 0.0F, 0.0F, Float.MAX_VALUE, null, Armatures.BIPED.get().head, accessor, Armatures.BIPED)
                 .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 2.0F)
-                .addState(EntityState.CAN_BASIC_ATTACK, false)
+                .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                 .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.1F, ((livingEntityPatch, assetAccessor, animationParameters) -> {
@@ -225,7 +223,7 @@ public class AnimsObsidianWeapon {
         );
 
         OBSIDIAN_WEAPON_LEFT_1 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_left_1",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.15F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.2F)
                         .addEvents(
@@ -233,7 +231,7 @@ public class AnimsObsidianWeapon {
                         ));
 
         OBSIDIAN_WEAPON_LEFT_2 = builder.nextAccessor("biped/obsidian_weapon/obsidian_weapon_left_2",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.5F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.5F, InteractionHand.OFF_HAND, null, Armatures.BIPED.get().toolL, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLUNT)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.2F)
                         .addEvents(
@@ -453,12 +451,12 @@ public class AnimsObsidianWeapon {
                         .addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(0.3F, (livingEntityPatch, self, params) -> livingEntityPatch.getOriginal().level().playSound(null, livingEntityPatch.getOriginal(), SoundEvents.ANVIL_LAND, SoundSource.MASTER, 0.3F, 1.2F - (new Random().nextFloat() - 0.5F) * 0.2F), AnimationEvent.Side.CLIENT)}));
 
         SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2 = builder.nextAccessor("biped/obsidian_weapon/shadow_obsidian_sword_dual_auto2",
-                accessor -> new BasicAttackAnimation(0.1F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.633F, 0.69F, 0.8F, 1.167F, 1.65F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, AVCollider.SHADOW_OBSIDIAN_PILLAR), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, AVCollider.SHADOW_OBSIDIAN_PILLAR))
+                accessor -> new ComboAttackAnimation(0.1F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.633F, 0.69F, 0.8F, 1.167F, 1.65F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, AVCollider.SHADOW_OBSIDIAN_PILLAR), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, AVCollider.SHADOW_OBSIDIAN_PILLAR))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.LONG)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.2F));
 
         SHADOW_OBSIDIAN_SWORD_DUAL_AUTO3 = builder.nextAccessor("biped/obsidian_weapon/shadow_obsidian_sword_dual_auto3",
-                accessor -> new BasicAttackAnimation(0.1F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.633F, 0.69F, 0.8F, 1.167F, 1.65F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, AVCollider.SHADOW_OBSIDIAN_PILLAR), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, AVCollider.SHADOW_OBSIDIAN_PILLAR))
+                accessor -> new ComboAttackAnimation(0.1F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.633F, 0.69F, 0.8F, 1.167F, 1.65F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, AVCollider.SHADOW_OBSIDIAN_PILLAR), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, AVCollider.SHADOW_OBSIDIAN_PILLAR))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.LONG)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.2F));
 

@@ -22,6 +22,7 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsDemoniacVoltageReaver;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderAegis;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderGlaive;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderSlayerScythe;
+import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEpicFightAwaken;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsLegendarySword;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsNullWeapon;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianSledgehammer;
@@ -37,6 +38,7 @@ import com.pla.epicfight_annoyingvillagers.skill.ShadowObsidianPillarSkill;
 import com.pla.epicfight_annoyingvillagers.skill.TridentFestivalSkill;
 import com.pla.epicfight_annoyingvillagers.skill.WoopieTheSwordSkill;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
+import com.pla.epicfight_annoyingvillagers.util.ItemStackData;
 import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -44,6 +46,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemCooldowns;
@@ -56,8 +59,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.ModList;
-import net.shelmarow.ef_awaken.efassets.animations.StraightSwordAnimations;
+import net.neoforged.fml.ModList;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -174,7 +177,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                             PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                             if (playerPatch instanceof ServerPlayerPatch) {
                                 ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.BLACK_FIRE_SWORD);
+                                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.BLACK_FIRE_SWORD.get());
                                 if (skillContainer != null) {
                                     Level var13 = entity.level();
                                     if (var13 instanceof ServerLevel) {
@@ -192,7 +195,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                             PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                             if (playerPatch instanceof ServerPlayerPatch) {
                                 ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.THUNDER_DIAMOND_BLADE);
+                                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.THUNDER_DIAMOND_BLADE.get());
                                 if (skillContainer != null) {
                                     Level var81 = entity.level();
                                     if (var81 instanceof ServerLevel) {
@@ -205,7 +208,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                     }
                                 }
 
-                                skillContainer = serverPlayerPatch.getSkill(AVSkills.DUAL_THUNDER_DIAMOND_BLADE);
+                                skillContainer = serverPlayerPatch.getSkill(AVSkills.DUAL_THUNDER_DIAMOND_BLADE.get());
                                 if (skillContainer != null) {
                                     Level var82 = entity.level();
                                     if (var82 instanceof ServerLevel) {
@@ -238,7 +241,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                         } else {
                                             HerobrineEnderEyeItem.spawnAndShootDarkObPillars((ServerLevel)player.level(), player, 10);
                                             player.getCooldowns().addCooldown(herobrineEnderEyeItem, 40);
-                                            stack.hurtAndBreak(5, player, (p) -> {
+                                            stack.hurtAndBreak(5, (ServerLevel) player.level(), player, item -> {
                                             });
                                             return true;
                                         }
@@ -259,7 +262,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                     PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                     if (playerPatch instanceof ServerPlayerPatch) {
                                         ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.TRIDENT_FESTIVAL);
+                                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.TRIDENT_FESTIVAL.get());
                                         if (skillContainer != null) {
                                             Skill var93 = skillContainer.getSkill();
                                             if (var93 instanceof TridentFestivalSkill) {
@@ -290,7 +293,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_GLAIVE);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_GLAIVE.get());
                                     if (skillContainer != null) {
                                         Skill var101 = skillContainer.getSkill();
                                         if (var101 instanceof EnderGlaiveSkill) {
@@ -311,12 +314,12 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 return;
                             }
 
-                            if (holdingItem.getItem().equals(AnnoyingVillagersModItems.DEMONIAC_VOLTAGE_REAVER.get()) && entity.level() instanceof ServerLevel && holdingItem.getTag() != null && !holdingItem.getTag().getBoolean("SnakeAnimation")) {
+                            if (holdingItem.getItem().equals(AnnoyingVillagersModItems.DEMONIAC_VOLTAGE_REAVER.get()) && entity.level() instanceof ServerLevel && !ItemStackData.getBoolean(holdingItem, "SnakeAnimation")) {
                                 boolean success = false;
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.DEMONIAC_VOLTAGE_REAVER);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.DEMONIAC_VOLTAGE_REAVER.get());
                                     if (skillContainer != null) {
                                         Skill var100 = skillContainer.getSkill();
                                         if (var100 instanceof DemoniacVoltageReaverSkill) {
@@ -342,7 +345,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_SLEDGEHAMMER);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_SLEDGEHAMMER.get());
                                     if (skillContainer != null) {
                                         Skill var99 = skillContainer.getSkill();
                                         if (var99 instanceof ObsidianSledgeHammerSkill) {
@@ -371,7 +374,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                     PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                     if (playerPatch instanceof ServerPlayerPatch) {
                                         ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE);
+                                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE.get());
                                         if (skillContainer != null && skillContainer.getSkill() instanceof EnderSlayerScytheSkill && skillContainer.isActivated() && entity.getPersistentData().hasUUID("DragonUUID")) {
                                             Entity dragon = serverLevel.getEntity(player.getPersistentData().getUUID("DragonUUID"));
                                             if (dragon instanceof HerobrineDragonEntity) {
@@ -399,7 +402,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.NULL_WEAPON);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.NULL_WEAPON.get());
                                     if (skillContainer != null && skillContainer.getSkill() instanceof NullWeaponSkill && !skillContainer.isActivated()) {
                                         livingEntityPatch.playAnimationSynchronized(AnimsNullWeapon.NULL_WEAPON_SPECIAL, 0.0F);
                                     } else {
@@ -415,7 +418,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_WEAPON);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_WEAPON.get());
                                     if (skillContainer != null && skillContainer.getStack() >= 1 && entity.level() instanceof ServerLevel) {
                                         Skill var97 = skillContainer.getSkill();
                                         if (var97 instanceof ObsidianWeaponSkill) {
@@ -440,7 +443,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_WEAPON);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.OBSIDIAN_WEAPON.get());
                                     if (skillContainer != null && skillContainer.getStack() >= 1 && entity.level() instanceof ServerLevel) {
                                         Skill var96 = skillContainer.getSkill();
                                         if (var96 instanceof ObsidianWeaponSkill) {
@@ -465,7 +468,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.SHADOW_OBSIDIAN_PILLAR);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.SHADOW_OBSIDIAN_PILLAR.get());
                                     if (skillContainer != null && skillContainer.getStack() >= 1 && entity.level() instanceof ServerLevel) {
                                         Skill var95 = skillContainer.getSkill();
                                         if (var95 instanceof ShadowObsidianPillarSkill) {
@@ -498,11 +501,9 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                             if ((holdingItem.getItem().equals(AnnoyingVillagersModItems.HEROBRINE_ENDER_EYE.get()) || offHandItem.getItem().equals(AnnoyingVillagersModItems.HEROBRINE_ENDER_EYE.get())) && entity.level() instanceof ServerLevel) {
                                 livingEntityPatch.playAnimationSynchronized(AnimsObsidianWeapon.OBSIDIAN_MACHINE_GUN, 0.0F);
                                 if (player.getMainHandItem().getItem().equals(AnnoyingVillagersModItems.HEROBRINE_ENDER_EYE.get())) {
-                                    player.getMainHandItem().hurtAndBreak(10, player, (p) -> {
-                                    });
+                                    player.getMainHandItem().hurtAndBreak(10, player, EquipmentSlot.MAINHAND);
                                 } else if (player.getOffhandItem().getItem().equals(AnnoyingVillagersModItems.HEROBRINE_ENDER_EYE.get())) {
-                                    player.getOffhandItem().hurtAndBreak(10, player, (p) -> {
-                                    });
+                                    player.getOffhandItem().hurtAndBreak(10, player, EquipmentSlot.OFFHAND);
                                 }
 
                                 return;
@@ -513,7 +514,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.LEGENDARY_SWORD);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.LEGENDARY_SWORD.get());
                                     if (skillContainer != null) {
                                         Skill lookedPos = skillContainer.getSkill();
                                         if (lookedPos instanceof LegendarySwordSkill) {
@@ -554,7 +555,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 PlayerPatch<?> playerPatch = (PlayerPatch)EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
                                 if (playerPatch instanceof ServerPlayerPatch) {
                                     ServerPlayerPatch serverPlayerPatch = (ServerPlayerPatch)playerPatch;
-                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.WOOPIE_THE_SWORD);
+                                    SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.WOOPIE_THE_SWORD.get());
                                     if (skillContainer != null && skillContainer.getStack() == 1 && entity.level() instanceof ServerLevel) {
                                         Skill woopieSkill = skillContainer.getSkill();
                                         if (woopieSkill instanceof WoopieTheSwordSkill) {
@@ -571,7 +572,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 Level playerPatch = player.level();
                                 if (playerPatch instanceof ServerLevel) {
                                     ServerLevel level = (ServerLevel)playerPatch;
-                                    double reach = player.getBlockReach();
+                                    double reach = player.blockInteractionRange();
                                     HitResult hitResult = player.pick(reach, 0.0F, false);
                                     if (hitResult.getType() == Type.BLOCK) {
                                         BlockHitResult blockHit = (BlockHitResult)hitResult;
@@ -584,7 +585,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                                 if (soulFireState.canSurvive(level, firePos)) {
                                                     level.setBlock(firePos, soulFireState, 3);
                                                     livingEntityPatch.playAnimationSynchronized(AnimsAVSword.BLUE_FLAME_SWORD_SPECIAL, 0.0F);
-                                                    holdingItem.hurtAndBreak(1, player, (serverPlayer1) -> serverPlayer1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                                                    holdingItem.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                                                     return;
                                                 }
                                             }
@@ -610,7 +611,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 }
 
                                 if (mainHandCapability.getStyle(playerpatch) == Styles.TWO_HAND && entity.level() instanceof ServerLevel) {
-                                    livingEntityPatch.playAnimationSynchronized(StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_SLASH, 0.0F);
+                                    livingEntityPatch.playAnimationSynchronized(AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_SLASH, 0.0F);
                                     return;
                                 }
                             }
@@ -627,12 +628,12 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
 
                             if (mainHandCapability.getWeaponCategory() == WeaponCategories.LONGSWORD) {
                                 if (mainHandCapability.getStyle(playerpatch) == Styles.ONE_HAND && entity.level() instanceof ServerLevel) {
-                                    livingEntityPatch.playAnimationSynchronized(StraightSwordAnimations.STRAIGHTSWORD_DODGE_SLASH1, 0.0F);
+                                    livingEntityPatch.playAnimationSynchronized(AnimsEpicFightAwaken.STRAIGHTSWORD_DODGE_SLASH1, 0.0F);
                                     return;
                                 }
 
                                 if (mainHandCapability.getStyle(playerpatch) == Styles.TWO_HAND && entity.level() instanceof ServerLevel) {
-                                    livingEntityPatch.playAnimationSynchronized(StraightSwordAnimations.STRAIGHTSWORD_DUAL_DODGE_PURSUIT, 0.0F);
+                                    livingEntityPatch.playAnimationSynchronized(AnimsEpicFightAwaken.STRAIGHTSWORD_DUAL_DODGE_PURSUIT, 0.0F);
                                     return;
                                 }
                             }
@@ -642,7 +643,7 @@ public abstract class SpecialAttackOnKeyPressedEventMixin {
                                 return;
                             }
 
-                            if ((mainHandCapability.getWeaponCategory() == WeaponCategories.FIST || mainHandCapability.getWeaponCategory() == WeaponCategories.NOT_WEAPON || mainHandCapability.getWeaponCategory() == WeaponCategories.BOW || mainHandCapability.getWeaponCategory() == WeaponCategories.CROSSBOW) && entity.level() instanceof ServerLevel) {
+                            if ((mainHandCapability.getWeaponCategory() == WeaponCategories.FIST || mainHandCapability.getWeaponCategory() == WeaponCategories.NOT_WEAPON || mainHandCapability.getWeaponCategory() == WeaponCategories.RANGED) && entity.level() instanceof ServerLevel) {
                                 if (entity.isSprinting()) {
                                     if (entity.level() instanceof ServerLevel) {
                                         livingEntityPatch.playAnimationSynchronized(AnimsAVFist.WHIRLWIND_KICK, 0.0F);

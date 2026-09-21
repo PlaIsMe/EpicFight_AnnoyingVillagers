@@ -2,17 +2,11 @@ package com.pla.epicfight_annoyingvillagers.init;
 
 import com.pla.epicfight_annoyingvillagers.client.renderer.AvHumanoidRenderer;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModEntities;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import yesman.epicfight.api.client.forgeevent.PatchedRenderersEvent;
+import yesman.epicfight.api.client.event.types.registry.RegisterPatchedRenderersEvent;
 import yesman.epicfight.api.client.model.Meshes;
 
-@EventBusSubscriber(bus = Bus.MOD, value = {Dist.CLIENT})
 public class EpicFightAnnoyingVillagersModPatchedEntityRenderers {
-    @SubscribeEvent
-    public static void onPatchedRenderer(PatchedRenderersEvent.Add add) {
+    public static void onPatchedRenderer(RegisterPatchedRenderersEvent.AddEntity add) {
         add.addPatchedEntityRenderer(AnnoyingVillagersModEntities.VILLAGER_SCOUT.get(),
                 (entitytype) -> (new AvHumanoidRenderer<>(Meshes.BIPED, add.getContext(), entitytype))
                         .initLayerLast(add.getContext(), entitytype));

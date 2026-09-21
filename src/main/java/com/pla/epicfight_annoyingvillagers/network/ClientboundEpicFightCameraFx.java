@@ -1,14 +1,25 @@
 package com.pla.epicfight_annoyingvillagers.network;
 
 import com.pla.epicfight_annoyingvillagers.client.engine.EpicFightAnnoyingVillagersClientPacketHandlers;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.Supplier;
-
-public record ClientboundEpicFightCameraFx(int action, float fovModifier, int fovTicks, float blurStrength, int blurTicks) {
+public record ClientboundEpicFightCameraFx(int action, float fovModifier, int fovTicks, float blurStrength, int blurTicks)
+        implements CustomPacketPayload {
+    public static final Type<ClientboundEpicFightCameraFx> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(
+            EpicFightAnnoyingVillagers.MODID, "camera_fx"));
+    public static final StreamCodec<ByteBuf, ClientboundEpicFightCameraFx> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, ClientboundEpicFightCameraFx::action,
+            ByteBufCodecs.FLOAT, ClientboundEpicFightCameraFx::fovModifier,
+            ByteBufCodecs.VAR_INT, ClientboundEpicFightCameraFx::fovTicks,
+            ByteBufCodecs.FLOAT, ClientboundEpicFightCameraFx::blurStrength,
+            ByteBufCodecs.VAR_INT, ClientboundEpicFightCameraFx::blurTicks,
+            ClientboundEpicFightCameraFx::new);
     public static final int ACTION_ZOOM_IN = 0;
     public static final int ACTION_RESET_ZOOM_AND_BLUR = 1;
     public static final int ACTION_BLUR = 2;
@@ -25,30 +36,12 @@ public record ClientboundEpicFightCameraFx(int action, float fovModifier, int fo
         return new ClientboundEpicFightCameraFx(ACTION_BLUR, 0.0F, 0, blurStrength, blurTicks);
     }
 
-    public static void encode(ClientboundEpicFightCameraFx msg, FriendlyByteBuf buf) {
-        buf.writeVarInt(msg.action);
-        buf.writeFloat(msg.fovModifier);
-        buf.writeVarInt(msg.fovTicks);
-        buf.writeFloat(msg.blurStrength);
-        buf.writeVarInt(msg.blurTicks);
+    public void handle(IPayloadContext context) {
+        context.enqueueWork(() -> EpicFightAnnoyingVillagersClientPacketHandlers.handleEpicFightCameraFx(this));
     }
 
-    public static ClientboundEpicFightCameraFx decode(FriendlyByteBuf buf) {
-        return new ClientboundEpicFightCameraFx(
-                buf.readVarInt(),
-                buf.readFloat(),
-                buf.readVarInt(),
-                buf.readFloat(),
-                buf.readVarInt()
-        );
-    }
-
-    public static void handle(ClientboundEpicFightCameraFx msg, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context c = ctx.get();
-        c.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(
-                Dist.CLIENT,
-                () -> () -> EpicFightAnnoyingVillagersClientPacketHandlers.handleEpicFightCameraFx(msg)
-        ));
-        c.setPacketHandled(true);
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

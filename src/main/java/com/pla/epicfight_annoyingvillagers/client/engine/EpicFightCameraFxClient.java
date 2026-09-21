@@ -3,15 +3,16 @@ package com.pla.epicfight_annoyingvillagers.client.engine;
 import com.pla.epicfight_annoyingvillagers.client.shader.ImpactBlurShaderManager;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, value = Dist.CLIENT)
 public final class EpicFightCameraFxClient {
     private static float fovModifier;
     private static int fovTicks;
@@ -43,11 +44,7 @@ public final class EpicFightCameraFxClient {
     }
 
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) {
-            return;
-        }
-
+    public static void onClientTick(ClientTickEvent.Post event) {
         if (Minecraft.getInstance().isPaused()) {
             return;
         }

@@ -2,8 +2,8 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.pla.annoyingvillagers.entity.SledgehammerHerobrineEntity;
 import com.hm.efn.gameasset.EFNAnimations;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
 import com.pla.annoyingvillagers.item.ObsidianSledgehammerItem;
@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.ReuseableEvents;
 import reascer.wom.gameasset.colliders.WOMWeaponColliders;
@@ -35,13 +34,13 @@ import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
 import yesman.epicfight.api.utils.math.ValueModifier;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import reascer.wom.particle.WOMParticles;
 
 import java.util.Random;
@@ -49,14 +48,13 @@ import java.util.Set;
 
 import static com.hm.efn.gameasset.animations.EFNGreatSwordAnimations.AIRSLASH;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsObsidianSledgehammer {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_AUTO1;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_AUTO2;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_AUTO3;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_AUTO4;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_AUTO5;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> OBSIDIAN_SLEDGEHAMMER_DASH;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> OBSIDIAN_SLEDGEHAMMER_DASH;
     public static AnimationManager.AnimationAccessor<AttackAnimation> OBSIDIAN_SLEDGEHAMMER_AIRSLASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> OBSIDIAN_SLEDGEHAMMER_SPECIAL;
     public static AnimationManager.AnimationAccessor<AttackAnimation> OBSIDIAN_SLEDGEHAMMER_INNATE;
@@ -140,7 +138,7 @@ public class AnimsObsidianSledgehammer {
                         }));
 
         OBSIDIAN_SLEDGEHAMMER_DASH = builder.nextAccessor("biped/obsidian_sledgehammer/obsidian_sledgehammer_dash",
-                (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(33, 44, 70, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
+                (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(33, 44, 70, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_RUIN));
@@ -198,8 +196,8 @@ public class AnimsObsidianSledgehammer {
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, (dynamicanimation, livingentitypatch, f, f1, f2) -> 1.0F)
                         .newTimePair(0.0F, 0.4F).addStateRemoveOld(EntityState.TURNING_LOCKED, true)
                         .newTimePair(0.4F, Float.MAX_VALUE).addState(EntityState.TURNING_LOCKED, true)
-                        .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
-                        .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
+                        .newTimePair(0.0F, 1.85F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.6F, (patch, self, params) -> {
                                     if (patch.getOriginal() instanceof SledgehammerHerobrineEntity sledgehammer) sledgehammer.consumeSecondFormAction();
@@ -211,8 +209,8 @@ public class AnimsObsidianSledgehammer {
                                                 Armatures.BIPED.get().toolR, 2.5D, 0.6F)));
 
         OBSIDIAN_SLEDGEHAMMER_INNATE_SPECIAL = builder.nextAccessor("biped/obsidian_sledgehammer/obsidian_sledgehammer_innate_special", animationaccessor -> (ActionAnimation) new ActionAnimation(0.1F, animationaccessor, Armatures.BIPED)
-                .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
-                .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
+                .newTimePair(0.0F, 4.5F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                 .addEvents(
                         AnimationEvent.InTimeEvent.create(1.5F, (patch, self, params) -> {
                             if (patch.getOriginal() instanceof SledgehammerHerobrineEntity sledgehammer) sledgehammer.consumeSecondFormAction();

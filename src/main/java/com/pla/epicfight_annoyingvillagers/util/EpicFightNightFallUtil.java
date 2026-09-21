@@ -12,7 +12,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.shelmarow.combat_evolution.ai.CEHumanoidPatch;
 import org.joml.Vector3d;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.AnimationPlayer;
@@ -161,15 +160,6 @@ public class EpicFightNightFallUtil {
             spawnParryFlashParticle(livingEntityPatch.getOriginal(), damageSource.getDirectEntity(), animation, serverLevel);
             livingEntityPatch.playSound(EFNSounds.PARRY.get(), 0.5F, 0.0F, 0.0F);
         }
-    }
-
-    public static boolean isPlayingEfnGuardHit(CEHumanoidPatch<?> ceHumanoidPatch) {
-        AnimationPlayer animationPlayer = ceHumanoidPatch.getAnimator().getPlayerFor(null);
-        if (animationPlayer != null) {
-            AssetAccessor<? extends StaticAnimation> dynamicAnimation = animationPlayer.getRealAnimation();
-            return dynamicAnimation == EFNSkillAnimations.EFN_GUARD_ACTIVE_HIT1 || dynamicAnimation == EFNSkillAnimations.EFN_GUARD_ACTIVE_HIT2 || dynamicAnimation == EFNSkillAnimations.EFN_GUARD_ACTIVE_HIT3;
-        }
-        return false;
     }
 
     public static boolean isEfnWeapons(ItemStack itemStack) {

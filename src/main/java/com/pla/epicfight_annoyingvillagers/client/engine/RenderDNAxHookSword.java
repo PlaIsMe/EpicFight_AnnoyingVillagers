@@ -7,8 +7,9 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSword;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
@@ -65,7 +66,7 @@ public class RenderDNAxHookSword extends RenderItemBase {
         if (sweepingEdge || dancingEdge) {
             renderStack = new ItemStack(AnnoyingVillagersModItems.DNAX_HOOKED_SWORD_ABILITY.get());
             if (heldStack.isEnchanted()) {
-                renderStack.getOrCreateTag().putBoolean("foil", true);
+                renderStack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
             }
         } else {
             renderStack = heldStack.copy();

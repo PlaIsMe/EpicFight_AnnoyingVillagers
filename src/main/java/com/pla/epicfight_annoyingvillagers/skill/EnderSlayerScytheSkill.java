@@ -6,9 +6,10 @@ import com.pla.annoyingvillagers.init.AnnoyingVillagersModEntities;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
 import com.pla.annoyingvillagers.item.EnderSlayerScytheItem;
 import com.pla.annoyingvillagers.task.DelayedTask;
+import com.pla.epicfight_annoyingvillagers.util.ItemStackData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -21,12 +22,13 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import yesman.epicfight.gameasset.Animations;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.skill.*;
 import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener;
 
 import java.util.UUID;
 
@@ -38,7 +40,7 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
     private static final double SUMMON_RISE_DISTANCE = 15.0D;
     private static final int SUMMON_PENDING_TIMEOUT_TICKS = 60;
 
-    public EnderSlayerScytheSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public EnderSlayerScytheSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
@@ -87,7 +89,7 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (!(playerPatch instanceof ServerPlayerPatch serverPlayerPatch)) return;
 
-        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE);
+        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE.get());
         if (skillContainer != null
                 && skillContainer.isActivated()
                 && skillContainer.getSkill() instanceof EnderSlayerScytheSkill enderSlayerScytheSkill) {
@@ -98,14 +100,14 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
     public static void activateFromInnateAnimation(PlayerPatch<?> playerPatch) {
         if (!(playerPatch instanceof ServerPlayerPatch serverPlayerPatch)) return;
 
-        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE);
+        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE.get());
         if (skillContainer != null && skillContainer.getSkill() instanceof EnderSlayerScytheSkill enderSlayerScytheSkill) {
             enderSlayerScytheSkill.activateFromInnateEvent(skillContainer);
         }
     }
 
     @Override
-    public void executeOnServer(SkillContainer skillContainer, FriendlyByteBuf friendlyByteBuf) {
+    public void executeOnServer(SkillContainer skillContainer, CompoundTag friendlyByteBuf) {
         if (skillContainer.isActivated()) return;
         if (isSummonPending(skillContainer)) return;
 
@@ -145,10 +147,10 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.BASIC_ATTACK_EVENT, EVENT_UUID, event -> {
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Player.COMBO_ATTACK, event -> {
                     if (event.getPlayerPatch().isLogicalClient()) return;
                     SkillContainer skillContainer = event.getPlayerPatch().getSkill(this);
                     ItemStack itemStack = event.getPlayerPatch().getOriginal().getMainHandItem();
@@ -156,7 +158,7 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
                     Player player = serverPlayerPatch.getOriginal();
 
                     if (skillContainer.isActivated()) {
-                        event.setCanceled(true);
+                        event.cancel();
                         if (event.getPlayerPatch().getOriginal().getCooldowns().getCooldownPercent(itemStack.getItem(), 0) == 0
                                 && itemStack.getItem() instanceof EnderSlayerScytheItem && player.level() instanceof ServerLevel serverLevel
                                 && player.getPersistentData().hasUUID(DRAGON_UUID_TAG)) {
@@ -191,14 +193,14 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
                     } else if (!skillContainer.isActivated() && player.isPassenger()
                             && player.getVehicle() != null
                             && player.getVehicle() instanceof HerobrineDragonEntity) {
-                        event.setCanceled(true);
+                        event.cancel();
                         skillContainer.getExecutor().playAnimationSynchronized(Animations.SPEAR_MOUNT_ATTACK, 0.0F);
                     }
-                }
+                }, this
         );
 
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID, (event) -> {
+        eventListener.registerEvent(
+                EpicFightEventHooks.Player.CAST_SKILL, (event) -> {
                     if (event.getPlayerPatch().isLogicalClient()) return;
                     SkillContainer skillContainer = event.getPlayerPatch().getSkill(this);
                     ItemStack itemStack = event.getPlayerPatch().getOriginal().getMainHandItem();
@@ -207,8 +209,8 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
                     Skill skill = event.getSkillContainer().getSkill();
 
                     if (skillContainer.isActivated()
-                            && itemStack.getTag() != null && skill.getCategory() == SkillCategories.GUARD) {
-                        event.setCanceled(true);
+                            && ItemStackData.hasData(itemStack) && skill.getCategory() == SkillCategories.GUARD) {
+                        event.cancel();
                         if (event.getPlayerPatch().getOriginal().getCooldowns().getCooldownPercent(itemStack.getItem(), 0) == 0
                                 && itemStack.getItem() instanceof EnderSlayerScytheItem && player.level() instanceof ServerLevel serverLevel
                                 && player.getPersistentData().hasUUID(DRAGON_UUID_TAG)) {
@@ -241,11 +243,11 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
                             }
                         }
                     }
-                });
+                }, this);
 
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.DODGE_SUCCESS_EVENT, EVENT_UUID, (event) -> {
-                    SkillContainer skillContainer = container.getExecutor().getSkill(AVSkills.ENDER_SLAYER_SCYTHE);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Entity.ON_DODGE, (event) -> {
+                    SkillContainer skillContainer = container.getExecutor().getSkill(AVSkills.ENDER_SLAYER_SCYTHE.get());
                     if (skillContainer == null) return;
                     EnderSlayerScytheSkill enderSlayerScytheSkill = (EnderSlayerScytheSkill) skillContainer.getSkill();
                     if (!skillContainer.isActivated() && skillContainer.getStack() < 1) {
@@ -259,11 +261,11 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
                                 Math.min(skillContainer.getRemainDuration() + 80, enderSlayerScytheSkill.maxDuration)
                         );
                     }
-        });
+        }, this);
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         if (!container.getExecutor().isLogicalClient()) {
             discardSummonedDragon(container.getExecutor().getOriginal());
             setSummonPending(container, false);
@@ -272,12 +274,12 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
         super.cancelOnServer(container, args);
     }
 
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         super.cancelOnClient(container, args);
         container.deactivate();
     }
@@ -300,9 +302,7 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
             setSummonPending(container, false);
             discardSummonedDragon(player);
         }
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.BASIC_ATTACK_EVENT, EVENT_UUID);
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID);
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.DODGE_SUCCESS_EVENT, EVENT_UUID);
+        container.getExecutor().getEventListener().removeListenersBelongTo(this);
     }
 
     @Override
@@ -402,10 +402,10 @@ public class EnderSlayerScytheSkill extends WeaponInnateSkill {
     }
 
     private static void setSummonPending(SkillContainer container, boolean pending) {
-        container.getDataManager().setDataSync(AVSkillDataKeys.ENDER_SLAYER_SCYTHE_SUMMON_PENDING.get(), pending);
+        container.getDataManager().setDataSync(AVSkillDataKeys.ENDER_SLAYER_SCYTHE_SUMMON_PENDING, pending);
     }
 
     private static boolean isSummonPending(SkillContainer container) {
-        return Boolean.TRUE.equals(container.getDataManager().getDataValue(AVSkillDataKeys.ENDER_SLAYER_SCYTHE_SUMMON_PENDING.get()));
+        return Boolean.TRUE.equals(container.getDataManager().getDataValue(AVSkillDataKeys.ENDER_SLAYER_SCYTHE_SUMMON_PENDING));
     }
 }

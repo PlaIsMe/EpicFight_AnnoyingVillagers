@@ -34,15 +34,10 @@ public final class AdvancedAnimationAttackGoal<T extends MobPatch<?>> extends Go
 
     @Override
     public boolean canUse() {
-        boolean finishingAction = this.ownsCurrentAnimation();
-        return this.actionAllowed.getAsBoolean() && (this.hasValidTarget() || finishingAction);
-    }
-
-    /** A utility may preempt our attack, but must never adopt a stun or execution clip. */
-    public boolean ownsCurrentAnimation() {
         var player = this.mobPatch.getAnimator().getPlayerFor(null);
-        return this.ownedAnimation != null && player != null && !player.isEmpty()
+        boolean finishingAction = this.ownedAnimation != null && player != null && !player.isEmpty()
                 && this.ownedAnimation.equals(player.getRealAnimation());
+        return this.actionAllowed.getAsBoolean() && (this.hasValidTarget() || finishingAction);
     }
 
     @Override
@@ -91,6 +86,12 @@ public final class AdvancedAnimationAttackGoal<T extends MobPatch<?>> extends Go
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
+    }
+
+    public boolean ownsCurrentAnimation() {
+        var player = this.mobPatch.getAnimator().getPlayerFor(null);
+        return this.ownedAnimation != null && player != null && !player.isEmpty()
+                && this.ownedAnimation.equals(player.getRealAnimation());
     }
 
     private boolean hasValidTarget() {

@@ -24,8 +24,7 @@ public abstract class HerobrineDragonEntityMixin {
         }
 
         var cat = weaponCap.getWeaponCategory();
-        cir.setReturnValue(cat == CapabilityItem.WeaponCategories.BOW
-                || cat == CapabilityItem.WeaponCategories.CROSSBOW
+        cir.setReturnValue(cat == CapabilityItem.WeaponCategories.RANGED
                 || cat == CapabilityItem.WeaponCategories.NOT_WEAPON);
         return;
     }

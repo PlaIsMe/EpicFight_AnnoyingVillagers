@@ -3,9 +3,8 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 import com.hm.efn.client.sound.EFNSounds;
 import com.hm.efn.gameasset.EFNAnimations;
 import com.hm.efn.gameasset.EFNExtraDamageInstance;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
-import com.merlin204.avalon.util.AvalonEventUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.skill.EnderSlayerScytheSkill;
 import com.pla.annoyingvillagers.entity.ReaperHerobrineEntity;
@@ -14,8 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.animation.attacks.SpecialAttackAnimation;
@@ -32,9 +29,9 @@ import yesman.epicfight.api.collider.OBBCollider;
 import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
@@ -44,17 +41,16 @@ import java.util.Set;
 
 import static com.hm.efn.gameasset.animations.EFNLanceAnimations.MEEN_LANCE_CHARGE3;
 
-@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Bus.MOD)
 public class AnimsEnderSlayerScythe {
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO1;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO2;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO3;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO4;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO4;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_SLAYER_SCYTHE_AUTO5;
     public static AnimationManager.AnimationAccessor<DashAttackAnimation> ENDER_SLAYER_SCYTHE_DASH;
     public static AnimationManager.AnimationAccessor<AirSlashAnimation> ENDER_SLAYER_SCYTHE_AIRSLASH;
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> ENDER_SLAYER_SCYTHE_SPECIAL;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> ENDER_SLAYER_SCYTHE_INNATE;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> ENDER_SLAYER_SCYTHE_INNATE;
     public static AnimationManager.AnimationAccessor<StaticAnimation> ENDER_SLAYER_SCYTHE_SPECIAL_INNATE;
 
     public static void build(AnimationBuilder builder) {
@@ -62,11 +58,11 @@ public class AnimsEnderSlayerScythe {
         MultiOBBCollider SCYTHE_COLLIDER = new MultiOBBCollider(new OBBCollider(0.25F, 0.25F, 1.3, 0.0F, 0.0F, 1.0F), new OBBCollider(0.25F, 0.25F, 1.3, 0.0F, 0.0F, 1.0F), new OBBCollider(0.7, 0.9, 0.7, 0.0F, -0.5F, -0.45), new OBBCollider(0.7, 0.9, 0.7, 0.0F, -0.5F, -0.45));
 
         ENDER_SLAYER_SCYTHE_AUTO1 = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_auto1",
-                (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.1F, 0.11666667F, 0.58F, 0.7F, 1.3F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
+                (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.1F, 0.11666667F, 0.58F, 0.7F, 1.3F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_2.get())
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .newTimePair(0.0F, 0.725F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         ENDER_SLAYER_SCYTHE_AUTO2 = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_auto2",
                 (accessor) -> (BasicMultipleAttackAnimation)(new BasicMultipleAttackAnimation(0.15F, 0.15F, 0.45F, 0.45F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
@@ -97,11 +93,11 @@ public class AnimsEnderSlayerScythe {
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, true));
 
         ENDER_SLAYER_SCYTHE_AUTO4 = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_auto4",
-                (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.1F, 0.11666667F, 0.58F, 0.75F, 1.33F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
+                (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.1F, 0.11666667F, 0.58F, 0.75F, 1.33F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_4.get())
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .newTimePair(0.0F, 0.75F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         ENDER_SLAYER_SCYTHE_AUTO5 = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_auto5",
                 (accessor) -> (BasicMultipleAttackAnimation)(new BasicMultipleAttackAnimation(0.15F, 0.5F, 0.75F, 0.9F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
@@ -118,7 +114,7 @@ public class AnimsEnderSlayerScythe {
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_2.get())
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .newTimePair(0.0F, 0.81F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         ENDER_SLAYER_SCYTHE_AIRSLASH = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_airslash",
                 (accessor) -> (AirSlashAnimation)(new AirSlashAnimation(0.1F, 0.56F, 0.65F, 1.28F, SCYTHE_COLLIDER, humanoidArmature.get().toolR, accessor, humanoidArmature))
@@ -128,7 +124,7 @@ public class AnimsEnderSlayerScythe {
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .addProperty(AnimationProperty.AttackAnimationProperty.NO_GRAVITY_TIME, TimePairList.create(0.0F, 0.65F))
                         .newTimePair(0.0F, 0.75F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         ENDER_SLAYER_SCYTHE_SPECIAL = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_special",
                 (accessor) -> (SpecialAttackAnimation)(new SpecialAttackAnimation(0.1F, accessor, humanoidArmature,
@@ -155,7 +151,7 @@ public class AnimsEnderSlayerScythe {
                         .addProperty(WomAnimationProperty.ANTI_STUN_MULTIPLYER, 1.0F));
 
         ENDER_SLAYER_SCYTHE_INNATE = builder.nextAccessor("biped/ender_slayer_scythe/ender_slayer_scythe_innate",
-                (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(59, 70, 100, InteractionHand.MAIN_HAND, 1.0F, 2.0F, Armatures.BIPED.get().rootJoint, MEEN_LANCE_CHARGE3)))
+                (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(59, 70, 100, InteractionHand.MAIN_HAND, 1.0F, 2.0F, Armatures.BIPED.get().rootJoint, MEEN_LANCE_CHARGE3)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.KNOCKDOWN)
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH_BIG.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
@@ -173,7 +169,7 @@ public class AnimsEnderSlayerScythe {
                                 }, AnimationEvent.Side.CLIENT),
                                 AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) -> entitypatch.getOriginal().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 120, 5, false, false, false)), AnimationEvent.Side.BOTH),
                                 AnimationEvent.InTimeEvent.create(0.2F, (entitypatch, self, params) ->
-                                        entitypatch.playSound(SoundEvents.RESPAWN_ANCHOR_DEPLETE.get(), 1.5F, 0.0F, 0.0F), AnimationEvent.Side.SERVER),
+                                        entitypatch.playSound(SoundEvents.RESPAWN_ANCHOR_DEPLETE, 1.5F, 0.0F, 0.0F), AnimationEvent.Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(1.1F, (entitypatch, self, params) -> {
                                     entitypatch.playSound(SoundEvents.GENERIC_EXPLODE, 1.5F, 0.0F, 0.0F);
                                     if (entitypatch instanceof PlayerPatch<?> playerPatch) {
@@ -182,8 +178,8 @@ public class AnimsEnderSlayerScythe {
                                         reaper.completePendingDragonSummon();
                                     }
                                 }, AnimationEvent.Side.SERVER),
-                                AvalonEventUtils.simpleGroundSplit(57, 0.0F, 0.0F, 0.0F, 0.0F, 5.0F, true),
-                                AvalonEventUtils.simpleCameraShake(59, 60, 4.0F, 4.0F, 4.0F))
+                                NativeAnimationUtils.simpleGroundSplit(57, 0.0F, 0.0F, 0.0F, 0.0F, 5.0F, true),
+                                NativeAnimationUtils.simpleCameraShake(59, 60, 4.0F, 4.0F, 4.0F))
                         .newTimePair(0.0F, Float.MAX_VALUE)
                         .addStateRemoveOld(EntityState.MOVEMENT_LOCKED, true)
                         .addStateRemoveOld(EntityState.CAN_SWITCH_HAND_ITEM, false)

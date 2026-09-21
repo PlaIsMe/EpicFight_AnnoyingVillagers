@@ -15,6 +15,10 @@ import yesman.epicfight.world.capabilities.item.Style;
 import java.util.List;
 
 public class NullPatch extends AdvancedAvNpcPatch<NullEntity> {
+    public NullPatch(NullEntity original) {
+        super(original);
+    }
+
     @Override
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,

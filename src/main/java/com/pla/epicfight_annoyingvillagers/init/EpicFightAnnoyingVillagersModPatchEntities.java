@@ -12,41 +12,63 @@ import com.pla.epicfight_annoyingvillagers.mobpatch.*;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import yesman.epicfight.api.forgeevent.EntityPatchRegistryEvent;
+import net.minecraft.world.entity.PathfinderMob;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import yesman.epicfight.api.event.types.registry.EntityPatchRegistryEvent;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.mob.SkeletonPatch;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID)
 public final class EpicFightAnnoyingVillagersModPatchEntities {
     private EpicFightAnnoyingVillagersModPatchEntities() {
     }
 
-    @SubscribeEvent
     public static void setPatch(EntityPatchRegistryEvent event) {
-        for (EntityType<? extends LivingEntity> type : advancedNpcTypes()) {
-            event.getTypeEntry().put(type, entity -> AdvancedAvNpcPatch::new);
+        for (EntityType<? extends PathfinderMob> type : advancedNpcTypes()) {
+            registerAdvancedPatch(event, type);
         }
 
-        for (EntityType<? extends LivingEntity> type : stepDodgeNpcTypes()) {
-            event.getTypeEntry().put(type, entity -> StepDodgeAvNpcPatch::new);
+        for (EntityType<? extends PathfinderMob> type : stepDodgeNpcTypes()) {
+            registerStepDodgePatch(event, type);
         }
 
-        for (EntityType<? extends LivingEntity> type : fullDodgeNpcTypes()) {
-            event.getTypeEntry().put(type, entity -> FullDodgeAvNpcPatch::new);
+        for (EntityType<? extends PathfinderMob> type : fullDodgeNpcTypes()) {
+            registerFullDodgePatch(event, type);
         }
 
-        event.getTypeEntry().put(AnnoyingVillagersModEntities.NULL.get(), entity -> NullPatch::new);
-        event.getTypeEntry().put(AnnoyingVillagersModEntities.NULL_SKELETON.get(), entity -> SkeletonPatch::new);
-        event.getTypeEntry().put(AnnoyingVillagersModEntities.AEGIS_HEROBRINE.get(), entity -> AegisHerobrinePatch::new);
-        event.getTypeEntry().put(AnnoyingVillagersModEntities.ANGRY_STEVE.get(), entity -> AngryStevePatch::new);
-        event.getTypeEntry().put(AnnoyingVillagersModEntities.BLUE_DEMON.get(), entity -> BlueDemonPatch::new);
+        event.registerEntityPatch(AnnoyingVillagersModEntities.NULL.get(), NullPatch::new);
+        event.registerEntityPatch(AnnoyingVillagersModEntities.NULL_SKELETON.get(), SkeletonPatch::new);
+        event.registerEntityPatch(AnnoyingVillagersModEntities.AEGIS_HEROBRINE.get(), AegisHerobrinePatch::new);
+        event.registerEntityPatch(AnnoyingVillagersModEntities.ANGRY_STEVE.get(), AngryStevePatch::new);
+        event.registerEntityPatch(AnnoyingVillagersModEntities.BLUE_DEMON.get(), BlueDemonPatch::new);
+    }
+
+    private static <T extends PathfinderMob> void registerAdvancedPatch(
+            EntityPatchRegistryEvent event,
+            EntityType<T> type
+    ) {
+        event.registerEntityPatch(type, AdvancedAvNpcPatch::new);
+    }
+
+    private static <T extends PathfinderMob> void registerStepDodgePatch(
+            EntityPatchRegistryEvent event,
+            EntityType<T> type
+    ) {
+        event.registerEntityPatch(type, StepDodgeAvNpcPatch::new);
+    }
+
+    private static <T extends PathfinderMob> void registerFullDodgePatch(
+            EntityPatchRegistryEvent event,
+            EntityType<T> type
+    ) {
+        event.registerEntityPatch(type, FullDodgeAvNpcPatch::new);
     }
 
     @SubscribeEvent
@@ -54,21 +76,21 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         List<EntityType<? extends LivingEntity>> patchedTypes = new ArrayList<>(advancedNpcTypes());
         patchedTypes.add(AnnoyingVillagersModEntities.NULL_SKELETON.get());
         for (EntityType<? extends LivingEntity> type : patchedTypes) {
-            event.add(type, EpicFightAttributes.WEIGHT.get());
-            event.add(type, EpicFightAttributes.ARMOR_NEGATION.get());
-            event.add(type, EpicFightAttributes.IMPACT.get());
-            event.add(type, EpicFightAttributes.MAX_STRIKES.get());
-            event.add(type, EpicFightAttributes.STUN_ARMOR.get());
-            event.add(type, EpicFightAttributes.OFFHAND_ATTACK_SPEED.get());
-            event.add(type, EpicFightAttributes.OFFHAND_MAX_STRIKES.get());
-            event.add(type, EpicFightAttributes.OFFHAND_ARMOR_NEGATION.get());
-            event.add(type, EpicFightAttributes.OFFHAND_IMPACT.get());
-            event.add(type, EpicFightAttributes.MAX_STAMINA.get());
-            event.add(type, EpicFightAttributes.STAMINA_REGEN.get());
+            event.add(type, EpicFightAttributes.WEIGHT);
+            event.add(type, EpicFightAttributes.ARMOR_NEGATION);
+            event.add(type, EpicFightAttributes.IMPACT);
+            event.add(type, EpicFightAttributes.MAX_STRIKES);
+            event.add(type, EpicFightAttributes.STUN_ARMOR);
+            event.add(type, EpicFightAttributes.OFFHAND_ATTACK_SPEED);
+            event.add(type, EpicFightAttributes.OFFHAND_MAX_STRIKES);
+            event.add(type, EpicFightAttributes.OFFHAND_ARMOR_NEGATION);
+            event.add(type, EpicFightAttributes.OFFHAND_IMPACT);
+            event.add(type, EpicFightAttributes.MAX_STAMINA);
+            event.add(type, EpicFightAttributes.STAMINA_REGEN);
         }
     }
 
-    private static List<EntityType<? extends LivingEntity>> advancedNpcTypes() {
+    private static List<EntityType<? extends PathfinderMob>> advancedNpcTypes() {
         return List.of(
                 AnnoyingVillagersModEntities.ALEX.get(),
                 AnnoyingVillagersModEntities.JEV.get(),
@@ -98,7 +120,7 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         );
     }
 
-    private static List<EntityType<? extends LivingEntity>> stepDodgeNpcTypes() {
+    private static List<EntityType<? extends PathfinderMob>> stepDodgeNpcTypes() {
         return List.of(
                 AnnoyingVillagersModEntities.STEVE.get(),
                 AnnoyingVillagersModEntities.ALEX.get(),
@@ -109,7 +131,7 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         );
     }
 
-    private static List<EntityType<? extends LivingEntity>> fullDodgeNpcTypes() {
+    private static List<EntityType<? extends PathfinderMob>> fullDodgeNpcTypes() {
         return List.of(
                 AnnoyingVillagersModEntities.GLAIVE_HEROBRINE.get(),
                 AnnoyingVillagersModEntities.SLEDGEHAMMER_HEROBRINE.get(),
@@ -144,7 +166,7 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         return true;
     }
 
-    @Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID)
     public static final class ForgeEvents {
         private ForgeEvents() {
         }

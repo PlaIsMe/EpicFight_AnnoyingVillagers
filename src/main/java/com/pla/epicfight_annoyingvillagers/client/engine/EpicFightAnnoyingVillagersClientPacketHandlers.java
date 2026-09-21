@@ -1,8 +1,8 @@
 package com.pla.epicfight_annoyingvillagers.client.engine;
 
 import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class EpicFightAnnoyingVillagersClientPacketHandlers {

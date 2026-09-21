@@ -3,9 +3,9 @@ package com.pla.epicfight_annoyingvillagers.event;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVAnimations;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModMobEffects;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
@@ -20,9 +20,9 @@ import java.util.Random;
 @EventBusSubscriber
 public class KnockdownEvent {
     @SubscribeEvent
-    public static void onEntityAttacked(LivingHurtEvent livingHurtEvent) {
+    public static void onEntityAttacked(LivingDamageEvent.Pre livingHurtEvent) {
         if (livingHurtEvent != null && livingHurtEvent.getEntity() != null) {
-            if (livingHurtEvent.getEntity().hasEffect(AnnoyingVillagersModMobEffects.GROUND_STUCK.get())) return;
+            if (livingHurtEvent.getEntity().hasEffect(AnnoyingVillagersModMobEffects.GROUND_STUCK)) return;
             LivingEntityPatch<?> livingEntityPatch = EpicFightCapabilities.getEntityPatch(livingHurtEvent.getEntity(), LivingEntityPatch.class);
             if (livingEntityPatch != null && livingHurtEvent.getEntity().level() instanceof ServerLevel) {
                 AnimationPlayer animationPlayer = Objects.requireNonNull(livingEntityPatch.getAnimator().getPlayerFor(null));

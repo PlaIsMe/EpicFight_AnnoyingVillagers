@@ -10,6 +10,10 @@ import yesman.epicfight.world.capabilities.item.Style;
 import java.util.List;
 
 public class BlueDemonPatch extends FullDodgeAvNpcPatch<BlueDemonEntity> {
+    public BlueDemonPatch(BlueDemonEntity original) {
+        super(original);
+    }
+
     @Override
     protected List<AdditionalAttackGroup> getAdditionalAttackGroups(CapabilityItem mainHandCap, CapabilityItem offHandCap, Style style) {
         var preset = WeaponCapabilityPresetTracking.getPreset(mainHandCap);

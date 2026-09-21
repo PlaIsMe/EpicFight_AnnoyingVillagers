@@ -30,7 +30,7 @@ public class WeaponInnateSkillMixin {
     )
     private ResourceLocation dynamicSkillTextureForTridentFestival(Skill skill, BattleModeGui gui, SkillContainer container, GuiGraphics guiGraphics, float x, float y, float partialTick) {
         if (skill instanceof TridentFestivalSkill) {
-            boolean ranged = container.getDataManager().getDataValue(AVSkillDataKeys.IS_TRIDENT_RANGED_MODE.get());
+            boolean ranged = container.getDataManager().getDataValue(AVSkillDataKeys.IS_TRIDENT_RANGED_MODE);
             Player player = container.getExecutor().getOriginal();
             ItemStack mainHand = player.getMainHandItem();
             ItemStack offHand = player.getOffhandItem();
@@ -101,9 +101,10 @@ public class WeaponInnateSkillMixin {
         }
 
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, (float) gui.getSlidingProgression(), 0.0F);
+        guiGraphics.pose().translate(0.0F,
+                ((BattleModeGuiAccessor) (Object) gui).epicFightAnnoyingVillagers$getSliding(partialTick), 0.0F);
 
-        String s = String.valueOf(container.getDataManager().getDataValue(AVSkillDataKeys.TRIDENT_AMOUNT.get()));
+        String s = String.valueOf(container.getDataManager().getDataValue(AVSkillDataKeys.TRIDENT_AMOUNT));
         int stringWidth = (gui.getFont().width(s) - 6) / 3;
         guiGraphics.drawString(gui.getFont(), s, x + 25.0F - (float) stringWidth, y + 22.0F, 16777215, true);
 

@@ -11,8 +11,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraftforge.fml.ModList;
-import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
+import net.neoforged.fml.ModList;
 import reascer.wom.gameasset.WOMAnimations;
 import reascer.wom.gameasset.animations.weapons.*;
 import yesman.epicfight.api.animation.types.StaticAnimation;
@@ -159,8 +158,7 @@ public class DangerousReactionUtil {
         if (patch == null) return false;
         var player = patch.getAnimator().getPlayerFor(null);
         return player != null && !player.isEmpty() && !player.isEnd()
-                && (isAnimationDangerous(player.getRealAnimation())
-                || player.getRealAnimation().get() instanceof ExecutionAttackAnimation);
+                && isAnimationDangerous(player.getRealAnimation());
     }
 
     public static boolean canReact(Mob mob) {
@@ -172,7 +170,7 @@ public class DangerousReactionUtil {
         LivingEntityPatch<?> targetLivingEntityPatch = EpicFightCapabilities.getEntityPatch(target, LivingEntityPatch.class);
         if (target == null || targetLivingEntityPatch == null) return false;
         AssetAccessor<? extends StaticAnimation> targetDynamicAnimation = Objects.requireNonNull(targetLivingEntityPatch.getAnimator().getPlayerFor(null)).getRealAnimation();
-        return isAnimationDangerous(targetDynamicAnimation) || targetDynamicAnimation.get() instanceof ExecutionAttackAnimation;
+        return isAnimationDangerous(targetDynamicAnimation);
     }
 
     public static void stepLeftRightOnHurtByDangerousAnimation(DamageSource damageSource, MobPatch<?> mobPatch) {

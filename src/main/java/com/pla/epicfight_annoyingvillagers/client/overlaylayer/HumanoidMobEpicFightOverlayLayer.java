@@ -42,7 +42,7 @@ public class HumanoidMobEpicFightOverlayLayer<E extends LivingEntity, AM extends
         } else if (e instanceof HerobrineMob || e instanceof LowShadowHerobrineCloneEntity
                 || (e instanceof HerobrineGregEntity herobrineGregEntity && herobrineGregEntity.isWhiteEye())) {
             return DEFAULT_EYE;
-        } else if (ObedienceMobEffect.canBeObedientMob(e) && e.hasEffect(AnnoyingVillagersModMobEffects.OBEDIENCE.get())) {
+        } else if (ObedienceMobEffect.canBeObedientMob(e) && e.hasEffect(AnnoyingVillagersModMobEffects.OBEDIENCE)) {
             if (e instanceof ZombieVillager) {
                 return ResourceLocation.fromNamespaceAndPath(AnnoyingVillagers.MODID, "textures/entities/obedience/zombie_villager.png");
             } else if (e instanceof Zombie) {

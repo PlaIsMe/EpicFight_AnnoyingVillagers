@@ -20,7 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -83,7 +83,7 @@ public abstract class FishingHookRendererMixin extends EntityRenderer<FishingHoo
 
             int armSign = owner.getMainArm() == HumanoidArm.RIGHT ? 1 : -1;
             ItemStack mainHand = owner.getMainHandItem();
-            if (!mainHand.canPerformAction(ToolActions.FISHING_ROD_CAST)) {
+            if (!mainHand.canPerformAction(ItemAbilities.FISHING_ROD_CAST)) {
                 armSign = -armSign;
             }
 
@@ -164,8 +164,8 @@ public abstract class FishingHookRendererMixin extends EntityRenderer<FishingHoo
 
     @Unique
     private static Vec3 annoyingVillagers$getEpicFightRodAnchor(LivingEntity owner, int armSign, float partialTicks) {
-        if (!owner.getMainHandItem().canPerformAction(ToolActions.FISHING_ROD_CAST)
-                && !owner.getOffhandItem().canPerformAction(ToolActions.FISHING_ROD_CAST)) {
+        if (!owner.getMainHandItem().canPerformAction(ItemAbilities.FISHING_ROD_CAST)
+                && !owner.getOffhandItem().canPerformAction(ItemAbilities.FISHING_ROD_CAST)) {
             return null;
         }
 
@@ -216,13 +216,12 @@ public abstract class FishingHookRendererMixin extends EntityRenderer<FishingHoo
             int u,
             int v
     ) {
-        consumer.vertex(matrix, x - 0.5F, (float) y - 0.5F, 0.0F)
-                .color(255, 255, 255, 255)
-                .uv((float) u, (float) v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(lightmapUV)
-                .normal(normal, 0.0F, 1.0F, 0.0F)
-                .endVertex();
+        consumer.addVertex(matrix, x - 0.5F, (float) y - 0.5F, 0.0F)
+                .setColor(255, 255, 255, 255)
+                .setUv((float) u, (float) v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(lightmapUV)
+                .setNormal(0.0F, 1.0F, 0.0F);
     }
 
     @Unique
@@ -245,9 +244,8 @@ public abstract class FishingHookRendererMixin extends EntityRenderer<FishingHoo
         normalX /= normalLength;
         normalY /= normalLength;
         normalZ /= normalLength;
-        consumer.vertex(pose.pose(), currentX, currentY, currentZ)
-                .color(0, 0, 0, 255)
-                .normal(pose.normal(), normalX, normalY, normalZ)
-                .endVertex();
+        consumer.addVertex(pose.pose(), currentX, currentY, currentZ)
+                .setColor(0, 0, 0, 255)
+                .setNormal(pose, normalX, normalY, normalZ);
     }
 }

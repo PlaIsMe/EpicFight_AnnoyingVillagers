@@ -1,6 +1,5 @@
 package com.pla.epicfight_annoyingvillagers.animations;
 
-import com.pla.annoyingvillagers.AnnoyingVillagers;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import com.pla.annoyingvillagers.network.ClientboundMuteExplosionAtPos;
 import com.pla.annoyingvillagers.network.ClientboundWoopieSwordWindFx;
@@ -14,7 +13,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.Joint;
@@ -24,7 +23,7 @@ import yesman.epicfight.api.model.Armature;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
-import yesman.epicfight.world.effect.EpicFightMobEffects;
+import yesman.epicfight.registry.entries.EpicFightMobEffects;
 
 import javax.annotation.Nullable;
 
@@ -71,15 +70,11 @@ public class RushSwordAnimation extends BasicMultipleAttackAnimation {
         }
 
         BlockPos mutePos = BlockPos.containing(windPos);
-        AnnoyingVillagers.PACKET_HANDLER.send(
-                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                new ClientboundMuteExplosionAtPos(mutePos, 4)
-        );
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                livingEntity, new ClientboundMuteExplosionAtPos(mutePos, 4));
         livingEntity.level().explode(livingEntity, windPos.x, windPos.y, windPos.z, 2.0F, false, Level.ExplosionInteraction.NONE);
-        AnnoyingVillagers.PACKET_HANDLER.send(
-                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> livingEntity),
-                new ClientboundWoopieSwordWindFx(windPos)
-        );
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                livingEntity, new ClientboundWoopieSwordWindFx(windPos));
 
         Vec3 dashDir = livingEntity.getLookAngle();
 
@@ -92,7 +87,7 @@ public class RushSwordAnimation extends BasicMultipleAttackAnimation {
         }
 
         Vec3 dash = dashDir.normalize().scale(2.2D);
-        livingEntity.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY.get(), 60, 2, false, false));
+        livingEntity.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY, 60, 2, false, false));
         new DelayedTask(1) {
             @Override public void run() {
                 Vec3 cur = livingEntity.getDeltaMovement();

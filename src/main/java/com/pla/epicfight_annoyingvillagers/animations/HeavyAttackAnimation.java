@@ -8,8 +8,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameRules.BooleanValue;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.Joint;
 import yesman.epicfight.api.animation.property.AnimationProperty.ActionAnimationProperty;
@@ -26,7 +26,7 @@ import yesman.epicfight.api.client.animation.property.JointMask;
 import yesman.epicfight.api.client.animation.property.JointMaskEntry;
 import yesman.epicfight.api.collider.Collider;
 import yesman.epicfight.api.model.Armature;
-import yesman.epicfight.api.utils.datastruct.TypeFlexibleHashMap;
+import yesman.epicfight.api.utils.datastructure.ParameterizedHashMap;
 import yesman.epicfight.client.world.capabilites.entitypatch.player.LocalPlayerPatch;
 import yesman.epicfight.gameasset.Animations.ReusableSources;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
@@ -98,7 +98,7 @@ public class HeavyAttackAnimation extends AttackAnimation {
             f += 0.01F;
         }
 
-        this.stateSpectrumBlueprint.newTimePair(phase.start, f).addState(EntityState.PHASE_LEVEL, 1).newTimePair(phase.start, phase.contact + 0.01F).addState(EntityState.CAN_SKILL_EXECUTION, false).newTimePair(phase.start, phase.recovery).addState(EntityState.MOVEMENT_LOCKED, true).addState(EntityState.UPDATE_LIVING_MOTION, false).addState(EntityState.CAN_BASIC_ATTACK, false).newTimePair(phase.start, phase.end).addState(EntityState.INACTION, true).newTimePair(f, phase.contact + 0.01F).addState(EntityState.ATTACKING, true).addState(EntityState.PHASE_LEVEL, 2).newTimePair(phase.contact + 0.01F, phase.end).addState(EntityState.PHASE_LEVEL, 3).addState(EntityState.TURNING_LOCKED, true);
+        this.stateSpectrumBlueprint.newTimePair(phase.start, f).addState(EntityState.PHASE_LEVEL, 1).newTimePair(phase.start, phase.contact + 0.01F).addState(EntityState.SKILL_EXECUTABLE, false).newTimePair(phase.start, phase.recovery).addState(EntityState.MOVEMENT_LOCKED, true).addState(EntityState.UPDATE_LIVING_MOTION, false).addState(EntityState.COMBO_ATTACKS_DOABLE, false).newTimePair(phase.start, phase.end).addState(EntityState.INACTION, true).newTimePair(f, phase.contact + 0.01F).addState(EntityState.ATTACKING, true).addState(EntityState.PHASE_LEVEL, 2).newTimePair(phase.contact + 0.01F, phase.end).addState(EntityState.PHASE_LEVEL, 3).addState(EntityState.TURNING_LOCKED, true);
     }
 
     public void end(LivingEntityPatch<?> livingentitypatch, AssetAccessor<? extends DynamicAnimation> nextAnimation, boolean flag) {
@@ -113,15 +113,15 @@ public class HeavyAttackAnimation extends AttackAnimation {
 
     }
 
-    public TypeFlexibleHashMap<StateFactor<?>> getStatesMap(LivingEntityPatch<?> livingentitypatch, float f) {
-        TypeFlexibleHashMap<StateFactor<?>> typeflexiblehashmap = super.getStatesMap(livingentitypatch, f);
+    public ParameterizedHashMap<StateFactor<?>> getStatesMap(LivingEntityPatch<?> livingentitypatch, float f) {
+        ParameterizedHashMap<StateFactor<?>> states = super.getStatesMap(livingentitypatch, f);
 
         if (!livingentitypatch.getOriginal().level().getGameRules().getRule(EpicFightGameRules.STIFF_COMBO_ATTACKS.getRuleKey()).get()) {
-            typeflexiblehashmap.put((StateFactor<?>) EntityState.MOVEMENT_LOCKED, Boolean.FALSE);
-            typeflexiblehashmap.put((StateFactor<?>) EntityState.UPDATE_LIVING_MOTION, Boolean.TRUE);
+            states.put((StateFactor<?>) EntityState.MOVEMENT_LOCKED, Boolean.FALSE);
+            states.put((StateFactor<?>) EntityState.UPDATE_LIVING_MOTION, Boolean.TRUE);
         }
 
-        return typeflexiblehashmap;
+        return states;
     }
 
     protected Vec3 getCoordVector(LivingEntityPatch<?> livingentitypatch, AssetAccessor<? extends DynamicAnimation> nextAnimation) {
@@ -134,7 +134,7 @@ public class HeavyAttackAnimation extends AttackAnimation {
         return vec3;
     }
 
-    public boolean isBasicAttackAnimation() {
+    public boolean isComboAttackAnimation() {
         return true;
     }
 

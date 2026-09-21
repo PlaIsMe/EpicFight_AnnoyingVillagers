@@ -3,6 +3,7 @@ package com.pla.epicfight_annoyingvillagers.advancedmobpatch;
 import com.pla.epicfight_annoyingvillagers.capabilities.WeaponCapabilityRedirect;
 import com.pla.epicfight_annoyingvillagers.mixin.WeaponCapabilityAccessor;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
@@ -19,7 +20,6 @@ import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import yesman.epicfight.api.animation.AnimationManager.AnimationAccessor;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.api.animation.LivingMotion;
@@ -30,13 +30,14 @@ import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.api.utils.AttackResult;
 import yesman.epicfight.api.utils.AttackResult.ResultType;
 import yesman.epicfight.gameasset.Animations;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.network.EpicFightNetworkManager;
 import yesman.epicfight.network.server.SPChangeLivingMotion;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.Factions;
+import yesman.epicfight.world.capabilities.entitypatch.Faction;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.MobPatch;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
@@ -48,7 +49,7 @@ import yesman.epicfight.world.capabilities.item.WeaponCategory;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.StunType;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 import yesman.epicfight.world.entity.ai.goal.AnimatedAttackGoal;
 import yesman.epicfight.world.entity.ai.goal.TargetChasingGoal;
 
@@ -87,8 +88,8 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     private float stamina;
     private AdvancedStaminaStatus staminaStatus = AdvancedStaminaStatus.COMMON;
 
-    protected AdvancedMobPatch(Factions factions) {
-        super(factions);
+    protected AdvancedMobPatch(T original, Faction faction) {
+        super(original, faction);
     }
 
     @Override
@@ -97,27 +98,16 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     }
 
     @Override
-    public void onAddedToWorld() {
-        super.onAddedToWorld();
+    public void onJoinWorld(T entity, net.minecraft.world.level.Level level, boolean isClientSide) {
+        super.onJoinWorld(entity, level, isClientSide);
         this.stamina = this.getMaxStamina();
         this.staminaStatus = AdvancedStaminaStatus.COMMON;
         this.modifyLivingMotionByCurrentItem(false);
     }
 
     @Override
-    public void onStartTracking(ServerPlayer trackingPlayer) {
-        super.onStartTracking(trackingPlayer);
-        this.modifyLivingMotionByCurrentItem(false);
-        // A new observer still needs the preset, even when it has not changed.
-        // Do not reset animation layers for players already watching this mob.
-        SPChangeLivingMotion packet = new SPChangeLivingMotion(this.getOriginal().getId());
-        packet.putEntries(this.getAnimator().getLivingAnimations().entrySet());
-        EpicFightNetworkManager.sendToPlayer(packet, trackingPlayer);
-    }
-
-    @Override
-    public void tick(LivingTickEvent livingTickEvent) {
-        super.tick(livingTickEvent);
+    public void preTick() {
+        super.preTick();
         if (this.isLogicalClient()) {
             return;
         }
@@ -139,7 +129,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 return;
             }
 
-            AttributeInstance staminaRegen = this.getOriginal().getAttribute(EpicFightAttributes.STAMINA_REGEN.get());
+            AttributeInstance staminaRegen = this.getOriginal().getAttribute(EpicFightAttributes.STAMINA_REGEN);
             if (this.getEntityState().inaction() || this.guardingLocally || this.isCombatActionLocked()) {
                 this.lastActionTime = this.getOriginal().tickCount;
             } else if (staminaRegen != null
@@ -250,9 +240,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         return !mainHandCap.isEmpty()
                 && mainHandCap instanceof WeaponCapability
                 && category != WeaponCategories.NOT_WEAPON
-                && category != WeaponCategories.FIST
-                && category != WeaponCategories.BOW
-                && category != WeaponCategories.CROSSBOW
+                && category != WeaponCategories.RANGED
                 && category != WeaponCategories.SHIELD;
     }
 
@@ -265,15 +253,20 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
             );
         }
 
-        if (!this.canGenerateWeaponCapabilityMoveset(mainHandCap, style)
-                || !(mainHandCap instanceof WeaponCapabilityAccessor accessor)) {
+        if (!this.canGenerateWeaponCapabilityMoveset(mainHandCap, style)) {
             return WeaponMoveset.empty();
         }
 
-        Map<Style, List<AnimationAccessor<? extends AttackAnimation>>> autoAttackMotions =
-                accessor.annoyingvillagers$getAutoAttackMotions();
-        List<AnimationAccessor<? extends AttackAnimation>> configured =
-                autoAttackMotions.getOrDefault(style, autoAttackMotions.get(Styles.COMMON));
+        // Epic Fight 21's built-in weapons use data-driven Movesets. The legacy
+        // autoAttackMotions map is only populated by older addon capabilities.
+        var moveset = ((WeaponCapability) mainHandCap).getCurrentSet(this);
+        List<AnimationAccessor<? extends AttackAnimation>> configured = null;
+        if (moveset != null) {
+            configured = moveset.getComboAttackAnimations();
+        } else if (mainHandCap instanceof WeaponCapabilityAccessor accessor) {
+            var autoAttackMotions = accessor.annoyingvillagers$getAutoAttackMotions();
+            configured = autoAttackMotions.getOrDefault(style, autoAttackMotions.get(Styles.COMMON));
+        }
         List<AnimationAccessor<? extends StaticAnimation>> animations = copyAnimations(configured);
 
         if (animations.size() < 4) {
@@ -334,7 +327,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 .priority(1.0D)
                 .weight(40.0D)
                 .maxCooldown(20);
-    List<AdditionalAttackGroup> additionalGroups = this.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
+        List<AdditionalAttackGroup> additionalGroups = this.getAdditionalAttackGroups(mainHandCap, offHandCap, style);
         Random random = new Random(
                 GENERATED_CHAIN_SEED
                         + moveset.normalAttacks().size() * 31L
@@ -457,9 +450,9 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         }
         ItemStack previous = from.copy();
         ItemStack current = to.copy();
-        previous.removeTagKey("Damage");
-        current.removeTagKey("Damage");
-        return ItemStack.isSameItemSameTags(previous, current);
+        previous.remove(DataComponents.DAMAGE);
+        current.remove(DataComponents.DAMAGE);
+        return ItemStack.isSameItemSameComponents(previous, current);
     }
 
     /**
@@ -512,13 +505,6 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 InteractionHand.OFF_HAND
         );
 
-        // Item state tags (for example SnakeAnimation/SecondForm) can change without
-        // changing any motion. SPChangeLivingMotion turns off ALL client layers, so
-        // resending an identical preset would cancel an ongoing snake-blade cast.
-        if (livingMotions.equals(animator.getLivingAnimations())) {
-            return;
-        }
-
         animator.resetLivingAnimations();
         livingMotions.forEach(animator::addLivingAnimation);
 
@@ -538,10 +524,6 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 capability.getLivingMotionModifier(this, hand);
         if (modifiers != null) {
             modifiers.forEach(target::put);
-            // Player weapon presets often define RUN without the mob-only CHASE motion.
-            if (!modifiers.containsKey(LivingMotions.CHASE) && modifiers.containsKey(LivingMotions.RUN)) {
-                target.put(LivingMotions.CHASE, modifiers.get(LivingMotions.RUN));
-            }
         }
     }
 
@@ -607,12 +589,9 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
         return !this.combatActionLocks.isEmpty();
     }
 
-    /**
-     * Epic Fight stun replaces the animation owned by AV goals before their normal
-     * completion callback can run. Release every compatibility-side owner here;
-     * later goal cleanup remains safe because unlockCombatActions is idempotent.
-     */
+    /** Releases compatibility owners when stun interrupts their action. */
     private void interruptCombatActionsForStun() {
+        // Later owner cleanup can still unlock safely: removal is idempotent.
         this.combatActionLocks.clear();
         this.stopLocalGuard();
         if (this.combatBehaviors != null) {
@@ -649,7 +628,7 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     }
 
     public final float getMaxStamina() {
-        AttributeInstance maxStamina = this.getOriginal().getAttribute(EpicFightAttributes.MAX_STAMINA.get());
+        AttributeInstance maxStamina = this.getOriginal().getAttribute(EpicFightAttributes.MAX_STAMINA);
         return maxStamina == null ? 15.0F : (float) maxStamina.getValue();
     }
 
@@ -740,10 +719,13 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
     }
 
     private void startLocalGuard() {
+        this.activeGuardAnimation = this.getLocalGuardAnimation();
+        if (this.activeGuardAnimation == null) {
+            return;
+        }
         this.guardingLocally = true;
         this.guardEndTick = this.getOriginal().tickCount + Math.max(1, this.getGuardDurationTicks());
         this.getOriginal().getNavigation().stop();
-        this.activeGuardAnimation = this.getLocalGuardAnimation();
         this.playAnimationSynchronized(this.activeGuardAnimation, 0.0F);
     }
 
@@ -760,6 +742,9 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
                 ? this.getLocalGuardAnimation()
                 : this.activeGuardAnimation;
         this.activeGuardAnimation = null;
+        if (guardAnimation == null) {
+            return;
+        }
         if (this.isLogicalClient()) {
             this.getAnimator().stopPlaying(guardAnimation);
         } else {
@@ -782,14 +767,23 @@ public abstract class AdvancedMobPatch<T extends Mob> extends MobPatch<T> {
             return offHandGuard;
         }
 
-        return this.getAnimator().getLivingAnimation(LivingMotions.BLOCK, Animations.SWORD_GUARD);
+        return null;
     }
 
     private AnimationAccessor<? extends StaticAnimation> getCapabilityGuardAnimation(InteractionHand hand) {
+        if (this.getOriginal().getItemInHand(hand).isEmpty()) {
+            return null;
+        }
         CapabilityItem capability = this.getAdvancedHoldingItemCapability(hand);
+        if (capability.isEmpty() || capability.getWeaponCategory() == WeaponCategories.FIST) {
+            return null;
+        }
         Map<LivingMotion, AnimationAccessor<? extends StaticAnimation>> livingMotions =
                 capability.getLivingMotionModifier(this, hand);
-        return livingMotions == null ? null : livingMotions.get(LivingMotions.BLOCK);
+        if (livingMotions == null) {
+            return null;
+        }
+        return livingMotions.getOrDefault(LivingMotions.BLOCK, livingMotions.get(LivingMotions.BLOCK_SHIELD));
     }
 
     public void playGuardBreakSound() {

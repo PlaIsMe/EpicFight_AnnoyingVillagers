@@ -1,8 +1,8 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.hm.efn.gameasset.EFNAnimations;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.annoyingvillagers.AnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.animations.RushSwordAnimation;
@@ -24,8 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.particle.WOMParticles;
 import reascer.wom.world.damagesources.WOMDamageType;
@@ -39,9 +38,9 @@ import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.gameasset.ColliderPreset;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
@@ -49,9 +48,8 @@ import yesman.epicfight.world.damagesource.StunType;
 import java.util.Random;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsAVSword {
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> WOOPIE_INNATE;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> WOOPIE_INNATE;
     public static AnimationManager.AnimationAccessor<RushSwordAnimation> WOOPIE_INNATE_SPECIAL;
     public static AnimationManager.AnimationAccessor<RushSwordAnimation> WOOPIE_INNATE_SPECIAL_LEGENDARY;
     public static AnimationManager.AnimationAccessor<ActionAnimation> WOOPIE_FLY;
@@ -61,22 +59,22 @@ public class AnimsAVSword {
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLACK_FIRE_SWORD_INNATE;
     public static AnimationManager.AnimationAccessor<ActionAnimation> BLUE_FLAME_SWORD_SPECIAL;
     public static AnimationManager.AnimationAccessor<ActionAnimation> DIAMOND_ATTRACTOR_INNATE;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> DIAMOND_BLASTER_INNATE;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> DIAMOND_BLASTER_INNATE;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> HACKER_SWORD_INNATE;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> HOOK_SWORD_INNATE1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> HOOK_SWORD_INNATE2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> HOOK_SWORD_INNATE1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> HOOK_SWORD_INNATE2;
     public static AnimationManager.AnimationAccessor<AttackAnimation> HOOK_SWORD_DUAL_INNATE;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> FLANKER_HOOK_SWORD_INNATE;
     public static AnimationManager.AnimationAccessor<AttackAnimation> DNAX_HOOK_SWORD_INNATE;
     public static AnimationManager.AnimationAccessor<AttackAnimation> DNAX_HOOK_SWORD_DUAL_INNATE;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> AV_DAGGER_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> AV_DAGGER_AUTO2;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> AV_DAGGER_INNATE;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> AV_DAGGER_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> AV_DAGGER_AUTO2;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> AV_DAGGER_INNATE;
 
     public static void build(AnimationManager.AnimationBuilder builder) {
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
 
-        WOOPIE_INNATE = builder.nextAccessor("biped/av_sword/woopie_innate", (animationaccessor) -> (BasicAttackAnimation) (new BasicAttackAnimation(0.05F, 0.01F, 0.1F, 0.6F, null, humanoidArmature.get().toolR, animationaccessor, humanoidArmature))
+        WOOPIE_INNATE = builder.nextAccessor("biped/av_sword/woopie_innate", (animationaccessor) -> (ComboAttackAnimation) (new ComboAttackAnimation(0.05F, 0.01F, 0.1F, 0.6F, null, humanoidArmature.get().toolR, animationaccessor, humanoidArmature))
                 .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(2.1F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                 .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F)
@@ -94,16 +92,12 @@ public class AnimsAVSword {
                             );
                             if (windPos != null) {
                                 BlockPos mutePos = BlockPos.containing(windPos);
-                                AnnoyingVillagers.PACKET_HANDLER.send(
-                                        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-                                        new ClientboundMuteExplosionAtPos(mutePos, 4)
-                                );
+                                PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                                        entity, new ClientboundMuteExplosionAtPos(mutePos, 4));
                                 entity.level().explode(entity, windPos.x, windPos.y, windPos.z,
                                         2.0F, false, Level.ExplosionInteraction.NONE);
-                                AnnoyingVillagers.PACKET_HANDLER.send(
-                                        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-                                        new ClientboundWoopieSwordWindFx(windPos)
-                                );
+                                PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                                        entity, new ClientboundWoopieSwordWindFx(windPos));
                             }
                         }, AnimationEvent.Side.SERVER)
                 )
@@ -133,8 +127,8 @@ public class AnimsAVSword {
                         .addProperty(AnimationProperty.ActionAnimationProperty.REMOVE_DELTA_MOVEMENT, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, (animation, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 1.0F)
-                        .newTimePair(0.0F, 0.3F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .newTimePair(0.0F, 0.3F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .newTimePair(0.0F, 0.3F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .newTimePair(0.0F, 0.3F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.0F, (livingEntityPatch, self, params) -> {
                                     LivingEntity entity = livingEntityPatch.getOriginal();
@@ -143,9 +137,9 @@ public class AnimsAVSword {
                                     Vec3 offHandPos = EpicfightUtil.getJointWithTranslation(entity, new Vec3f(0.0F, 0.0F, 0.0F), Armatures.BIPED.get().toolL, 0.0F, 0.0F);
                                     Vec3 windPos = offHandPos == null ? entity.position().add(0.0D, 0.05D, 0.0D) : new Vec3(offHandPos.x, entity.getY() + 0.05D, offHandPos.z);
 
-                                    AnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new ClientboundMuteExplosionAtPos(BlockPos.containing(windPos), 4));
+                                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new ClientboundMuteExplosionAtPos(BlockPos.containing(windPos), 4));
                                     entity.level().explode(entity, windPos.x, windPos.y, windPos.z, 2.0F, false, Level.ExplosionInteraction.NONE);
-                                    AnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), new ClientboundWoopieSwordWindFx(windPos));
+                                    PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, new ClientboundWoopieSwordWindFx(windPos));
                                 }, AnimationEvent.Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(0.6F, (livingEntityPatch, self, params) -> livingEntityPatch.playAnimationSynchronized(AnimsLegendarySword.LEGENDARY_SWORD_INNATE, 0.0F), AnimationEvent.Side.SERVER)
                         ));
@@ -191,7 +185,7 @@ public class AnimsAVSword {
 
         BLACK_FIRE_SWORD_INNATE = builder.nextAccessor("biped/av_sword/black_fire_sword_innate",
                 accessor -> new AttackAnimation(0.0F, 0.0F, 0.0F, 0.0F, Float.MAX_VALUE, null, Armatures.BIPED.get().head, accessor, Armatures.BIPED)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.5F)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, true)
                         .addEvents(
@@ -200,7 +194,7 @@ public class AnimsAVSword {
 
         BLUE_FLAME_SWORD_SPECIAL = builder.nextAccessor("biped/av_sword/blue_flame_sword_special",
                 accessor -> new ActionAnimation(0.0F, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, false)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false));
 
@@ -209,7 +203,7 @@ public class AnimsAVSword {
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE)
                         .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, true)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.1F, (livingEntityPatch, self, p) -> {
                                     LivingEntity entity = livingEntityPatch.getOriginal();
@@ -226,10 +220,8 @@ public class AnimsAVSword {
                                                 1.0F
                                         );
 
-                                        AnnoyingVillagers.PACKET_HANDLER.send(
-                                                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(livingEntityPatch::getOriginal),
-                                                new ClientboundDiamondAttractorFx(entity)
-                                        );
+                                        PacketDistributor.sendToPlayersTrackingEntityAndSelf(
+                                                livingEntityPatch.getOriginal(), new ClientboundDiamondAttractorFx(entity));
 
                                         DiamondAttractorSwordItem.pullWeapons(entity);
                                     }
@@ -237,7 +229,7 @@ public class AnimsAVSword {
                         ));
 
         DIAMOND_BLASTER_INNATE = builder.nextAccessor("biped/av_sword/diamond_blaster_innate",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature)
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.5F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.multiplier(1.5F)));
 
@@ -280,9 +272,9 @@ public class AnimsAVSword {
         );
 
         HOOK_SWORD_INNATE1 = builder.nextAccessor("biped/av_sword/hook_sword_innate1",
-                (accessor) -> new BasicAttackAnimation(0.15F, 0.05F, 0.15F, 0.7F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED));
+                (accessor) -> new ComboAttackAnimation(0.15F, 0.05F, 0.15F, 0.7F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED));
 
-        HOOK_SWORD_INNATE2 = builder.nextAccessor("biped/av_sword/hook_sword_innate2", (accessor) -> new BasicAttackAnimation(0.15F, 0.05F, 0.15F, 0.85F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED));
+        HOOK_SWORD_INNATE2 = builder.nextAccessor("biped/av_sword/hook_sword_innate2", (accessor) -> new ComboAttackAnimation(0.15F, 0.05F, 0.15F, 0.85F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED));
 
         HOOK_SWORD_DUAL_INNATE = builder.nextAccessor("biped/av_sword/hook_sword_dual_innate",
                 (accessor) -> (AttackAnimation)(new AttackAnimation(0.1F, accessor, Armatures.BIPED,
@@ -322,20 +314,20 @@ public class AnimsAVSword {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, true));
 
         AV_DAGGER_AUTO1 = builder.nextAccessor("biped/av_sword/av_dagger_auto1",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature));
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature));
 
         AV_DAGGER_AUTO2 = builder.nextAccessor("biped/av_sword/av_dagger_auto2",
-                accessor -> new BasicAttackAnimation(0.08F, 0.0F, 0.1F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature));
+                accessor -> new ComboAttackAnimation(0.08F, 0.0F, 0.1F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature));
 
         AV_DAGGER_INNATE = builder.nextAccessor("biped/av_sword/av_dagger_innate",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
                         0.01F,
                         accessor,
                         Armatures.BIPED,
                         0.8F,
                         1.0F,
-                        AvalonAnimationUtils.createSimplePhase(13, 18, 19, InteractionHand.MAIN_HAND, 0.5F, 0.7F, Armatures.BIPED.get().toolL, ColliderPreset.TACHI),
-                        AvalonAnimationUtils.createSimplePhase(20, 26, 30, InteractionHand.MAIN_HAND, 0.5F, 0.7F, Armatures.BIPED.get().toolR, ColliderPreset.TACHI)))
+                        NativeAnimationUtils.createSimplePhase(13, 18, 19, InteractionHand.MAIN_HAND, 0.5F, 0.7F, Armatures.BIPED.get().toolL, ColliderPreset.TACHI),
+                        NativeAnimationUtils.createSimplePhase(20, 26, 30, InteractionHand.MAIN_HAND, 0.5F, 0.7F, Armatures.BIPED.get().toolR, ColliderPreset.TACHI)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.EXTRA_DAMAGE, Set.of(ExtraDamageInstance.SWEEPING_EDGE_ENCHANTMENT.create()))

@@ -5,8 +5,9 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AVExecutionType;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModItems;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.shelmarow.combat_evolution.api.event.RegisterCustomExecutionEvent;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.WeaponCategory;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID)
 public class ExecuteEvent {
     private static final List<ResourceLocation> listAvSwords = new ArrayList<>(Arrays.asList(
             AnnoyingVillagersModItems.BLACK_FIRE_SWORD.getId(),

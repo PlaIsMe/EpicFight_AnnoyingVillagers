@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import yesman.epicfight.world.entity.ai.attribute.EpicFightAttributes;
+import yesman.epicfight.registry.entries.EpicFightAttributes;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 
@@ -71,11 +71,11 @@ public abstract class ReaperHerobrineEntityMixin {
 
     @Inject(method = "addEpicFightAttributes", at = @At("HEAD"))
     private static void addEpicFightAttributes(Builder builder, CallbackInfoReturnable<Builder> cir) {
-        builder.add(EpicFightAttributes.IMPACT.get(), 4.0D)
-                .add(EpicFightAttributes.ARMOR_NEGATION.get(), 10.0D)
-                .add(EpicFightAttributes.STUN_ARMOR.get(), 20.0D)
-                .add(EpicFightAttributes.MAX_STRIKES.get(), 100.0D)
-                .add(EpicFightAttributes.MAX_STAMINA.get(), 60.0D)
-                .add(EpicFightAttributes.STAMINA_REGEN.get(), 1.5D);
+        builder.add(EpicFightAttributes.IMPACT, 4.0D)
+                .add(EpicFightAttributes.ARMOR_NEGATION, 10.0D)
+                .add(EpicFightAttributes.STUN_ARMOR, 20.0D)
+                .add(EpicFightAttributes.MAX_STRIKES, 100.0D)
+                .add(EpicFightAttributes.MAX_STAMINA, 60.0D)
+                .add(EpicFightAttributes.STAMINA_REGEN, 1.5D);
     }
 }

@@ -10,7 +10,7 @@ import com.pla.annoyingvillagers.init.AnnoyingVillagersModParticleTypes;
 import com.pla.annoyingvillagers.item.NullWeaponItem;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -19,11 +19,13 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.api.utils.AttackResult;
 import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.skill.Skill;
 import yesman.epicfight.skill.SkillBuilder;
@@ -33,8 +35,7 @@ import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener;
-import yesman.epicfight.world.entity.eventlistener.SkillCastEvent;
+import yesman.epicfight.api.event.types.player.SkillCastEvent;
 
 import java.util.*;
 
@@ -65,12 +66,12 @@ public class NullWeaponSkill extends WeaponInnateSkill {
         return candidates.get(rand.nextInt(candidates.size()));
     }
 
-    public NullWeaponSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public NullWeaponSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void executeOnServer(SkillContainer skillContainer, FriendlyByteBuf friendlyByteBuf) {
+    public void executeOnServer(SkillContainer skillContainer, CompoundTag friendlyByteBuf) {
         if (!skillContainer.isActivated()) {
             skillContainer.getExecutor().playAnimationSynchronized(AVAnimations.POINT_LEFT_HAND_TOWARD, 0.0F);
             Player player = skillContainer.getExecutor().getOriginal();
@@ -83,7 +84,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                 } else {
                     releaseTrackedWeapons(serverLevel, data);
                 }
-                skillContainer.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS.get(), 0);
+                skillContainer.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS, 0);
             }
             super.executeOnServer(skillContainer, friendlyByteBuf);
             skillContainer.activate();
@@ -96,14 +97,14 @@ public class NullWeaponSkill extends WeaponInnateSkill {
             return true;
         }
 
-        SkillContainer container = serverPatch.getSkill(AVSkills.NULL_WEAPON);
+        SkillContainer container = serverPatch.getSkill(AVSkills.NULL_WEAPON.get());
         if (container == null || container.getSkill() != this) {
             return false;
         }
 
         Player player = serverPatch.getOriginal();
         int available = getClampedStack(container.getStack());
-        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS.get(), available);
+        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS, available);
 
         if (player.level() instanceof ServerLevel serverLevel) {
             syncWeaponsForStack(serverLevel, player, player.getPersistentData(), available);
@@ -123,10 +124,10 @@ public class NullWeaponSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS.get(), 0);
-        container.getExecutor().getEventListener().addEventListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID, (pre) -> {
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS, 0);
+        eventListener.registerEvent(EpicFightEventHooks.Entity.TAKE_DAMAGE_INCOME, (pre) -> {
             DamageSource damageSource = pre.getDamageSource();
             if (!damageSource.is(DamageTypes.MAGIC)
                     && !damageSource.is(DamageTypes.EXPLOSION)
@@ -135,7 +136,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                     && !damageSource.is(DamageTypes.FALL)
                     && !damageSource.is(DamageTypes.FELL_OUT_OF_WORLD)
                     && !damageSource.is(DamageTypes.DROWN)) {
-                Player player = pre.getPlayerPatch().getOriginal();
+                Player player = (Player) pre.getEntityPatch().getOriginal();
 
                 if (player.level() instanceof ServerLevel serverLevel) {
                     CompoundTag data = player.getPersistentData();
@@ -144,7 +145,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
 
                     if (nullWeapon != null) {
                         nullWeapon.moveTo(player.getX(), player.getY(), player.getZ(), nullWeapon.getYRot(), nullWeapon.getXRot());
-                        pre.setCanceled(true);
+                        pre.cancel();
                         pre.setResult(AttackResult.ResultType.BLOCKED);
 
                         EpicfightUtil.damageBlocked(pre.getDamageSource(), player, serverLevel);
@@ -160,9 +161,9 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                     }
                 }
             }
-        });
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID, (event) -> {
+        }, this);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Player.CAST_SKILL, (event) -> {
                     Player player = container.getExecutor().getOriginal();
                     Skill skill = event.getSkillContainer().getSkill();
 
@@ -179,7 +180,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                             }
                         }
                     }
-                });
+                }, this);
     }
 
     @Override
@@ -188,15 +189,14 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                 && container.getExecutor().getOriginal().level() instanceof ServerLevel serverLevel) {
             killOwnedNullSkeletons(serverLevel, container.getExecutor().getOriginal());
         }
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID);
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID);
+        container.getExecutor().getEventListener().removeListenersBelongTo(this);
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         Player player = container.getExecutor().getOriginal();
-        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS.get(), 0);
+        container.getDataManager().setDataSync(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS, 0);
 
         if (player.level() instanceof ServerLevel serverLevel) {
             killOwnedNullSkeletons(serverLevel, player);
@@ -215,12 +215,12 @@ public class NullWeaponSkill extends WeaponInnateSkill {
         super.cancelOnServer(container, args);
     }
 
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         super.cancelOnClient(container, args);
         container.deactivate();
     }
@@ -241,7 +241,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
     }
 
     private static int getReleaseStackCount(SkillContainer container) {
-        Integer releaseStacks = container.getDataManager().getDataValue(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS.get());
+        Integer releaseStacks = container.getDataManager().getDataValue(AVSkillDataKeys.NULL_WEAPON_RELEASE_STACKS);
         return getClampedStack(releaseStacks == null ? 0 : releaseStacks);
     }
 

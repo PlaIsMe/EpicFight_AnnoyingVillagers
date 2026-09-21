@@ -4,6 +4,7 @@ import com.pla.annoyingvillagers.item.DemoniacVoltageReaverItem;
 import com.pla.annoyingvillagers.util.HerobrineUtil;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkills;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsDemoniacVoltageReaver;
+import com.pla.epicfight_annoyingvillagers.util.ItemStackData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -32,13 +33,13 @@ public abstract class DemoniacVoltageReaverItemMixin {
 
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (playerPatch instanceof ServerPlayerPatch serverPlayerPatch) {
-            SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.DEMONIAC_VOLTAGE_REAVER);
+            SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.DEMONIAC_VOLTAGE_REAVER.get());
             if (skillContainer != null) {
                 if (skillContainer.getStack() >= 1) {
                     HerobrineUtil.spawnEliteEffect(level, entity.getX(), entity.getY(), entity.getZ(), entity);
-                    itemstack.getOrCreateTag().putBoolean("SecondForm", true);
-                } else if (itemstack.getTag() != null) {
-                    itemstack.getTag().remove("SecondForm");
+                    ItemStackData.putBoolean(itemstack, "SecondForm", true);
+                } else if (ItemStackData.hasData(itemstack)) {
+                    ItemStackData.remove(itemstack, "SecondForm");
                 }
             }
         }

@@ -5,5 +5,7 @@
 * **Epic Fight - Valour Guard** by namelesslk `[LGPL-2.1]` - Epic Fight animation assets. ([Source](https://github.com/Cyber2049/valour-guard))
 * **Annoying Villagers - Pugilist Steve** `[AFL-3.0]` - Epic Fight animation assets. ([Link](https://space.bilibili.com/1337039598/dynamic))
 * **EpicFight - Battle Arts** by Forixaim `[CC-BY-SA]` - Epic Fight animation assets. ([Source](https://github.com/Forixaim/Epic-Fight-Battle-Arts))
+* **EpicFight Awaken** by ShelMarow `[Authorization Use]` - Epic Fight animation assets. ([Source](https://www.curseforge.com/minecraft/mc-mods/epicfight-awaken))
+* **Combat Evolution** by ShelMarow `[GPLv3]` - Custom EpicFight mobpatch that having builder root design. ([Source](https://www.curseforge.com/minecraft/mc-mods/combat-evolution))
 * **Sculk Steve** `[Authorized Use]` - Epic Fight animation assets used with permission from the original author.
 * **Yonchi Chikito** `[Authorized Use]` - Epic Fight animation assets used with permission from the original author.

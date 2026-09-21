@@ -6,7 +6,8 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsEnderAegis;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
 import com.pla.annoyingvillagers.item.EnderAegisItem;
 import com.pla.epicfight_annoyingvillagers.util.EpicfightUtil;
-import net.minecraft.network.FriendlyByteBuf;
+import com.pla.epicfight_annoyingvillagers.util.ItemStackData;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -15,13 +16,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.ShieldBlockEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.api.utils.AttackResult;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
@@ -29,23 +33,22 @@ import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener.EventType;
-import yesman.epicfight.world.entity.eventlistener.TakeDamageEvent;
+import yesman.epicfight.api.event.types.entity.TakeDamageEvent;
 
 import java.util.Objects;
 import java.util.UUID;
 
-@Mod.EventBusSubscriber(modid = AnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = AnnoyingVillagers.MODID)
 public class EnderAegisSkill extends WeaponInnateSkill {
     private static final UUID EVENT_UUID = UUID.fromString("348aa19d-7c78-4959-9639-00c467ed258d");
     private static final float RESOURCE_PER_PARRY = 5.0F;
 
-    public EnderAegisSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public EnderAegisSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     public static void onParry(ServerPlayerPatch serverPlayerPatch) {
-        SkillContainer container = serverPlayerPatch.getSkill(AVSkills.ENDER_AEGIS);
+        SkillContainer container = serverPlayerPatch.getSkill(AVSkills.ENDER_AEGIS.get());
         if (container == null
                 || !(container.getSkill() instanceof EnderAegisSkill skill)
                 || container.getStack() >= skill.getMaxStack()) {
@@ -59,7 +62,7 @@ public class EnderAegisSkill extends WeaponInnateSkill {
     }
 
     @SubscribeEvent
-    public static void onShieldBlock(ShieldBlockEvent event) {
+    public static void onShieldBlock(LivingShieldBlockEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer serverPlayer)
                 || event.getBlockedDamage() <= 0.0F
                 || !(serverPlayer.getUseItem().getItem() instanceof EnderAegisItem)) {
@@ -73,7 +76,7 @@ public class EnderAegisSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnServer(SkillContainer container, CompoundTag args) {
         if (!this.isActivated(container)) {
             super.executeOnServer(container, args);
             container.getExecutor().playAnimationSynchronized(AnimsEnderAegis.ENDER_AEGIS_INNATE, 0.0F);
@@ -81,44 +84,41 @@ public class EnderAegisSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
     }
 
     @Override
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
-        super.executeOnClient(container, args);
-        container.activate();
-    }
-
-    @Override
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         super.cancelOnClient(container, args);
         container.deactivate();
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                EventType.TAKE_DAMAGE_EVENT_ATTACK,
-                EVENT_UUID,
-                EnderAegisSkill::handleIncomingAttack
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Entity.TAKE_DAMAGE_INCOME,
+                EnderAegisSkill::handleIncomingAttack,
+                this
         );
     }
 
-    private static void handleIncomingAttack(TakeDamageEvent.Attack event) {
-        ItemStack itemStack = event.getPlayerPatch().getOriginal().getMainHandItem();
+    private static void handleIncomingAttack(TakeDamageEvent.Income event) {
+        if (!(event.getEntityPatch() instanceof ServerPlayerPatch serverPlayerPatch)) {
+            return;
+        }
+        ItemStack itemStack = serverPlayerPatch.getOriginal().getMainHandItem();
         if (!(itemStack.getItem() instanceof EnderAegisItem)) {
             return;
         }
 
-        tryBlockDuringInnate(event, event.getPlayerPatch());
+        tryBlockDuringInnate(event, serverPlayerPatch);
     }
 
     private static void tryBlockDuringInnate(
-            TakeDamageEvent.Attack event,
+            TakeDamageEvent.Income event,
             ServerPlayerPatch serverPlayerPatch
     ) {
         DamageSource damageSource = event.getDamageSource();
@@ -130,7 +130,7 @@ public class EnderAegisSkill extends WeaponInnateSkill {
             return;
         }
 
-        PlayerPatch<?> playerPatch = event.getPlayerPatch();
+        PlayerPatch<?> playerPatch = (PlayerPatch<?>) event.getEntityPatch();
         AnimationPlayer animationPlayer = Objects.requireNonNull(playerPatch.getAnimator().getPlayerFor(null));
         AssetAccessor<? extends StaticAnimation> dynamicAnimation = animationPlayer.getRealAnimation();
         EntityState entityState = dynamicAnimation.get().getState(playerPatch, animationPlayer.getElapsedTime());
@@ -144,7 +144,7 @@ public class EnderAegisSkill extends WeaponInnateSkill {
             return;
         }
 
-        event.setCanceled(true);
+        event.cancel();
         event.setResult(AttackResult.ResultType.BLOCKED);
         attacker.setDeltaMovement(new Vec3(attacker.getLookAngle().x * -0.2D, 0.0D, attacker.getLookAngle().z * -0.2D));
         serverPlayer.setDeltaMovement(new Vec3(serverPlayer.getLookAngle().x * -0.2D, 0.0D, serverPlayer.getLookAngle().z * -0.2D));
@@ -169,18 +169,18 @@ public class EnderAegisSkill extends WeaponInnateSkill {
         }
 
         if (container.getStack() >= 1) {
-            if (!itemStack.getOrCreateTag().getBoolean(EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG)) {
+            if (!ItemStackData.getBoolean(itemStack, EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG)) {
                 player.playSound(AnnoyingVillagersModSounds.ELITE_HEROBRINE_WEAPON_SCREAMING.get(), 0.5F, 1.0F);
-                itemStack.getOrCreateTag().putBoolean(EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG, true);
+                ItemStackData.putBoolean(itemStack, EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG, true);
             }
-        } else if (itemStack.hasTag() && itemStack.getTag() != null) {
-            itemStack.getTag().remove(EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG);
+        } else if (ItemStackData.hasData(itemStack)) {
+            ItemStackData.remove(itemStack, EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG);
         }
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID);
+        container.getExecutor().getEventListener().removeListenersBelongTo(this);
         super.onRemoved(container);
     }
 }

@@ -1,8 +1,9 @@
 package com.pla.epicfight_annoyingvillagers.skill;
+import com.pla.epicfight_annoyingvillagers.mixin.client.BattleModeGuiAccessor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.client.gui.BattleModeGui;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
@@ -13,7 +14,7 @@ public class StunEscapeSkill extends PassiveSkill {
 
     private int lastSynced = Integer.MIN_VALUE;
 
-    public StunEscapeSkill(SkillBuilder<? extends PassiveSkill> builder) {
+    public StunEscapeSkill(SkillBuilder<?> builder) {
         super(builder);
     }
 
@@ -49,7 +50,8 @@ public class StunEscapeSkill extends PassiveSkill {
     public void drawOnGui(BattleModeGui gui, SkillContainer container, GuiGraphics guiGraphics,
                           float x, float y, float partialTick) {
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, gui.getSlidingProgression(), 0.0F);
+        guiGraphics.pose().translate(0.0F,
+                ((BattleModeGuiAccessor) (Object) gui).epicFightAnnoyingVillagers$getSliding(partialTick), 0.0F);
 
         guiGraphics.blit(this.getSkillTexture(), (int)x, (int)y, 24, 24,
                 0.0F, 0.0F, 1, 1, 1, 1);

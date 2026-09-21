@@ -3,7 +3,6 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraftforge.fml.common.Mod;
 import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
 import net.shelmarow.combat_evolution.gameassets.animation.ExecutionHitAnimation;
 import yesman.epicfight.api.animation.AnimationManager;
@@ -15,15 +14,14 @@ import yesman.epicfight.api.collider.OBBCollider;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsAVExecute {
     public static AnimationManager.AnimationAccessor<ExecutionAttackAnimation> STRANGLE_EXECUTE;
     public static AnimationManager.AnimationAccessor<ExecutionHitAnimation> STRANGLE_EXECUTE_HIT;

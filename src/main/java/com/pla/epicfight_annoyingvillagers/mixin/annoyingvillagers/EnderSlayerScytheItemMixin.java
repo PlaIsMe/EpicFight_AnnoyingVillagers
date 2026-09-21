@@ -26,7 +26,7 @@ public abstract class EnderSlayerScytheItemMixin {
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (!(playerPatch instanceof ServerPlayerPatch serverPlayerPatch)) return;
 
-        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE);
+        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_SLAYER_SCYTHE.get());
         if (skillContainer != null && skillContainer.isActivated()) {
             HerobrineUtil.spawnEliteEffect(serverLevel, entity.getX(), entity.getY(), entity.getZ(), entity);
         }

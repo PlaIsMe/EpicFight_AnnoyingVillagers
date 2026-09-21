@@ -9,6 +9,10 @@ import yesman.epicfight.gameasset.Animations;
 import java.util.List;
 
 public class StepDodgeAvNpcPatch<T extends PathfinderMob> extends AdvancedAvNpcPatch<T> {
+    public StepDodgeAvNpcPatch(T original) {
+        super(original);
+    }
+
     @Override
     protected List<AnimationManager.AnimationAccessor<? extends StaticAnimation>> getDodgeAnimations() {
         return List.of(

@@ -2,22 +2,22 @@ package com.pla.epicfight_annoyingvillagers.config;
 
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EpicFightAnnoyingVillagersConfig {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec SPEC;
 
-    public static ForgeConfigSpec.ConfigValue<Double> MOB_GUARD_BREAK_WAKE_UP_MIN_CHANCE;
-    public static ForgeConfigSpec.ConfigValue<Double> MOB_GUARD_BREAK_WAKE_UP_MAX_CHANCE;
-    public static ForgeConfigSpec.IntValue WEAPON_BREAKING_MECHANISM_VALUE;
+    public static ModConfigSpec.ConfigValue<Double> MOB_GUARD_BREAK_WAKE_UP_MIN_CHANCE;
+    public static ModConfigSpec.ConfigValue<Double> MOB_GUARD_BREAK_WAKE_UP_MAX_CHANCE;
+    public static ModConfigSpec.IntValue WEAPON_BREAKING_MECHANISM_VALUE;
 
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> WEAPON_CAPABILITY_REDIRECTS;
-    public static ForgeConfigSpec.ConfigValue<Double> KICK_STAMINA_DECREASE_PERCENTAGE;
+    public static ModConfigSpec.ConfigValue<List<? extends String>> WEAPON_CAPABILITY_REDIRECTS;
+    public static ModConfigSpec.ConfigValue<Double> KICK_STAMINA_DECREASE_PERCENTAGE;
 
     private static volatile List<? extends String> cachedRawEntries = List.of();
     private static volatile Map<ResourceLocation, ResourceLocation> cachedRedirects = Map.of();

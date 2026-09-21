@@ -4,8 +4,8 @@ import com.hm.efn.gameasset.EFNAnimations;
 import com.hm.efn.registries.EFNMobEffectRegistry;
 import com.hm.efn.util.EffectConditionParticleTrail;
 import com.hm.efn.util.EffectEntityInvoker;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.annoyingvillagers.entity.GlaiveHerobrineEntity;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.annoyingvillagers.item.EnderGlaiveItem;
@@ -14,8 +14,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.ReuseableEvents;
@@ -26,24 +24,23 @@ import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;
 import yesman.epicfight.api.animation.property.MoveCoordFunctions;
 import yesman.epicfight.api.animation.types.AttackAnimation;
-import yesman.epicfight.api.animation.types.BasicAttackAnimation;
+import yesman.epicfight.api.animation.types.ComboAttackAnimation;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.StunType;
 
-@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Bus.MOD)
 public class AnimsEnderGlaive {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_GLAIVE_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> ENDER_GLAIVE_AUTO2;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> ENDER_GLAIVE_AUTO3;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> ENDER_GLAIVE_AUTO4;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> ENDER_GLAIVE_AUTO2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> ENDER_GLAIVE_AUTO3;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> ENDER_GLAIVE_AUTO4;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_GLAIVE_AUTO5;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> ENDER_GLAIVE_DASH;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> ENDER_GLAIVE_DASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> ENDER_GLAIVE_AIRSLASH;
     public static AnimationManager.AnimationAccessor<AttackAnimation> ENDER_GLAIVE_SPECIAL;
     public static AnimationManager.AnimationAccessor<AttackAnimation> ENDER_GLAIVE_INNATE;
@@ -68,13 +65,13 @@ public class AnimsEnderGlaive {
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
 
         ENDER_GLAIVE_AUTO2 = builder.nextAccessor("biped/ender_glaive/ender_glaive_auto2",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
                         0.1F,
                         accessor,
                         Armatures.BIPED,
                         1.0F,
                         1.0F,
-                        AvalonAnimationUtils.createSimplePhase(37, 44, 60, InteractionHand.MAIN_HAND, 0.8F, 1.0F, Armatures.BIPED.get().toolR, null)))
+                        NativeAnimationUtils.createSimplePhase(37, 44, 60, InteractionHand.MAIN_HAND, 0.8F, 1.0F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.LONG)
@@ -86,18 +83,18 @@ public class AnimsEnderGlaive {
                         .newTimePair(0.0F, Float.MAX_VALUE)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_MEEN)
                         .addEvents(
-                                EffectConditionParticleTrail.buffedParticleTrail(33, 44, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.5F), new Vec3(0.0F, 0.0F, -1.8F), 4.0F, 3, ParticleTypes.LAVA, 0.2F, EFNMobEffectRegistry.MEEN_LANCE.get())
+                                EffectConditionParticleTrail.buffedParticleTrail(33, 44, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.5F), new Vec3(0.0F, 0.0F, -1.8F), 4.0F, 3, ParticleTypes.LAVA, 0.2F, EFNMobEffectRegistry.MEEN_LANCE)
                         ));
 
         ENDER_GLAIVE_AUTO3 = builder.nextAccessor("biped/ender_glaive/ender_glaive_auto3",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
                         0.1F,
                         accessor,
                         Armatures.BIPED,
                         1.0F,
                         1.0F,
-                        AvalonAnimationUtils.createSimplePhase(40, 46, 55, InteractionHand.MAIN_HAND, 0.5F, 0.5F, Armatures.BIPED.get().toolR, null),
-                        AvalonAnimationUtils.createSimplePhase(61, 70, 72, InteractionHand.MAIN_HAND, 0.5F, 0.5F, Armatures.BIPED.get().toolR, null)))
+                        NativeAnimationUtils.createSimplePhase(40, 46, 55, InteractionHand.MAIN_HAND, 0.5F, 0.5F, Armatures.BIPED.get().toolR, null),
+                        NativeAnimationUtils.createSimplePhase(61, 70, 72, InteractionHand.MAIN_HAND, 0.5F, 0.5F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(10.0F))
@@ -106,19 +103,19 @@ public class AnimsEnderGlaive {
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_MEEN)
                         .addEvents(
                                 EffectEntityInvoker.clearFireWind(20),
-                                EffectConditionParticleTrail.buffedParticleTrail(30, 43, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.7F), new Vec3(0.0F, 0.0F, -2.15F), 5.0F, 1, ParticleTypes.FLAME, 0.3F, EFNMobEffectRegistry.MEEN_LANCE.get()),
-                                EffectConditionParticleTrail.buffedParticleTrail(50, 69, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.7F), new Vec3(0.0F, 0.0F, -2.15F), 5.0F, 1, ParticleTypes.LAVA, 0.3F, EFNMobEffectRegistry.MEEN_LANCE.get())
+                                EffectConditionParticleTrail.buffedParticleTrail(30, 43, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.7F), new Vec3(0.0F, 0.0F, -2.15F), 5.0F, 1, ParticleTypes.FLAME, 0.3F, EFNMobEffectRegistry.MEEN_LANCE),
+                                EffectConditionParticleTrail.buffedParticleTrail(50, 69, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -1.7F), new Vec3(0.0F, 0.0F, -2.15F), 5.0F, 1, ParticleTypes.LAVA, 0.3F, EFNMobEffectRegistry.MEEN_LANCE)
                         ));
 
         ENDER_GLAIVE_AUTO4 = builder.nextAccessor("biped/ender_glaive/ender_glaive_auto4",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
                         0.1F,
                         accessor,
                         Armatures.BIPED,
                         1.0F,
                         1.0F,
-                        AvalonAnimationUtils.createSimplePhase(30, 36, 50, InteractionHand.MAIN_HAND, 0.5F, 0.6F, Armatures.BIPED.get().toolR, null),
-                        AvalonAnimationUtils.createSimplePhase(64, 70, 80, InteractionHand.MAIN_HAND, 0.5F, 0.6F, Armatures.BIPED.get().toolR, null)))
+                        NativeAnimationUtils.createSimplePhase(30, 36, 50, InteractionHand.MAIN_HAND, 0.5F, 0.6F, Armatures.BIPED.get().toolR, null),
+                        NativeAnimationUtils.createSimplePhase(64, 70, 80, InteractionHand.MAIN_HAND, 0.5F, 0.6F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH_BIG.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(10.0F))
@@ -126,8 +123,8 @@ public class AnimsEnderGlaive {
                         .newTimePair(0.0F, Float.MAX_VALUE)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_MEEN)
                         .addEvents(
-                                EffectConditionParticleTrail.buffedParticleTrail(25, 40, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -2.0F), new Vec3(0.0F, 0.0F, -2.15F), 8.0F, 3, ParticleTypes.FLAME, 0.5F, EFNMobEffectRegistry.MEEN_LANCE.get()),
-                                EffectConditionParticleTrail.buffedParticleTrail(58, 72, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -2.0F), new Vec3(0.0F, 0.0F, -2.15F), 8.0F, 2, ParticleTypes.LAVA, 0.1F, EFNMobEffectRegistry.MEEN_LANCE.get())
+                                EffectConditionParticleTrail.buffedParticleTrail(25, 40, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -2.0F), new Vec3(0.0F, 0.0F, -2.15F), 8.0F, 3, ParticleTypes.FLAME, 0.5F, EFNMobEffectRegistry.MEEN_LANCE),
+                                EffectConditionParticleTrail.buffedParticleTrail(58, 72, InteractionHand.MAIN_HAND, new Vec3(0.0F, 0.0F, -2.0F), new Vec3(0.0F, 0.0F, -2.15F), 8.0F, 2, ParticleTypes.LAVA, 0.1F, EFNMobEffectRegistry.MEEN_LANCE)
                         ));
 
         ENDER_GLAIVE_AUTO5 = builder.nextAccessor("biped/ender_glaive/ender_glaive_auto5",
@@ -148,22 +145,22 @@ public class AnimsEnderGlaive {
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
 
         ENDER_GLAIVE_DASH = builder.nextAccessor("biped/ender_glaive/ender_glaive_dash",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
                         0.1F,
                         accessor,
                         Armatures.BIPED,
                         1.0F,
                         1.0F,
-                        AvalonAnimationUtils.createSimplePhase(30, 36, 42, InteractionHand.MAIN_HAND, 0.7F, 0.7F, Armatures.BIPED.get().toolR, null),
-                        AvalonAnimationUtils.createSimplePhase(42, 48, 65, InteractionHand.MAIN_HAND, 0.7F, 0.7F, Armatures.BIPED.get().toolR, null),
-                        AvalonAnimationUtils.createSimplePhase(65, 74, 90, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
+                        NativeAnimationUtils.createSimplePhase(30, 36, 42, InteractionHand.MAIN_HAND, 0.7F, 0.7F, Armatures.BIPED.get().toolR, null),
+                        NativeAnimationUtils.createSimplePhase(42, 48, 65, InteractionHand.MAIN_HAND, 0.7F, 0.7F, Armatures.BIPED.get().toolR, null),
+                        NativeAnimationUtils.createSimplePhase(65, 74, 90, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                         .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(10.0F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
                         .addProperty(AnimationProperty.ActionAnimationProperty.AFFECT_SPEED, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false)
                         .newTimePair(0.0F, 0.85F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_MEEN));
 
         ENDER_GLAIVE_AIRSLASH = builder.nextAccessor("biped/ender_glaive/ender_glaive_airslash",
@@ -202,9 +199,9 @@ public class AnimsEnderGlaive {
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(0.5F))
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 1.5F)
                         .newTimePair(0.0F, 0.83F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 1.0F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.0F, 0.33F));
 
         ENDER_GLAIVE_INNATE = builder.nextAccessor("biped/ender_glaive/ender_glaive_innate",
@@ -229,9 +226,9 @@ public class AnimsEnderGlaive {
                         .newTimePair(0.86F, Float.MAX_VALUE)
                         .addState(EntityState.TURNING_LOCKED, true)
                         .newTimePair(0.0F, 1.16F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 1.33F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.0F, 0.86F));
 
         ENDER_GLAIVE_INNATE_SPECIAL = builder.nextAccessor("biped/ender_glaive/ender_glaive_innate_special",
@@ -256,9 +253,9 @@ public class AnimsEnderGlaive {
                         .newTimePair(1.0F, Float.MAX_VALUE)
                         .addState(EntityState.TURNING_LOCKED, true)
                         .newTimePair(0.0F, 1.5F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 1.66F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.0F, 1.0F));
     }
 }

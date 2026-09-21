@@ -28,7 +28,7 @@ public abstract class BlueDemonTridentItemMixin {
         if (flag && entity instanceof Player player && entity.level() instanceof ServerLevel serverLevel) {
             PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
             if (playerPatch instanceof ServerPlayerPatch serverPlayerPatch) {
-                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.TRIDENT_FESTIVAL);
+                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.TRIDENT_FESTIVAL.get());
                 if (skillContainer != null) {
                     if (skillContainer.getStack() >= 1) {
                         double d0 = entity.getX();

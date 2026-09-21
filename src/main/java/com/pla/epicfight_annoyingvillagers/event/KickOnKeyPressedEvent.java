@@ -1,6 +1,5 @@
 package com.pla.epicfight_annoyingvillagers.event;
 
-import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolution;
 import com.pla.epicfight_annoyingvillagers.gameasset.AnimsKick;
 import com.pla.epicfight_annoyingvillagers.util.EpicFightNightFallUtil;
 import net.minecraft.server.level.ServerLevel;
@@ -10,12 +9,12 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import yesman.epicfight.api.animation.types.KnockdownAnimation;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.gameasset.Animations;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
@@ -29,10 +28,8 @@ public class KickOnKeyPressedEvent {
     private static final String NBT_KICK_COMBO = "KickCombo";
 
     private static boolean canKick(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
-        return !((ModList.get().isLoaded("combat_evolution") && CombatEvolution.isExecuted(dynamicAnimation)))
-                && (dynamicAnimation.get() instanceof KnockdownAnimation
-                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation))
-                || (ModList.get().isLoaded("combat_evolution") && CombatEvolution.isGuardBreak(dynamicAnimation, livingEntityPatch)));
+        return dynamicAnimation.get() instanceof KnockdownAnimation
+                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation));
     }
 
     public static void execute(final Entity entity, int strafe) {

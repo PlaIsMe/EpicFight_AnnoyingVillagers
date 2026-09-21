@@ -11,9 +11,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.utils.math.MathUtils;
 import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.client.renderer.patched.item.RenderItemBase;
@@ -55,7 +55,7 @@ public class RenderDiamondBolt extends RenderItemBase {
             poseStack.translate(AIM_HAND_X_OFFSET, AIM_HAND_Y_OFFSET, AIM_HAND_Z_OFFSET);
 
             BakedModel model = itemRenderer.getModel(stack, entity.level(), entity, entity.getId());
-            model = ForgeHooksClient.handleCameraTransforms(
+            model = ClientHooks.handleCameraTransforms(
                     poseStack,
                     model,
                     displayContext,

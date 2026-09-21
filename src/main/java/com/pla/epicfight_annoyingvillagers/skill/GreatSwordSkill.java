@@ -5,7 +5,7 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsAVSword;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModParticleTypes;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
 import com.pla.annoyingvillagers.task.DelayedTask;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -15,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.asset.AssetAccessor;
+import yesman.epicfight.api.event.EntityEventListener;
+import yesman.epicfight.api.event.EpicFightEventHooks;
 import yesman.epicfight.api.utils.AttackResult;
 import yesman.epicfight.skill.SkillBuilder;
 import yesman.epicfight.skill.SkillContainer;
@@ -22,9 +24,8 @@ import yesman.epicfight.skill.weaponinnate.WeaponInnateSkill;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.capabilities.entitypatch.player.PlayerPatch;
-import yesman.epicfight.world.effect.EpicFightMobEffects;
-import yesman.epicfight.world.entity.eventlistener.PlayerEventListener;
-import yesman.epicfight.world.entity.eventlistener.TakeDamageEvent;
+import yesman.epicfight.registry.entries.EpicFightMobEffects;
+import yesman.epicfight.api.event.types.entity.TakeDamageEvent;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -36,19 +37,19 @@ public class GreatSwordSkill extends WeaponInnateSkill {
     private static final float COUNTER_DAMAGE = 6.0f;
     private static final double KNOCKBACK_STRENGTH = 1.0;
 
-    public GreatSwordSkill(SkillBuilder<? extends WeaponInnateSkill> builder) {
+    public GreatSwordSkill(WeaponInnateSkill.Builder<?> builder) {
         super(builder);
     }
 
     @Override
-    public void executeOnServer(SkillContainer skillContainer, FriendlyByteBuf friendlyByteBuf) {
+    public void executeOnServer(SkillContainer skillContainer, CompoundTag friendlyByteBuf) {
         final LivingEntity livingEntity = skillContainer.getExecutor().getOriginal();
         final ServerLevel serverLevel = (ServerLevel) livingEntity.level();
         if (skillContainer.isActivated()) {
             this.cancelOnServer(skillContainer, friendlyByteBuf);
         } else {
             skillContainer.getExecutor().playAnimationSynchronized(AnimsAVSword.GREAT_SWORD_INNATE, 0.0F);
-            livingEntity.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY.get(), 60, 2));
+            livingEntity.addEffect(new MobEffectInstance(EpicFightMobEffects.STUN_IMMUNITY, 60, 2));
 
             new DelayedTask(4) {
                 @Override public void run() {
@@ -68,7 +69,7 @@ public class GreatSwordSkill extends WeaponInnateSkill {
     }
 
     @Override
-    public void cancelOnServer(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnServer(SkillContainer container, CompoundTag args) {
         container.deactivate();
         super.cancelOnServer(container, args);
     }
@@ -79,25 +80,25 @@ public class GreatSwordSkill extends WeaponInnateSkill {
         return super.canExecute(container);
     }
 
-    public void executeOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void executeOnClient(SkillContainer container, CompoundTag args) {
         super.executeOnClient(container, args);
         container.activate();
     }
 
-    public void cancelOnClient(SkillContainer container, FriendlyByteBuf args) {
+    public void cancelOnClient(SkillContainer container, CompoundTag args) {
         super.cancelOnClient(container, args);
         container.deactivate();
     }
 
     @Override
-    public void onInitiate(SkillContainer container) {
-        super.onInitiate(container);
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID,
-                (TakeDamageEvent.Attack event) -> {
-                    if (event.getPlayerPatch().isLogicalClient()) return;
+    public void onInitiate(SkillContainer container, EntityEventListener eventListener) {
+        super.onInitiate(container, eventListener);
+        eventListener.registerEvent(
+                EpicFightEventHooks.Entity.TAKE_DAMAGE_INCOME,
+                (TakeDamageEvent.Income event) -> {
+                    if (event.getEntityPatch().isLogicalClient()) return;
 
-                    final PlayerPatch<?> playerPatch = event.getPlayerPatch();
+                    final PlayerPatch<?> playerPatch = (PlayerPatch<?>) event.getEntityPatch();
                     final Player defender = playerPatch.getOriginal();
 
                     AssetAccessor<? extends StaticAnimation> dynamicAnimation = Objects.requireNonNull(playerPatch.getAnimator().getPlayerFor(null)).getRealAnimation();
@@ -126,16 +127,16 @@ public class GreatSwordSkill extends WeaponInnateSkill {
 
                     attacker.hurtMarked = true;
                     attacker.hurt(defender.damageSources().playerAttack(defender), COUNTER_DAMAGE);
-                    event.setCanceled(true);
+                    event.cancel();
                     event.setResult(AttackResult.ResultType.BLOCKED);
-                },
+                }, this,
                 10
         );
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID);
+        container.getExecutor().getEventListener().removeListenersBelongTo(this);
         super.onRemoved(container);
     }
 }

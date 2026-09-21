@@ -3,9 +3,8 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 import com.hm.efn.gameasset.EFNAnimations;
 import com.hm.efn.gameasset.animations.EFNGreatSwordAnimations;
 import com.hm.efn.registries.EFNMobEffectRegistry;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
-import com.merlin204.avalon.util.AvalonEventUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.animations.HeavyAttackAnimation;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModSounds;
@@ -31,7 +30,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.gameasset.WOMSounds;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
@@ -47,9 +45,9 @@ import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.skill.SkillContainer;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
@@ -60,19 +58,18 @@ import yesman.epicfight.world.capabilities.entitypatch.player.ServerPlayerPatch;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsLegendarySword {
     public static AnimationManager.AnimationAccessor<StaticAnimation> LEGENDARY_SWORD_IDLE;
     public static AnimationManager.AnimationAccessor<MovementAnimation> LEGENDARY_SWORD_RUN;
     public static AnimationManager.AnimationAccessor<StaticAnimation> LEGENDARY_SWORD_GUARD;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> LEGENDARY_SWORD_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> LEGENDARY_SWORD_AUTO2;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> LEGENDARY_SWORD_AUTO3;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> LEGENDARY_SWORD_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> LEGENDARY_SWORD_AUTO2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> LEGENDARY_SWORD_AUTO3;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> LEGENDARY_SWORD_AUTO4;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> LEGENDARY_SWORD_AUTO5;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> LEGENDARY_SWORD_AUTO5;
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> LEGENDARY_SWORD_DASH;
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> LEGENDARY_SWORD_AIRSLASH;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> LEGENDARY_SWORD_WOOPIE_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> LEGENDARY_SWORD_WOOPIE_AUTO1;
     public static AnimationManager.AnimationAccessor<AttackAnimation> LEGENDARY_SWORD_SPECIAL;
     public static AnimationManager.AnimationAccessor<HeavyAttackAnimation> LEGENDARY_SWORD_INNATE;
     public static AnimationManager.AnimationAccessor<UltimateAttackAnimation> LEGENDARY_SWORD_INNATE_SPECIAL;
@@ -101,21 +98,21 @@ public class AnimsLegendarySword {
         LEGENDARY_SWORD_GUARD = builder.nextAccessor("biped/legendary_sword/legendary_sword_guard",
                 accessor -> new StaticAnimation(true, accessor, humanoidArmature));
 
-        LEGENDARY_SWORD_AUTO1 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto1", (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.1F, 0.6F, 0.8F, 0.9F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
+        LEGENDARY_SWORD_AUTO1 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto1", (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.1F, 0.6F, 0.8F, 0.9F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
                 .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                 .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.0F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.ARMOR_NEGATION_MODIFIER, ValueModifier.setter(20.0F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(5.0F))
                 .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, AnimsLegendarySword::legendarySwordAttackSpeed));
 
-        LEGENDARY_SWORD_AUTO2 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto2", (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.1F, 0.5F, 0.83F, 0.93F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
+        LEGENDARY_SWORD_AUTO2 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto2", (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.1F, 0.5F, 0.83F, 0.93F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
                 .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                 .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.05F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.ARMOR_NEGATION_MODIFIER, ValueModifier.setter(20.0F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(5.0F))
                 .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, AnimsLegendarySword::legendarySwordAttackSpeed));
 
-        LEGENDARY_SWORD_AUTO3 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto3", (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.1F, 0.45F, 0.75F, 1.2F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
+        LEGENDARY_SWORD_AUTO3 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto3", (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.1F, 0.45F, 0.75F, 1.2F, null, Armatures.BIPED.get().toolR, accessor, Armatures.BIPED))
                 .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                 .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.1F))
                 .addProperty(AnimationProperty.AttackPhaseProperty.ARMOR_NEGATION_MODIFIER, ValueModifier.setter(20.0F))
@@ -132,7 +129,7 @@ public class AnimsLegendarySword {
                 .addProperty(AnimationProperty.ActionAnimationProperty.NO_GRAVITY_TIME, TimePairList.create(0.15F, 0.65F))
                 .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false));
 
-        LEGENDARY_SWORD_AUTO5 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto5", (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.1F, accessor, Armatures.BIPED, 0.5F, 2.0F, AvalonAnimationUtils.createSimplePhase(7, 15, 40, InteractionHand.MAIN_HAND, 2.0F, 2.0F, Armatures.BIPED.get().toolR, EFNGreatSwordAnimations.GREATSWORD_AIRSLASH_SECOND)))
+        LEGENDARY_SWORD_AUTO5 = builder.nextAccessor("biped/legendary_sword/legendary_sword_auto5", (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.1F, accessor, Armatures.BIPED, 0.5F, 2.0F, NativeAnimationUtils.createSimplePhase(7, 15, 40, InteractionHand.MAIN_HAND, 2.0F, 2.0F, Armatures.BIPED.get().toolR, EFNGreatSwordAnimations.GREATSWORD_AIRSLASH_SECOND)))
                 .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
                 .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                 .addProperty(AnimationProperty.AttackPhaseProperty.EXTRA_DAMAGE, Set.of(ExtraDamageInstance.SWEEPING_EDGE_ENCHANTMENT.create()))
@@ -141,8 +138,8 @@ public class AnimsLegendarySword {
                         AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) ->
                                 entitypatch.getOriginal().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 2, false, false, false)), AnimationEvent.Side.BOTH),
                         AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) ->
-                                entitypatch.getOriginal().addEffect(new MobEffectInstance(EFNMobEffectRegistry.SIN_STUN_IMMUNITY.get(), 30, 10, false, false, false)), AnimationEvent.Side.BOTH),
-                        AvalonEventUtils.simpleCameraShake(7, 20, 2.0F, 2.0F, 2.0F), AvalonEventUtils.simpleGroundSplit(7, 0.0F, 0.0F, 0.0F, 0.0F, 2.5F, true)})
+                                entitypatch.getOriginal().addEffect(new MobEffectInstance(EFNMobEffectRegistry.SIN_STUN_IMMUNITY, 30, 10, false, false, false)), AnimationEvent.Side.BOTH),
+                        NativeAnimationUtils.simpleCameraShake(7, 20, 2.0F, 2.0F, 2.0F), NativeAnimationUtils.simpleGroundSplit(7, 0.0F, 0.0F, 0.0F, 0.0F, 2.5F, true)})
         );
 
         LEGENDARY_SWORD_DASH = builder.nextAccessor("biped/legendary_sword/legendary_sword_dash",
@@ -279,14 +276,14 @@ public class AnimsLegendarySword {
                                 }, AnimationEvent.Side.BOTH))
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.9F, reascer.wom.gameasset.ReuseableEvents.BODY_BIG_GROUNDSLAM, AnimationEvent.Side.CLIENT))
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, true)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, true)
                         .newTimePair(0.0F, 0.35F)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.55F, 1.1F)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false));
+                        .addState(EntityState.SKILL_EXECUTABLE, false));
 
         LEGENDARY_SWORD_WOOPIE_AUTO1 = builder.nextAccessor("biped/legendary_sword/legendary_sword_woopie_auto1",
-                accessor -> new BasicAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
+                accessor -> new ComboAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.setter(2.5F))
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
@@ -303,9 +300,9 @@ public class AnimsLegendarySword {
                 .newTimePair(0.53F, Float.MAX_VALUE)
                 .addState(EntityState.TURNING_LOCKED, true)
                 .newTimePair(0.0F, 1.16F)
-                .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                 .newTimePair(0.0F, 0.0F)
-                .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
 
         LEGENDARY_SWORD_INNATE = builder.nextAccessor("biped/legendary_sword/legendary_sword_innate",
                 accessor -> new HeavyAttackAnimation(0.05F, 0.05F, 0.5F, 0.7F, 1.2F, WOMWeaponColliders.TORMENT_BERSERK_AIRSLAM, humanoidArmature.get().rootJoint, accessor, humanoidArmature)
@@ -362,7 +359,7 @@ public class AnimsLegendarySword {
                 .addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true)
                 .addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(0.55F, (entitypatch, self, params) -> {
                     if (entitypatch instanceof ServerPlayerPatch serverPlayerPatch) {
-                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.LEGENDARY_SWORD);
+                        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.LEGENDARY_SWORD.get());
                         if (skillContainer == null || skillContainer.getStack() < 1
                                 || !(skillContainer.getSkill() instanceof LegendarySwordSkill legendarySwordSkill)
                                 || LegendarySwordSkill.isAwakened(skillContainer)) {
@@ -379,10 +376,10 @@ public class AnimsLegendarySword {
 
         LEGENDARY_SWORD_KNOCKDOWN = builder.nextAccessor("biped/legendary_sword/legendary_sword_knockdown",
                 accessor -> new KnockdownAnimation(0.2F, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addState(EntityState.TURNING_LOCKED, true)
-                        .addState(EntityState.LOCKON_ROTATE, true)
+                        .addState(EntityState.LOOK_TARGET, true)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE));
     }
 

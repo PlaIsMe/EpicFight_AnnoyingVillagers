@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Math;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.ReuseableEvents;
@@ -15,22 +14,21 @@ import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;
 import yesman.epicfight.api.animation.types.AttackAnimation;
-import yesman.epicfight.api.animation.types.BasicAttackAnimation;
+import yesman.epicfight.api.animation.types.ComboAttackAnimation;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsAVGreatsword {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATSWORD_AUTO4;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATSWORD_AUTO5;
@@ -39,7 +37,7 @@ public class AnimsAVGreatsword {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATAXE_AUTO5;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATAXE_DASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATSWORD_SPECIAL;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> AV_GREATSWORD_INNATE;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> AV_GREATSWORD_INNATE;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_GREATAXE_INNATE;
     public static AnimationManager.AnimationAccessor<StaticAnimation> CARRY;
 
@@ -135,7 +133,7 @@ public class AnimsAVGreatsword {
                 .addEvents(new AnimationEvent[]{AnimationEvent.InTimeEvent.create(0.8F, ReuseableEvents.SOLAR_GROUNDSLAM_SMALL, AnimationEvent.Side.CLIENT)}));
 
         AV_GREATSWORD_INNATE = builder.nextAccessor("biped/av_greatsword/av_greatsword_innate",
-                accessor -> new BasicAttackAnimation(0.05F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.1F, 0.25F, 0.25F, 0.25F, humanoidArmature.get().toolR, null)
+                accessor -> new ComboAttackAnimation(0.05F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.1F, 0.25F, 0.25F, 0.25F, humanoidArmature.get().toolR, null)
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(0.6F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.setter(0.0F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(10.0F)), new AttackAnimation.Phase(0.25F, 0.25F, 0.4F, 0.5F, 0.5F, humanoidArmature.get().toolR, null)
@@ -183,11 +181,11 @@ public class AnimsAVGreatsword {
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.LONG))
                         .addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true)
                         .addProperty(AnimationProperty.ActionAnimationProperty.STOP_MOVEMENT, true)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
                         .addState(EntityState.TURNING_LOCKED, false)
-                        .addState(EntityState.LOCKON_ROTATE, false)
+                        .addState(EntityState.LOOK_TARGET, false)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.8F));
 
         AV_GREATAXE_INNATE = builder.nextAccessor("biped/av_greatsword/av_greataxe_innate", (accessor) -> (BasicMultipleAttackAnimation)(new BasicMultipleAttackAnimation(0.05F, 1.0F, 1.2F, 1.5F, WOMWeaponColliders.TORMENT_BERSERK_AIRSLAM, humanoidArmature.get().rootJoint, accessor, humanoidArmature))

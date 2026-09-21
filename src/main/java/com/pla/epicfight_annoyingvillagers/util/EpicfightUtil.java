@@ -4,7 +4,6 @@ import com.pla.annoyingvillagers.task.DelayedTask;
 import com.pla.annoyingvillagers.util.ScreenShakeUtil;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.capabilities.MobStamina;
-import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolution;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -21,10 +20,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.network.PacketDistributor;
-import net.shelmarow.combat_evolution.execution.ExecutionHandler;
-import net.shelmarow.combat_evolution.gameassets.animation.ExecutionHitAnimation;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.network.PacketDistributor;
 import yesman.epicfight.api.animation.Joint;
 import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.types.*;
@@ -32,8 +29,8 @@ import yesman.epicfight.api.asset.AssetAccessor;
 import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
-import yesman.epicfight.gameasset.EpicFightSounds;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.particle.HitParticleType;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
@@ -160,23 +157,17 @@ public class EpicfightUtil {
     }
 
     public static boolean isLongHitAnimationNotExecutedAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
-        return !(dynamicAnimation.get() instanceof ExecutionHitAnimation)
-                && (dynamicAnimation.get() instanceof KnockdownAnimation
-                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation))
-                || ExecutionHandler.isTargetGuardBreak(dynamicAnimation, livingEntityPatch));
+        return dynamicAnimation.get() instanceof KnockdownAnimation
+                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation));
     }
 
     public static boolean isLongHitAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
-        return dynamicAnimation.get() instanceof ExecutionHitAnimation
-                || dynamicAnimation.get() instanceof KnockdownAnimation
-                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation))
-                || ExecutionHandler.isTargetGuardBreak(dynamicAnimation, livingEntityPatch);
+        return dynamicAnimation.get() instanceof KnockdownAnimation
+                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation));
     }
 
     public static boolean isDamagableHitAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
-        return dynamicAnimation.get() instanceof ExecutionHitAnimation
-                || dynamicAnimation.get() instanceof KnockdownAnimation
-                || ExecutionHandler.isTargetGuardBreak(dynamicAnimation, livingEntityPatch);
+        return dynamicAnimation.get() instanceof KnockdownAnimation;
     }
 
     public static void stopAnimationSynchronized(LivingEntity entity, AssetAccessor<? extends StaticAnimation> animation) {
@@ -244,9 +235,7 @@ public class EpicfightUtil {
                             breakValue = EpicFightAnnoyingVillagersConfig.WEAPON_BREAKING_MECHANISM_VALUE.get() * EpicFightNightFallUtil.MULTIPLIER_DAMAGE_VALUE;
                         }
                     }
-                    player.getMainHandItem().hurtAndBreak(breakValue, player, (livingEntity) -> {
-                        livingEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND);
-                    });
+                    player.getMainHandItem().hurtAndBreak(breakValue, player, EquipmentSlot.MAINHAND);
                 }
             }
         }
@@ -289,7 +278,7 @@ public class EpicfightUtil {
 
     private static void sendEpicFightCameraFx(LivingEntity entity, ClientboundEpicFightCameraFx packet) {
         if (entity instanceof ServerPlayer player) {
-            EpicFightAnnoyingVillagers.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), packet);
+            PacketDistributor.sendToPlayer(player, packet);
         }
     }
 
@@ -354,9 +343,6 @@ public class EpicfightUtil {
         }
         if (sourcePosition != null) {
             patch.getOriginal().lookAt(EntityAnchorArgument.Anchor.FEET, sourcePosition);
-        }
-        if (patch instanceof PlayerPatch<?> playerPatch && ModList.get().isLoaded("combat_evolution")) {
-            CombatEvolution.addFullStunImmunity(playerPatch);
         }
         Vec3 pos = patch.getOriginal().getEyePosition().add(patch.getOriginal().getLookAngle().scale(2.0D));
         if (patch.getOriginal().level() instanceof ServerLevel serverLevel) {

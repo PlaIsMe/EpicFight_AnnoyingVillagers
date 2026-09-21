@@ -2,27 +2,19 @@ package com.pla.epicfight_annoyingvillagers.init;
 
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.network.KickMessage;
-import com.pla.epicfight_annoyingvillagers.network.OpenEmoteMenuMessage;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import org.lwjgl.glfw.GLFW;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class EpicFightAnnoyingVillagersModKeyMappings {
-    public static final KeyMapping OPEN_EMOTE_MENU = new KeyMapping(
-            "key.epicfight_annoyingvillagers.open_emote_menu",
-            KeyConflictContext.UNIVERSAL,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_GRAVE_ACCENT,
-            "key.categories.epicfight_annoyingvillagers"
-    );
     public static final KeyMapping KICK = new KeyMapping(
             "key.epicfight_annoyingvillagers.kick",
             GLFW.GLFW_KEY_X,
@@ -36,7 +28,7 @@ public class EpicFightAnnoyingVillagersModKeyMappings {
 
             if (this.isDownOld != flag && flag) {
                 int strafe = readStrafeAD();
-                EpicFightAnnoyingVillagers.PACKET_HANDLER.sendToServer(new KickMessage(strafe));
+                PacketDistributor.sendToServer(new KickMessage(strafe));
             }
 
             this.isDownOld = flag;
@@ -57,25 +49,13 @@ public class EpicFightAnnoyingVillagersModKeyMappings {
     @SubscribeEvent
     public static void registerKeyBindings(RegisterKeyMappingsEvent event) {
         event.register(KICK);
-        event.register(OPEN_EMOTE_MENU);
     }
 
-    @Mod.EventBusSubscriber(value = Dist.CLIENT)
+    @EventBusSubscriber(value = Dist.CLIENT)
     public static class KeyEventListener {
         @SubscribeEvent
-        public static void onClientTick(TickEvent.ClientTickEvent event) {
-            if (event.phase != TickEvent.Phase.END) {
-                return;
-            }
-
+        public static void onClientTick(ClientTickEvent.Post event) {
             Minecraft mc = Minecraft.getInstance();
-
-            while (OPEN_EMOTE_MENU.consumeClick()) {
-                if (mc.player != null && mc.screen == null) {
-                    EpicFightAnnoyingVillagers.PACKET_HANDLER.sendToServer(new OpenEmoteMenuMessage());
-                }
-            }
-
             if (mc.screen == null) {
                 KICK.consumeClick();
             }

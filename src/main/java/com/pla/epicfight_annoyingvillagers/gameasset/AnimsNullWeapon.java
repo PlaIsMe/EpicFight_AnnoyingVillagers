@@ -20,7 +20,6 @@ import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.attacks.AntitheusShootAttackAnimation;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.WOMSounds;
@@ -41,9 +40,9 @@ import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.capabilities.EpicFightCapabilities;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
@@ -54,7 +53,6 @@ import yesman.epicfight.world.damagesource.StunType;
 import java.util.Random;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsNullWeapon {
     public static AnimationManager.AnimationAccessor<StaticAnimation> NULL_WEAPON_IDLE;
     public static AnimationManager.AnimationAccessor<MovementAnimation> NULL_WEAPON_RUN;
@@ -159,9 +157,9 @@ public class AnimsNullWeapon {
                         .addProperty(AnimationProperty.AttackAnimationProperty.NO_GRAVITY_TIME, TimePairList.create(0.1F, 0.9F))
                         .addProperty(AnimationProperty.AttackAnimationProperty.MOVE_VERTICAL, true)
                         .newTimePair(0.0F, 1.8F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 2.0F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.0F, Float.MAX_VALUE).addState(EntityState.ATTACK_RESULT, (damagesource) -> {
                             if (damagesource instanceof EpicFightDamageSource epicfightdamagesource) {
                                 if (epicfightdamagesource.getStunType() != StunType.NEUTRALIZE) {
@@ -248,8 +246,8 @@ public class AnimsNullWeapon {
                                 .addProperty(AnimationProperty.AttackPhaseProperty.ARMOR_NEGATION_MODIFIER, ValueModifier.adder(60.0F))))
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.2F)
                         .addProperty(AnimationProperty.AttackAnimationProperty.REACH, 0.3F).newTimePair(0.0F, 0.63F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .newTimePair(0.0F, 0.63F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .newTimePair(0.0F, 0.63F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
 
         NULL_WEAPON_AIRSLASH = builder.nextAccessor("biped/null_weapon/null_weapon_airslash",
                 accessor -> new BasicMultipleAttackAnimation(0.05F, 0.5F, 0.55F, 0.75F, WOMWeaponColliders.ANTITHEUS_ASCENDED_DEATHFALL, humanoidArmature.get().rootJoint, accessor, humanoidArmature)
@@ -384,7 +382,7 @@ public class AnimsNullWeapon {
                                         nullSkeletonEntity.finalizeSpawn(serverLevel,
                                                 serverLevel.getCurrentDifficultyAt(nullSkeletonEntity.blockPosition()),
                                                 MobSpawnType.MOB_SUMMONED,
-                                                null, null
+                                                null
                                         );
                                         if (!serverLevel.addFreshEntity(nullSkeletonEntity)) return;
                                         LivingEntityPatch<?> nullSkeletonPatch = EpicFightCapabilities.getEntityPatch(nullSkeletonEntity, LivingEntityPatch.class);

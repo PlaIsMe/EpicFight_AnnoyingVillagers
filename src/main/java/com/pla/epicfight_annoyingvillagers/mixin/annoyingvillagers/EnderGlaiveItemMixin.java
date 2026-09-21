@@ -25,7 +25,7 @@ public abstract class EnderGlaiveItemMixin {
         PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
         if (!(playerPatch instanceof ServerPlayerPatch serverPlayerPatch)) return;
 
-        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_GLAIVE);
+        SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_GLAIVE.get());
         if (skillContainer != null && skillContainer.getStack() >= 1) {
             HerobrineUtil.spawnEliteEffect(level, entity.getX(), entity.getY(), entity.getZ(), entity);
         }

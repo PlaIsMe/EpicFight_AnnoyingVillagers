@@ -2,11 +2,10 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.hm.efn.client.sound.EFNSounds;
 import com.hm.efn.gameasset.EFNAnimations;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.colliders.WOMWeaponColliders;
 import reascer.wom.particle.WOMParticles;
@@ -18,26 +17,25 @@ import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.gameasset.ColliderPreset;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.EpicFightDamageTypeTags;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
 
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsAVSpear {
     public static AnimationManager.AnimationAccessor<StaticAnimation> AV_SPEAR_IDLE;
     public static AnimationManager.AnimationAccessor<MovementAnimation> AV_SPEAR_WALK;
     public static AnimationManager.AnimationAccessor<MovementAnimation> AV_SPEAR_RUN;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> AV_SPEAR_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> AV_SPEAR_AUTO2;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> AV_SPEAR_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> AV_SPEAR_AUTO2;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_SPEAR_AUTO3;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_SPEAR_AUTO4;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> AV_SPEAR_AUTO5;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> AV_SPEAR_DASH;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> AV_SPEAR_AUTO5;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> AV_SPEAR_DASH;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> AV_SPEAR_AIRSLASH;
     public static AnimationManager.AnimationAccessor<AttackAnimation> AV_SPEAR_SPECIAL;
     public static AnimationManager.AnimationAccessor<AttackAnimation> AV_SPEAR_INNATE;
@@ -45,7 +43,7 @@ public class AnimsAVSpear {
     public static AnimationManager.AnimationAccessor<AttackAnimation> SICKLE_INNATE;
     public static AnimationManager.AnimationAccessor<StaticAnimation> AV_SPEAR_GUARD;
     public static AnimationManager.AnimationAccessor<StaticAnimation> BLACKSCRATCHER_IDLE;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLACKSCRATCHER_ATTACK;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLACKSCRATCHER_ATTACK;
 
     public static void build(AnimationManager.AnimationBuilder builder) {
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
@@ -60,7 +58,7 @@ public class AnimsAVSpear {
                 (accessor) -> new MovementAnimation(0.2F, true, accessor, humanoidArmature));
 
         AV_SPEAR_AUTO1 = builder.nextAccessor("biped/av_spear/av_spear_auto1",
-                (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.15F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(32, 40, 50, InteractionHand.MAIN_HAND, 0.8F, 1.0F, Armatures.BIPED.get().toolR, null)))
+                (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.15F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(32, 40, 50, InteractionHand.MAIN_HAND, 0.8F, 1.0F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH_BIG.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_HIT.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
@@ -70,11 +68,11 @@ public class AnimsAVSpear {
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, EFNAnimations.ATTACK_SPEED_CAP_MEEN));
 
         AV_SPEAR_AUTO2 = builder.nextAccessor("biped/av_spear/av_spear_auto2",
-                (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.25F, 0.11666667F, 0.575F, 0.71F, 1.0F, ColliderPreset.SPEAR, humanoidArmature.get().toolR, accessor, humanoidArmature))
+                (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.25F, 0.11666667F, 0.575F, 0.71F, 1.0F, ColliderPreset.SPEAR, humanoidArmature.get().toolR, accessor, humanoidArmature))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_1.get())
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .newTimePair(0.0F, 0.735F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         AV_SPEAR_AUTO3 = builder.nextAccessor("biped/av_spear/av_spear_auto3",
                 (accessor) -> (BasicMultipleAttackAnimation)(new BasicMultipleAttackAnimation(0.1F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.2F, 0.35F, 0.45F, Float.MAX_VALUE, humanoidArmature.get().toolR, WOMWeaponColliders.STAFF_TAIL)))
@@ -94,14 +92,14 @@ public class AnimsAVSpear {
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F));
 
         AV_SPEAR_AUTO5 = builder.nextAccessor("biped/av_spear/av_spear_auto5",
-                (accessor) -> (BasicAttackAnimation)(new BasicAttackAnimation(0.01F, 0.33333334F, 0.75F, 0.86F, 1.42F, ColliderPreset.SPEAR, humanoidArmature.get().toolR, accessor, humanoidArmature))
+                (accessor) -> (ComboAttackAnimation)(new ComboAttackAnimation(0.01F, 0.33333334F, 0.75F, 0.86F, 1.42F, ColliderPreset.SPEAR, humanoidArmature.get().toolR, accessor, humanoidArmature))
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_2.get())
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.0F)
                         .newTimePair(0.0F, 0.885F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false));
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false));
 
         AV_SPEAR_DASH = builder.nextAccessor("biped/av_spear/av_spear_dash",
-                (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(30, 40, 48, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
+                (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(30, 40, 48, InteractionHand.MAIN_HAND, 1.0F, 1.0F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.SHORT)
                         .addProperty(AnimationProperty.AttackPhaseProperty.MAX_STRIKES_MODIFIER, ValueModifier.setter(10.0F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
@@ -167,9 +165,9 @@ public class AnimsAVSpear {
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EFNSounds.WHOOSH_HEAVY_2.get())))
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, entityPatch, speed, prevElapsedTime, elapsedTime) -> 1.0F)
                         .newTimePair(0.0F, 1.63F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 1.83F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
 
         AV_SPEAR_GUARD = builder.nextAccessor("biped/av_spear/av_spear_guard",
                 accessor -> new StaticAnimation(0.05F, true, accessor, humanoidArmature)
@@ -182,11 +180,11 @@ public class AnimsAVSpear {
                                 AnimationEvent.InTimeEvent.create(0.6F, reascer.wom.gameasset.ReuseableEvents.FAST_SPINING_AGONY, AnimationEvent.Side.CLIENT),
                                 AnimationEvent.InTimeEvent.create(0.7F, reascer.wom.gameasset.ReuseableEvents.FAST_SPINING_AGONY, AnimationEvent.Side.CLIENT)));
 
-        BLACKSCRATCHER_IDLE = builder.nextAccessor("biped/pla/blackscratcher_idle",
+        BLACKSCRATCHER_IDLE = builder.nextAccessor("biped/av_spear/blackscratcher_idle",
                 accessor -> new StaticAnimation(true, accessor, humanoidArmature));
 
-        BLACKSCRATCHER_ATTACK = builder.nextAccessor("biped/pla/blackscratcher_attack.",
-                accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature)
+        BLACKSCRATCHER_ATTACK = builder.nextAccessor("biped/av_spear/blackscratcher_attack",
+                accessor -> new ComboAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.5F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.multiplier(1.5F)));
     }

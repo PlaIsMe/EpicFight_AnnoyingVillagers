@@ -8,9 +8,9 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianWeapon;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
@@ -57,15 +57,14 @@ public class RenderShadowObsidianSword extends RenderItemBase {
                 } else if (((dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_AUTO3
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_AUTO4
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO1
-                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2
-                        || dynamicAnimation.get() instanceof ExecutionAttackAnimation) && entityState.getLevel() > 1)
+                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2) && entityState.getLevel() > 1)
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_AIRSLASH
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_INNATE
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AIRSLASH
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_INNATE
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_DUAL_INNATE) {
                     itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_STRAIGHT.get());
-                    itemstack.getOrCreateTag().putBoolean("foil", stack.isEnchanted());
+                    itemstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, stack.isEnchanted());
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4f);
                     AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
@@ -97,23 +96,21 @@ public class RenderShadowObsidianSword extends RenderItemBase {
                             .is(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.get())
                             ? new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_STRAIGHT.get()) : ItemStack.EMPTY;
                     if (!itemstack.isEmpty()) {
-                        itemstack.getOrCreateTag().putBoolean("foil", stack.isEnchanted());
+                        itemstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, stack.isEnchanted());
                     }
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4f);
                     AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, InteractionHand.OFF_HAND, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 } else if (((dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO2
-                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO3
-                        || dynamicAnimation.get() instanceof ExecutionAttackAnimation) && entityState.getLevel() > 1)
+                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AUTO3) && entityState.getLevel() > 1)
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_DASH
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_AIRSLASH
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_INNATE
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_DUAL_INNATE) {
                     itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_STRAIGHT.get());
-                    if (itemstack.getTag() != null) {
-                        itemstack.getTag().putBoolean("foil", livingEntityPatch.getOriginal().getOffhandItem().isEnchanted());
-                    }
+                    itemstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE,
+                            livingEntityPatch.getOriginal().getOffhandItem().isEnchanted());
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4f);
                     AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, InteractionHand.OFF_HAND, poseStack, buffer, packedLight);

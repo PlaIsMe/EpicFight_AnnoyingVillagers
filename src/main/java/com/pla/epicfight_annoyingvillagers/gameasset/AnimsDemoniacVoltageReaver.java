@@ -7,7 +7,6 @@ import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.common.Mod;
 import org.joml.Math;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.ReuseableEvents;
@@ -21,7 +20,7 @@ import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.utils.math.OpenMatrix4f;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
 import yesman.epicfight.api.utils.TimePairList;
 import yesman.epicfight.api.utils.math.ValueModifier;
@@ -41,7 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsDemoniacVoltageReaver {
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> DEMONIAC_VOLTAGE_REAVER_AUTO1;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> DEMONIAC_VOLTAGE_REAVER_AUTO2;
@@ -210,7 +208,7 @@ public class AnimsDemoniacVoltageReaver {
 
         DEMONIAC_VOLTAGE_REAVER_INNATE = builder.nextAccessor("biped/demoniac_voltage_reaver/demoniac_voltage_reaver_innate",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.0F, (livingEntityPatch, self, p) -> {
                                     ItemStack stack = livingEntityPatch.getOriginal().getMainHandItem();
@@ -221,7 +219,7 @@ public class AnimsDemoniacVoltageReaver {
         
         DEMONIAC_VOLTAGE_REAVER_INNATE_SPECIAL = builder.nextAccessor("biped/demoniac_voltage_reaver/demoniac_voltage_reaver_innate_special",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.0F, (livingEntityPatch, self, p) -> {
                                     if (livingEntityPatch.getOriginal() instanceof SwordsmanHerobrineEntity swordsmanHerobrineEntity

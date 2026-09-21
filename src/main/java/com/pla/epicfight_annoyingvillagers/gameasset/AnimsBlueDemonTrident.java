@@ -18,6 +18,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -27,7 +28,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
 import reascer.wom.gameasset.colliders.WOMWeaponColliders;
 import yesman.epicfight.api.animation.AnimationManager;
@@ -45,7 +45,7 @@ import yesman.epicfight.gameasset.Animations.ReusableSources;
 import yesman.epicfight.gameasset.Armatures;
 import yesman.epicfight.gameasset.ColliderPreset;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.StunType;
 
 import com.pla.epicfight_annoyingvillagers.util.*;
@@ -55,26 +55,25 @@ import yesman.epicfight.api.animation.property.AnimationEvent.Side;
 
 import java.util.Random;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsBlueDemonTrident {
     public static AnimationManager.AnimationAccessor<MovementAnimation> BLUE_DEMON_TRIDENT_TWOHAND_RUN;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLUE_DEMON_TRIDENT_AUTO1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLUE_DEMON_TRIDENT_AUTO2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLUE_DEMON_TRIDENT_AUTO1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLUE_DEMON_TRIDENT_AUTO2;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_AUTO3;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_AUTO4;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_AUTO5;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_AUTO6;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_DASH;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_AIRSLASH;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLUE_DEMON_TRIDENT_THROW_1;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLUE_DEMON_TRIDENT_THROW_2;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLUE_DEMON_TRIDENT_THROW_1;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLUE_DEMON_TRIDENT_THROW_2;
     public static AnimationManager.AnimationAccessor<BasicMultipleAttackAnimation> BLUE_DEMON_TRIDENT_THROW_3;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_THROW_4;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_THROW_5;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_THROW_DASH;
     public static AnimationManager.AnimationAccessor<AttackAnimation> BLUE_DEMON_TRIDENT_THROW_AIRSLASH;
     public static AnimationManager.AnimationAccessor<StaticAnimation> BLUE_DEMON_TRIDENT_SPECIAL;
-    public static AnimationManager.AnimationAccessor<BasicAttackAnimation> BLUE_DEMON_TRIDENT_SPECIAL_LEGENDARY;
+    public static AnimationManager.AnimationAccessor<ComboAttackAnimation> BLUE_DEMON_TRIDENT_SPECIAL_LEGENDARY;
     public static AnimationManager.AnimationAccessor<ActionAnimation> BLUE_DEMON_TRIDENT_FESTIVAL;
     public static AnimationManager.AnimationAccessor<ActionAnimation> BLUE_DEMON_TRIDENT_THUNDER_ATTACK;
     public static AnimationManager.AnimationAccessor<ActionAnimation> BLUE_DEMON_TRIDENT_ELECTRIC_FIELD;
@@ -95,11 +94,11 @@ public class AnimsBlueDemonTrident {
                 accessor -> new MovementAnimation(0.1F, true, accessor, humanoidArmature));
 
         BLUE_DEMON_TRIDENT_AUTO1 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_auto1", access ->
-                new BasicAttackAnimation(0.2f, 0.0f, 0.2f, 0.3f, 0.5f, null, Armatures.BIPED.get().toolR, access, Armatures.BIPED)
+                new ComboAttackAnimation(0.2f, 0.0f, 0.2f, 0.3f, 0.5f, null, Armatures.BIPED.get().toolR, access, Armatures.BIPED)
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F));
 
         BLUE_DEMON_TRIDENT_AUTO2 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_auto2",
-                accessor -> new BasicAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
+                accessor -> new ComboAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.setter(2.5F))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F));
@@ -109,7 +108,7 @@ public class AnimsBlueDemonTrident {
                         .addProperty(AnimationProperty.AttackAnimationProperty.FIXED_MOVE_DISTANCE, true)
                         .addProperty(ActionAnimationProperty.MOVE_VERTICAL, true)
                         .addProperty(ActionAnimationProperty.NO_GRAVITY_TIME, TimePairList.create(0.0f, 0.5f))
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (dynamicAnimation, livingEntityPatch, speed, prevElapsedTime, elapsedTime) ->
                         {
                             if (elapsedTime >= 0.5F && elapsedTime < 0.6F) {
@@ -151,8 +150,8 @@ public class AnimsBlueDemonTrident {
                         .addProperty(AnimationProperty.AttackAnimationProperty.REMOVE_DELTA_MOVEMENT, false)
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 1.5F)
                         .newTimePair(0.0F, 0.3F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .newTimePair(0.3F, 10.0F));
 
         BLUE_DEMON_TRIDENT_AUTO5 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_auto5", access ->
@@ -258,19 +257,19 @@ public class AnimsBlueDemonTrident {
                         .addProperty(ActionAnimationProperty.AFFECT_SPEED, true)
                         .addProperty(AnimationProperty.AttackAnimationProperty.STOP_MOVEMENT, false)
                         .newTimePair(0.0F, 1.45F)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .newTimePair(0.0F, 1.95F)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
 
         BLUE_DEMON_TRIDENT_THROW_1 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_throw_1", access ->
-                new BasicAttackAnimation(0.2f, 0.0f, 0.2f, 0.3f, 0.5f, null, Armatures.BIPED.get().toolR, access, Armatures.BIPED)
+                new ComboAttackAnimation(0.2f, 0.0f, 0.2f, 0.3f, 0.5f, null, Armatures.BIPED.get().toolR, access, Armatures.BIPED)
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.0f, PLAY_TRIDENT_EFFECT_HAND_RIGHT, Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(0.05f, THROW_TRIDENT_HAND_RIGHT, Side.SERVER)));
 
         BLUE_DEMON_TRIDENT_THROW_2 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_throw_2",
-                accessor -> new BasicAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
+                accessor -> new ComboAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.setter(2.5F))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F)
@@ -311,8 +310,8 @@ public class AnimsBlueDemonTrident {
                                 AnimationEvent.InTimeEvent.create(0.43F, PLAY_TRIDENT_EFFECT_HAND_RIGHT, Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(0.43F, THROW_TRIDENT_HAND_RIGHT_LIGHTNING, Side.SERVER))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 1.5F)
-                        .newTimePair(0.0F, 0.76F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .newTimePair(0.0F, 1.0F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                        .newTimePair(0.0F, 0.76F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .newTimePair(0.0F, 1.0F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
         
         BLUE_DEMON_TRIDENT_THROW_5 = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_throw_5", access ->
                 new AttackAnimation(0.2f, 0.0f, 0.75f, 0.9f, 2f, null, Armatures.BIPED.get().toolR, access, Armatures.BIPED)
@@ -333,8 +332,8 @@ public class AnimsBlueDemonTrident {
                                 AnimationEvent.InTimeEvent.create(0.23F, PLAY_TRIDENT_EFFECT_HAND_RIGHT, Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(0.23F, THROW_TRIDENT_HAND_RIGHT, Side.SERVER))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F)
-                        .newTimePair(0.0F, 0.6F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .newTimePair(0.0F, 0.83F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false));
+                        .newTimePair(0.0F, 0.6F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .newTimePair(0.0F, 0.83F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false));
 
         BLUE_DEMON_TRIDENT_THROW_AIRSLASH = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_throw_airslash",
                 accessor -> new AttackAnimation(0.15F, accessor, Armatures.BIPED,
@@ -344,8 +343,8 @@ public class AnimsBlueDemonTrident {
                                 .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.1F)))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F)
                         .addProperty(ActionAnimationProperty.AFFECT_SPEED, true).addProperty(AnimationProperty.AttackAnimationProperty.STOP_MOVEMENT, false)
-                        .newTimePair(0.0F, 0.85F).addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .newTimePair(0.0F, 1.35F).addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .newTimePair(0.0F, 0.85F).addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .newTimePair(0.0F, 1.35F).addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .addEvents(
                                 AnimationEvent.InTimeEvent.create(0.2F, PLAY_TRIDENT_EFFECT_HAND_LEFT, Side.SERVER),
                                 AnimationEvent.InTimeEvent.create(0.2F, THROW_TRIDENT_HAND_LEFT, Side.SERVER),
@@ -368,7 +367,7 @@ public class AnimsBlueDemonTrident {
                                 AnimationEvent.InTimeEvent.create(0.5F, TRIDENT_SPINNING, Side.CLIENT)));
 
         BLUE_DEMON_TRIDENT_SPECIAL_LEGENDARY = builder.nextAccessor("biped/blue_demon_trident/blue_demon_trident_special_legendary",
-                accessor -> new BasicAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
+                accessor -> new ComboAttackAnimation(0.15F, accessor, humanoidArmature, new AttackAnimation.Phase(0.0F, 0.5F, 0.63F, 0.667F, 0.667F, InteractionHand.MAIN_HAND, humanoidArmature.get().toolR, null), new AttackAnimation.Phase(0.2F, 0.7F, 0.8F, 0.9F, 1.3F, humanoidArmature.get().toolL, null))
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.HOLD)
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.setter(2.5F))
                         .addProperty(StaticAnimationProperty.PLAY_SPEED_MODIFIER, (self, livingEntityPatch, speed, prevElapsedTime, elapsedTime) -> 2.0F)
@@ -538,6 +537,11 @@ public class AnimsBlueDemonTrident {
                         .addProperty(ActionAnimationProperty.STOP_MOVEMENT, true)
                         .addProperty(ActionAnimationProperty.CANCELABLE_MOVE, false)
         );
+        ZAP_LONG = builder.nextAccessor("biped/blue_demon_trident/zap_long",
+                accessor -> new LongHitAnimation(0.1F, accessor, humanoidArmature)
+                        .addProperty(ActionAnimationProperty.STOP_MOVEMENT, true)
+                        .addProperty(ActionAnimationProperty.CANCELABLE_MOVE, false)
+        );
     }
 
     private static final AnimationEvent.E0 TRIDENT_SPINNING =
@@ -638,7 +642,7 @@ public class AnimsBlueDemonTrident {
                     Item weapon = stack.getItem();
                     if (weapon instanceof BlueDemonTridentItem) {
                         if (livingEntity instanceof Player player) {
-                            stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(InteractionHand.OFF_HAND));
+                            stack.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
                         }
                         Vec3 jointVec = EpicfightUtil.getJointWithTranslation(
                                 livingEntity, new Vec3f(0, 0, 0),
@@ -674,7 +678,7 @@ public class AnimsBlueDemonTrident {
                     Item weapon = stack.getItem();
                     if (weapon instanceof BlueDemonTridentItem) {
                         if (livingEntity instanceof Player player) {
-                            stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                            stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                         }
                         Vec3 jointVec = EpicfightUtil.getJointWithTranslation(
                                 livingEntity, new Vec3f(0, 0, 0),
@@ -710,7 +714,7 @@ public class AnimsBlueDemonTrident {
                     Item weapon = stack.getItem();
                     if (weapon instanceof BlueDemonTridentItem) {
                         if (livingEntity instanceof Player player) {
-                            stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(InteractionHand.OFF_HAND));
+                            stack.hurtAndBreak(1, player, EquipmentSlot.OFFHAND);
                         }
                         Vec3 jointVec = EpicfightUtil.getJointWithTranslation(
                                 livingEntity, new Vec3f(0, 0, 0),
@@ -747,7 +751,7 @@ public class AnimsBlueDemonTrident {
                     Item weapon = stack.getItem();
                     if (weapon instanceof BlueDemonTridentItem) {
                         if (livingEntity instanceof Player player) {
-                            stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                            stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                         }
                         Vec3 jointVec = EpicfightUtil.getJointWithTranslation(
                                 livingEntity, new Vec3f(0, 0, 0),
@@ -784,7 +788,7 @@ public class AnimsBlueDemonTrident {
                     Item weapon = stack.getItem();
                     if (weapon instanceof BlueDemonTridentItem) {
                         if (livingEntity instanceof Player player) {
-                            stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                            stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
                         }
                         Vec3 jointVec = EpicfightUtil.getJointWithTranslation(
                                 livingEntity, new Vec3f(0, 0, 0),

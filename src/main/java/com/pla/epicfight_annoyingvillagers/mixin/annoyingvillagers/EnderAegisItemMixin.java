@@ -26,7 +26,7 @@ public abstract class EnderAegisItemMixin {
         if (selected) {
             PlayerPatch<?> playerPatch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
             if (playerPatch instanceof ServerPlayerPatch serverPlayerPatch) {
-                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_AEGIS);
+                SkillContainer skillContainer = serverPlayerPatch.getSkill(AVSkills.ENDER_AEGIS.get());
                 secondForm = skillContainer != null && skillContainer.getStack() >= 1;
             }
         }

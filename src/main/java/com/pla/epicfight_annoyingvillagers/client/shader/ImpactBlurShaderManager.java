@@ -6,9 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.PostPass;
+import com.pla.epicfight_annoyingvillagers.mixin.client.PostChainAccessor;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.io.IOException;
 
@@ -84,7 +85,8 @@ public final class ImpactBlurShaderManager {
                 progress = duration / totalTime;
             }
 
-            EffectInstance effect = ((PostPass) chain.passes.get(0)).getEffect();
+            EffectInstance effect = ((PostChainAccessor) (Object) chain)
+                    .epicFightAnnoyingVillagers$getPasses().getFirst().getEffect();
             effect.safeGetUniform("center").set(0.5F, 0.5F);
             effect.safeGetUniform("strength").set(strength);
             effect.safeGetUniform("intensity").set(progress);

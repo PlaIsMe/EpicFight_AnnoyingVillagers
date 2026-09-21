@@ -3,9 +3,9 @@ package com.pla.epicfight_annoyingvillagers.capabilities;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.WeaponTypeReloadListener;
 
@@ -27,13 +27,13 @@ public final class WeaponCapabilityRedirect {
         }
 
         Item sourceItem = heldStack.getItem();
-        ResourceLocation sourceItemId = ForgeRegistries.ITEMS.getKey(sourceItem);
+        ResourceLocation sourceItemId = BuiltInRegistries.ITEM.getKey(sourceItem);
         ResourceLocation targetPresetId = EpicFightAnnoyingVillagersConfig.getWeaponCapabilityRedirect(sourceItemId);
         if (targetPresetId == null) {
             return originalCapability;
         }
 
-        Function<Item, CapabilityItem.Builder> preset = WeaponTypeReloadListener.get(targetPresetId);
+        Function<Item, ? extends CapabilityItem.Builder<?>> preset = WeaponTypeReloadListener.get(targetPresetId);
         if (preset == null) {
             warnMissingPreset(sourceItemId, targetPresetId);
             return originalCapability;
@@ -82,7 +82,7 @@ public final class WeaponCapabilityRedirect {
     }
 
     private record CacheEntry(
-            Function<Item, CapabilityItem.Builder> presetFactory,
+            Function<Item, ? extends CapabilityItem.Builder<?>> presetFactory,
             CapabilityItem capability
     ) {
     }

@@ -10,6 +10,10 @@ import yesman.epicfight.world.capabilities.item.CapabilityItem;
 import yesman.epicfight.world.capabilities.item.Style;
 
 public class AngryStevePatch extends FullDodgeAvNpcPatch<AngrySteveEntity> {
+    public AngryStevePatch(AngrySteveEntity original) {
+        super(original);
+    }
+
     @Override
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,

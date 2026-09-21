@@ -7,9 +7,8 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianWeapon;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
@@ -51,8 +50,7 @@ public class RenderShadowObsidianWeapon extends RenderItemBase {
                     || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_3
                     || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_1
                     || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_TWOHAND_2
-                    || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_DASH
-                    || dynamicAnimation.get() instanceof ExecutionAttackAnimation) {
+                    || dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_DASH) {
                 itemstack = ItemStack.EMPTY;
                 poseStack.pushPose();
                 MathUtils.mulStack(poseStack, openmatrix4f);

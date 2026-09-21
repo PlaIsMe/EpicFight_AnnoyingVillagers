@@ -7,9 +7,9 @@ import com.pla.epicfight_annoyingvillagers.gameasset.AnimsObsidianWeapon;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
+import net.minecraft.core.component.DataComponents;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import yesman.epicfight.api.animation.AnimationPlayer;
 import yesman.epicfight.api.animation.types.EntityState;
 import yesman.epicfight.api.animation.types.StaticAnimation;
@@ -58,12 +58,11 @@ public class RenderShadowObsidianPillar extends RenderItemBase {
                     AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);
                     poseStack.popPose();
                 } else if (((dynamicAnimation == AnimsObsidianWeapon.OBSIDIAN_WEAPON_RIGHT_4
-                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_SPECIAL
-                        || dynamicAnimation.get() instanceof ExecutionAttackAnimation) && entityState.getLevel() > 1)
+                        || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_SPECIAL) && entityState.getLevel() > 1)
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_SWORD_DUAL_INNATE
                         || dynamicAnimation == AnimsObsidianWeapon.SHADOW_OBSIDIAN_PILLAR_DUAL_INNATE) {
                     itemstack = new ItemStack(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_BURST.get());
-                    itemstack.getOrCreateTag().putBoolean("foil", stack.isEnchanted());
+                    itemstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, stack.isEnchanted());
                     poseStack.pushPose();
                     MathUtils.mulStack(poseStack, openmatrix4fmainHand);
                     AvItemRenderUtil.renderItem(itemstack, livingEntityPatch, hand, poseStack, buffer, packedLight);

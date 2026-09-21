@@ -7,19 +7,20 @@ import com.pla.annoyingvillagers.entity.goal.HerobrineEscapeHoleGoal;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;
 import yesman.epicfight.api.animation.types.*;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID)
 public class AVAnimations {
     public static AnimationManager.AnimationAccessor<StaticAnimation> ELITE_HOLD_WEAPON;
     public static AnimationManager.AnimationAccessor<MovementAnimation> ELITE_WALK_WEAPON;
@@ -88,9 +89,9 @@ public class AVAnimations {
         AnimsAVSpear.build(builder);
         AnimsAVFist.build(builder);
         AnimsEnderAegis.build(builder);
-        AnimsAVExecute.build(builder);
         AnimsKick.build(builder);
         AnimsEmote.build(builder);
+        AnimsEpicFightAwaken.build(builder);
 
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
         ELITE_HOLD_WEAPON = builder.nextAccessor("biped/living/elite_hold_weapon",
@@ -103,19 +104,19 @@ public class AVAnimations {
                 accessor -> new StaticAnimation(true, accessor, humanoidArmature));
         POINT_LEFT_HAND_TOWARD = builder.nextAccessor("biped/living/point_left_hand_toward",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
                                 GoalAnimationCompat.castPointAction(patch.getOriginal(),
                                         RigAnimationId.POINT_LEFT_HAND_TOWARD), AnimationEvent.Side.SERVER)));
         POINT_LEFT_HAND_UP = builder.nextAccessor("biped/living/point_left_hand_up",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
                                 GoalAnimationCompat.castPointAction(patch.getOriginal(),
                                         RigAnimationId.POINT_LEFT_HAND_UP), AnimationEvent.Side.SERVER)));
         POINT_LEFT_HAND_MIDDLE = builder.nextAccessor("biped/living/point_left_hand_middle",
                 accessor -> new StaticAnimation(false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addEvents(AnimationEvent.InTimeEvent.create(0.25F, (patch, self, params) ->
                                 GoalAnimationCompat.castPointAction(patch.getOriginal(),
                                         RigAnimationId.POINT_LEFT_HAND_MIDDLE), AnimationEvent.Side.SERVER)));
@@ -128,9 +129,9 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, false)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
                         .addState(EntityState.TURNING_LOCKED, true)
-                        .addState(EntityState.LOCKON_ROTATE, true)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.LOOK_TARGET, true)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE));
         HIT_LEFT = builder.nextAccessor("biped/living/hit_left",
                 accessor -> new LongHitAnimation(0.1F, accessor, humanoidArmature));
@@ -145,9 +146,9 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, false)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
                         .addState(EntityState.TURNING_LOCKED, true)
-                        .addState(EntityState.LOCKON_ROTATE, true)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.LOOK_TARGET, true)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE));
         KNOCKDOWN_RIGHT = builder.nextAccessor("biped/living/knockdown_right",
                 accessor -> new KnockdownAnimation(0.1F, accessor, humanoidArmature)
@@ -156,9 +157,9 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, false)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
                         .addState(EntityState.TURNING_LOCKED, true)
-                        .addState(EntityState.LOCKON_ROTATE, true)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.LOOK_TARGET, true)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE));
         KNOCKDOWN_LEFT = builder.nextAccessor("biped/living/knockdown_left",
                 accessor -> new KnockdownAnimation(0.1F, accessor, humanoidArmature)
@@ -167,9 +168,9 @@ public class AVAnimations {
                         .addProperty(AnimationProperty.ActionAnimationProperty.MOVE_VERTICAL, false)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
                         .addState(EntityState.TURNING_LOCKED, true)
-                        .addState(EntityState.LOCKON_ROTATE, true)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
+                        .addState(EntityState.LOOK_TARGET, true)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
                         .addProperty(AnimationProperty.StaticAnimationProperty.PLAY_SPEED_MODIFIER, Animations.ReusableSources.CONSTANT_ONE));
         HOLD_ONEHAND_RUN = builder.nextAccessor("biped/living/hold_onehand_run",
                 accessor -> new MovementAnimation(true, accessor, humanoidArmature));
@@ -212,8 +213,8 @@ public class AVAnimations {
         PORTAL_SUMMON = builder.nextAccessor("biped/living/portal_summon",
                 accessor -> new ActionAnimation(0.05F, Float.MAX_VALUE, accessor, humanoidArmature)
                         .addState(EntityState.MOVEMENT_LOCKED, true)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false)
-                        .addState(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .addState(EntityState.SKILL_EXECUTABLE, false)
                         .addProperty(AnimationProperty.ActionAnimationProperty.CANCELABLE_MOVE, false));
         LAYING_DEATH = builder.nextAccessor("biped/living/laying_death",
                 (accessor) -> new StaticAnimation(true, accessor, humanoidArmature)
@@ -222,29 +223,29 @@ public class AVAnimations {
         LAYING_DEATH_DEAD = builder.nextAccessor("biped/living/laying_death_dead", (accessor) -> new LongHitAnimation(0.16F, accessor, Armatures.BIPED));
         HOOK_GUN = builder.nextAccessor("biped/living/hook_gun",
                 accessor -> new ActionAnimation(0.0F, 1.85F, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false));
         DIG_MAINHAND = builder.nextAccessor("biped/living/dig_mainhand",
                 accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false));
         USE_MAINHAND = builder.nextAccessor("biped/living/use_mainhand",
                 accessor -> new StaticAnimation(0.1F, false, accessor, humanoidArmature)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false));
         EAT_MAINHAND = builder.nextAccessor("biped/living/eat_mainhand",
                 accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.StaticAnimationProperty.FIXED_HEAD_ROTATION, true)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false));
         EAT_OFFHAND = builder.nextAccessor("biped/living/eat_offhand",
                 accessor -> new StaticAnimation(0.1F, true, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.StaticAnimationProperty.FIXED_HEAD_ROTATION, true)
-                        .addState(EntityState.CAN_BASIC_ATTACK, false));
+                        .addState(EntityState.COMBO_ATTACKS_DOABLE, false));
         ZIPLINE = builder.nextAccessor("biped/living/zipline", (accessor) ->
                 new StaticAnimation(true, accessor, Armatures.BIPED)
                         .addProperty(AnimationProperty.StaticAnimationProperty.ON_ITEM_CHANGE_EVENT, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.SET_TOOLS_BACK_WHEN_ITEM_CHANGED, AnimationEvent.Side.CLIENT))
                         .addEvents(AnimationProperty.StaticAnimationProperty.ON_END_EVENTS, AnimationEvent.SimpleEvent.create(Animations.ReusableSources.REVERT_TO_HANDS, AnimationEvent.Side.CLIENT))
                         .newTimePair(0.0F, 10000.0F)
                         .addStateRemoveOld(EntityState.TURNING_LOCKED, true)
-                        .addStateRemoveOld(EntityState.CAN_BASIC_ATTACK, false)
-                        .addStateRemoveOld(EntityState.CAN_SKILL_EXECUTION, false)
+                        .addStateRemoveOld(EntityState.COMBO_ATTACKS_DOABLE, false)
+                        .addStateRemoveOld(EntityState.SKILL_EXECUTABLE, false)
                         .addStateRemoveOld(EntityState.INACTION, true));
         FLY_UP = builder.nextAccessor("biped/living/fly_up", accessor ->
                 new DodgeAnimation(0.0f, 0.15f, accessor, 0.4f, 1.4f, Armatures.BIPED)

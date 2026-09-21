@@ -2,9 +2,8 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.hm.efn.gameasset.EFNAnimations;
 import com.hm.efn.registries.EFNMobEffectRegistry;
-import com.merlin204.avalon.epicfight.animations.AvalonAttackAnimation;
-import com.merlin204.avalon.util.AvalonAnimationUtils;
-import com.merlin204.avalon.util.AvalonEventUtils;
+import com.pla.epicfight_annoyingvillagers.animations.NativeAttackAnimation;
+import com.pla.epicfight_annoyingvillagers.util.NativeAnimationUtils;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +14,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fml.common.Mod;
 import reascer.wom.animation.WomAnimationProperty;
 import reascer.wom.animation.attacks.SpecialAttackAnimation;
 import reascer.wom.gameasset.ReuseableEvents;
@@ -30,9 +28,9 @@ import yesman.epicfight.api.utils.math.ValueModifier;
 import yesman.epicfight.api.utils.math.Vec3f;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
-import yesman.epicfight.gameasset.EpicFightSounds;
+import yesman.epicfight.registry.entries.EpicFightSounds;
 import yesman.epicfight.model.armature.HumanoidArmature;
-import yesman.epicfight.particle.EpicFightParticles;
+import yesman.epicfight.registry.entries.EpicFightParticles;
 import yesman.epicfight.world.damagesource.ExtraDamageInstance;
 import yesman.epicfight.world.damagesource.StunType;
 
@@ -42,13 +40,12 @@ import java.util.Set;
 import static com.hm.efn.gameasset.animations.EFNGreatSwordAnimations.GREATSWORD_CLASH_HIT_FIRST;
 import static com.hm.efn.gameasset.animations.EFNGreatSwordAnimations.GREATSWORD_CLASH_HIT_SECOND;
 
-@Mod.EventBusSubscriber(modid = EpicFightAnnoyingVillagers.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AnimsAVTachi {
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> AV_TACHI_AUTO4;
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> AV_TACHI_AUTO5;
     public static AnimationManager.AnimationAccessor<SpecialAttackAnimation> AV_TACHI_AIRSLASH;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> AV_TACHI_SPECIAL;
-    public static AnimationManager.AnimationAccessor<AvalonAttackAnimation> AV_TACHI_INNATE;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> AV_TACHI_SPECIAL;
+    public static AnimationManager.AnimationAccessor<NativeAttackAnimation> AV_TACHI_INNATE;
 
     public static void build(AnimationManager.AnimationBuilder builder) {
         Armatures.ArmatureAccessor<HumanoidArmature> humanoidArmature = Armatures.BIPED;
@@ -118,8 +115,8 @@ public class AnimsAVTachi {
                         }, AnimationEvent.Side.SERVER)}));
 
         AV_TACHI_SPECIAL = builder.nextAccessor("biped/av_tachi/av_tachi_special",
-                (accessor) -> (AvalonAttackAnimation) (new AvalonAttackAnimation(
-                        0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(38, 48, 55, InteractionHand.MAIN_HAND, 1.7F, 1.7F, Armatures.BIPED.get().toolR, null)))
+                (accessor) -> (NativeAttackAnimation) (new NativeAttackAnimation(
+                        0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(38, 48, 55, InteractionHand.MAIN_HAND, 1.7F, 1.7F, Armatures.BIPED.get().toolR, null)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.SWING_SOUND, EpicFightSounds.WHOOSH_SHARP.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.EXTRA_DAMAGE, Set.of(ExtraDamageInstance.SWEEPING_EDGE_ENCHANTMENT.create()))
@@ -128,7 +125,7 @@ public class AnimsAVTachi {
         );
 
         AV_TACHI_INNATE = builder.nextAccessor("biped/av_tachi/av_tachi_innate",
-                (accessor) -> (AvalonAttackAnimation)(new AvalonAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, AvalonAnimationUtils.createSimplePhase(31, 39, 79, InteractionHand.MAIN_HAND, 0.8F, 0.8F, Armatures.BIPED.get().toolR, GREATSWORD_CLASH_HIT_FIRST), AvalonAnimationUtils.createSimplePhase(79, 85, 120, InteractionHand.MAIN_HAND, 0.8F, 0.8F, Armatures.BIPED.get().rootJoint, GREATSWORD_CLASH_HIT_SECOND)))
+                (accessor) -> (NativeAttackAnimation)(new NativeAttackAnimation(0.1F, accessor, Armatures.BIPED, 1.0F, 1.0F, NativeAnimationUtils.createSimplePhase(31, 39, 79, InteractionHand.MAIN_HAND, 0.8F, 0.8F, Armatures.BIPED.get().toolR, GREATSWORD_CLASH_HIT_FIRST), NativeAnimationUtils.createSimplePhase(79, 85, 120, InteractionHand.MAIN_HAND, 0.8F, 0.8F, Armatures.BIPED.get().rootJoint, GREATSWORD_CLASH_HIT_SECOND)))
                         .addProperty(AnimationProperty.AttackPhaseProperty.PARTICLE, EpicFightParticles.HIT_BLADE)
                         .addProperty(AnimationProperty.AttackPhaseProperty.HIT_SOUND, EpicFightSounds.BLADE_RUSH_FINISHER.get())
                         .addProperty(AnimationProperty.AttackPhaseProperty.EXTRA_DAMAGE, Set.of(ExtraDamageInstance.SWEEPING_EDGE_ENCHANTMENT.create()))
@@ -165,6 +162,6 @@ public class AnimsAVTachi {
                                 level.sendParticles(ParticleTypes.END_ROD, centerX, centerY + (double)0.5F, centerZ, 50, 1.5F, 0.5F, 1.5F, 0.7);
                             }
 
-                        }, AnimationEvent.Side.SERVER), AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) -> entitypatch.getOriginal().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 50, 2, false, false, false)), AnimationEvent.Side.BOTH), AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) -> entitypatch.getOriginal().addEffect(new MobEffectInstance(EFNMobEffectRegistry.SIN_STUN_IMMUNITY.get(), 50, 10, false, false, false)), AnimationEvent.Side.BOTH), AnimationEvent.InTimeEvent.create(0.3F, Animations.ReusableSources.FRACTURE_GROUND_SIMPLE, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0F, 0.3F, 0.0F), Armatures.BIPED.get().toolR, (double)2.0F, 0.5F), AnimationEvent.InTimeEvent.create(1.4F, Animations.ReusableSources.FRACTURE_GROUND_SIMPLE, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0F, 0.3F, 0.0F), Armatures.BIPED.get().rootJoint, (double)4.0F, 0.55F), AvalonEventUtils.simpleCameraShake(80, 40, 4.0F, 4.0F, 4.0F)}));
+                        }, AnimationEvent.Side.SERVER), AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) -> entitypatch.getOriginal().addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 50, 2, false, false, false)), AnimationEvent.Side.BOTH), AnimationEvent.InTimeEvent.create(0.0F, (entitypatch, self, params) -> entitypatch.getOriginal().addEffect(new MobEffectInstance(EFNMobEffectRegistry.SIN_STUN_IMMUNITY, 50, 10, false, false, false)), AnimationEvent.Side.BOTH), AnimationEvent.InTimeEvent.create(0.3F, Animations.ReusableSources.FRACTURE_GROUND_SIMPLE, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0F, 0.3F, 0.0F), Armatures.BIPED.get().toolR, (double)2.0F, 0.5F), AnimationEvent.InTimeEvent.create(1.4F, Animations.ReusableSources.FRACTURE_GROUND_SIMPLE, AnimationEvent.Side.CLIENT).params(new Vec3f(0.0F, 0.3F, 0.0F), Armatures.BIPED.get().rootJoint, (double)4.0F, 0.55F), NativeAnimationUtils.simpleCameraShake(80, 40, 4.0F, 4.0F, 4.0F)}));
     }
 }
