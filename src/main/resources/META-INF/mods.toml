@@ -6,7 +6,6 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-credits="Photon VFX by Sidtheplayer"
 description='''${mod_description}'''
 [[dependencies.epicfight_annoyingvillagers]]
     modId="forge"
@@ -29,43 +28,24 @@ description='''${mod_description}'''
 [[dependencies.epicfight_annoyingvillagers]]
     modId="wom"
     mandatory=true
-    versionRange="[2.0, )"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.epicfight_annoyingvillagers]]
-    modId="combat_evolution"
-    mandatory=true
-    versionRange="[1.1.7, )"
+    versionRange="[0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.epicfight_annoyingvillagers]]
     modId="efn"
-    mandatory=false
+    mandatory=true
     versionRange="[0,)"
     ordering="AFTER"
     side="BOTH"
 [[dependencies.epicfight_annoyingvillagers]]
-    modId="epicfightx"
-    mandatory=false
+    modId="epicfight_awaken"
+    mandatory=true
     versionRange="[0,)"
     ordering="AFTER"
     side="BOTH"
-[[dependencies.epicfight_annoyingvillagers]]
-    modId="dualaxes"
-    mandatory=false
-    versionRange="[0,)"
-    ordering="AFTER"
-    side="BOTH"
-[[dependencies.epicfight_annoyingvillagers]]
-    modId="dualgreatswords"
-    mandatory=false
-    versionRange="[0,)"
-    ordering="AFTER"
-    side="BOTH"
-
 [[dependencies.epicfight_annoyingvillagers]]
     modId="annoyingvillagers"
     mandatory=true
-    versionRange="[1.0.0,)"
+    versionRange="[0,)"
     ordering="AFTER"
     side="BOTH"

@@ -46,6 +46,8 @@ public class CombatEvolution {
         private final LivingEntity target;
         private final ExecutionTypeManager.Type executionType;
         private AdvancedMobPatch<?> lockedExecutorPatch;
+        private Mob suspendedExecutorMob;
+        private boolean executorWasNoAi;
         private boolean cancelled = false;
         private boolean finished = false;
 
@@ -67,6 +69,14 @@ public class CombatEvolution {
             if (executorPatch instanceof AdvancedMobPatch<?> advancedMobPatch) {
                 this.lockedExecutorPatch = advancedMobPatch;
                 advancedMobPatch.lockCombatActions(this);
+
+                if (executor instanceof Mob mob) {
+                    this.suspendedExecutorMob = mob;
+                    this.executorWasNoAi = mob.isNoAi();
+                    mob.getNavigation().stop();
+                    mob.setDeltaMovement(0.0D, mob.getDeltaMovement().y, 0.0D);
+                    mob.setNoAi(true);
+                }
             }
 
             executor.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100, 1, true, false));
@@ -149,6 +159,10 @@ public class CombatEvolution {
             if (this.lockedExecutorPatch != null) {
                 this.lockedExecutorPatch.unlockCombatActions(this);
                 this.lockedExecutorPatch = null;
+            }
+            if (this.suspendedExecutorMob != null) {
+                this.suspendedExecutorMob.setNoAi(this.executorWasNoAi);
+                this.suspendedExecutorMob = null;
             }
         }
     }
