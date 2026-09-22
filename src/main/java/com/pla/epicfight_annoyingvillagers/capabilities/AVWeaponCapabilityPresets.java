@@ -57,7 +57,9 @@ public class AVWeaponCapabilityPresets {
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK_SHIELD, AnimsEnderAegis.ENDER_AEGIS_GUARD);
 
     public static final Function<Item, CapabilityItem.Builder<?>> ENDER_GLAIVE = (item) ->
-            WeaponCapability.builder().category(WeaponCategories.SPEAR)
+            WeaponCapability.builder()
+                    .constructor(SpearGuardWeaponCapability::new)
+                    .category(WeaponCategories.SPEAR)
                     .styleProvider((livingEntityPatch) -> Styles.TWO_HAND)
                     .collider(WOMWeaponColliders.AGONY)
                     .hitSound(EpicFightSounds.BLADE_HIT.get())
@@ -81,7 +83,9 @@ public class AVWeaponCapabilityPresets {
                     .livingMotionModifier(Styles.TWO_HAND, LivingMotions.BLOCK, AnimsAVSpear.AV_SPEAR_GUARD);
 
     public static final Function<Item, CapabilityItem.Builder<?>> ENDER_SLAYER_SCYTHE = (item) ->
-            WeaponCapability.builder().category(WeaponCategories.SPEAR)
+            WeaponCapability.builder()
+                    .constructor(SpearGuardWeaponCapability::new)
+                    .category(WeaponCategories.SPEAR)
                     .styleProvider((entityPatch) -> Styles.TWO_HAND)
                     .collider(WOMWeaponColliders.ANTITHEUS)
                     .hitSound(EpicFightSounds.BLADE_HIT.get())
@@ -710,6 +714,7 @@ public class AVWeaponCapabilityPresets {
 
     private static WeaponCapability.Builder avSpearTemplate() {
         return WeaponCapability.builder()
+                .constructor(SpearGuardWeaponCapability::new)
                 .category(WeaponCategories.SPEAR)
                 .styleProvider((livingentitypatch) -> Styles.TWO_HAND)
                 .hitSound(EpicFightSounds.BLADE_HIT.get())

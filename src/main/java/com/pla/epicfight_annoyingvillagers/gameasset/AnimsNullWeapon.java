@@ -2,10 +2,12 @@ package com.pla.epicfight_annoyingvillagers.gameasset;
 
 import com.pla.annoyingvillagers.entity.goal.NullSummonSkeletonGoal;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
+import com.pla.annoyingvillagers.entity.BlackHoleEntity;
 import com.pla.annoyingvillagers.entity.NullEntity;
 import com.pla.annoyingvillagers.entity.NullSkeletonEntity;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModEntities;
 import com.pla.annoyingvillagers.init.AnnoyingVillagersModParticleTypes;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -18,7 +20,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import reascer.wom.animation.attacks.AntitheusShootAttackAnimation;
 import reascer.wom.animation.attacks.BasicMultipleAttackAnimation;
@@ -206,32 +211,19 @@ public class AnimsNullWeapon {
                 }, AnimationEvent.Side.CLIENT), AnimationEvent.InTimeEvent.create(1.45F, (livingEntityPatch, self, params) -> {
                     if (!(livingEntityPatch.getOriginal().level() instanceof ServerLevel serverLevel)) return;
 
-                    livingEntityPatch.getOriginal().level().playSound(
-                            null,
+                    Vec3 spawnPosition = getNullBlackHoleSpawnPosition(serverLevel, livingEntityPatch);
+                    serverLevel.addFreshEntity(new BlackHoleEntity(
+                            serverLevel,
                             livingEntityPatch.getOriginal(),
-                            SoundEvents.WITHER_BREAK_BLOCK,
-                            SoundSource.PLAYERS,
-                            1.0F, 0.5F
-                    );
-
-                    OpenMatrix4f transformMatrix = livingEntityPatch.getArmature()
-                            .getBoundTransformFor(livingEntityPatch.getAnimator().getPose(0.0F), Armatures.BIPED.get().handR);
-
-                    OpenMatrix4f CORRECTION = new OpenMatrix4f()
-                            .rotate((float) -Math.toRadians(livingEntityPatch.getOriginal().yRotO + 180.0F), new Vec3f(0.0F, 1.0F, 0.0F));
-                    CORRECTION.translate(new Vec3f(0.0F, 0.0F, -3.5F));
-                    OpenMatrix4f.mul(CORRECTION, transformMatrix, transformMatrix);
-
-                    serverLevel.sendParticles(WOMParticles.ANTITHEUS_BLACKHOLE_START.get(), (double) transformMatrix.m30 + livingEntityPatch.getOriginal().getX(), (double) transformMatrix.m31 + livingEntityPatch.getOriginal().getY(), (double) transformMatrix.m32 + livingEntityPatch.getOriginal().getZ(), 1, 0.0F, 0.0F, 0.0F, 0.0F);
-                    serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, (double) transformMatrix.m30 + livingEntityPatch.getOriginal().getX(), (double) transformMatrix.m31 + livingEntityPatch.getOriginal().getY(), (double) transformMatrix.m32 + livingEntityPatch.getOriginal().getZ(), 48, 0.0F, 0.0F, 0.0F, 0.5F);
+                            spawnPosition
+                    ));
+                    serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, spawnPosition.x, spawnPosition.y, spawnPosition.z, 48, 0.8D, 0.8D, 0.8D, 0.18D);
+                    serverLevel.sendParticles(AnnoyingVillagersModParticleTypes.NULL.get(), spawnPosition.x, spawnPosition.y, spawnPosition.z, 64, 1.4D, 1.4D, 1.4D, 0.12D);
+                    serverLevel.playSound(null, BlockPos.containing(spawnPosition), SoundEvents.WITHER_BREAK_BLOCK, SoundSource.HOSTILE, 1.0F, 0.5F);
                 }, AnimationEvent.Side.SERVER), AnimationEvent.InTimeEvent.create(1.45F, (livingEntityPatch, self, params) -> {
-                    OpenMatrix4f transformMatrix = livingEntityPatch.getArmature().getBoundTransformFor(livingEntityPatch.getAnimator().getPose(0.0F), Armatures.BIPED.get().handR);
-                    OpenMatrix4f CORRECTION = new OpenMatrix4f().rotate((float) -Math.toRadians(livingEntityPatch.getOriginal().yRotO + 180.0F), new Vec3f(0.0F, 1.0F, 0.0F));
-                    CORRECTION.translate(new Vec3f(0.0F, 0.0F, -3.5F));
-                    OpenMatrix4f.mul(CORRECTION, transformMatrix, transformMatrix);
                     Level level = livingEntityPatch.getOriginal().level();
-                    Vec3 FractureCenter = new Vec3((double) transformMatrix.m30 + livingEntityPatch.getOriginal().getX(), (double) transformMatrix.m31 + livingEntityPatch.getOriginal().getY() - (double) 2.0F, (double) transformMatrix.m32 + livingEntityPatch.getOriginal().getZ());
-                    LevelUtil.circleSlamFracture(livingEntityPatch.getOriginal(), level, FractureCenter, 4.0F, true, true);
+                    Vec3 fractureCenter = getNullBlackHoleSpawnPosition(level, livingEntityPatch).add(0.0D, -2.0D, 0.0D);
+                    LevelUtil.circleSlamFracture(livingEntityPatch.getOriginal(), level, fractureCenter, 4.0F, true, true);
                 }, AnimationEvent.Side.CLIENT)));
 
         NULL_WEAPON_DASH = builder.nextAccessor("biped/null_weapon/null_weapon_dash",
@@ -416,5 +408,67 @@ public class AnimsNullWeapon {
                         .addProperty(AnimationProperty.AttackPhaseProperty.STUN_TYPE, StunType.NONE, 2)
                         .addProperty(AnimationProperty.AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.7F)
                         .addProperty(AnimationProperty.AttackAnimationProperty.ATTACK_SPEED_FACTOR, 1.0F));
+    }
+
+    private static Vec3 getNullBlackHoleSpawnPosition(Level level, LivingEntityPatch<?> patch) {
+        LivingEntity attacker = patch.getOriginal();
+        OpenMatrix4f handTransform = patch.getArmature()
+                .getBoundTransformFor(patch.getAnimator().getPose(0.0F), Armatures.BIPED.get().handR);
+        OpenMatrix4f.mul(
+                new OpenMatrix4f().rotate(
+                        (float) -Math.toRadians(attacker.yRotO + 180.0F),
+                        new Vec3f(0.0F, 1.0F, 0.0F)
+                ),
+                handTransform,
+                handTransform
+        );
+
+        Vec3 handPosition = new Vec3(
+                handTransform.m30 + attacker.getX(),
+                handTransform.m31 + attacker.getY(),
+                handTransform.m32 + attacker.getZ()
+        );
+        LivingEntity target = getNullCombatTarget(patch);
+        Vec3 desiredPosition;
+
+        if (target != null && target.isAlive() && attacker.distanceToSqr(target) <= 100.0D) {
+            desiredPosition = target.position().add(0.0D, target.getBbHeight() * 0.5D, 0.0D);
+        } else {
+            Vec3 lookDirection = attacker.getLookAngle();
+            if (lookDirection.lengthSqr() < 1.0E-7D) {
+                lookDirection = Vec3.directionFromRotation(0.0F, attacker.yBodyRot);
+            }
+            desiredPosition = handPosition.add(lookDirection.normalize().scale(4.0D));
+        }
+
+        BlockHitResult hitResult = level.clip(new ClipContext(
+                handPosition,
+                desiredPosition,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                attacker
+        ));
+        if (hitResult.getType() != HitResult.Type.BLOCK) {
+            return desiredPosition;
+        }
+
+        Vec3 path = desiredPosition.subtract(handPosition);
+        return path.lengthSqr() < 1.0E-7D
+                ? hitResult.getLocation()
+                : hitResult.getLocation().subtract(path.normalize().scale(0.35D));
+    }
+
+    private static LivingEntity getNullCombatTarget(LivingEntityPatch<?> patch) {
+        LivingEntity attacker = patch.getOriginal();
+        LivingEntity target = patch.getTarget();
+
+        if (target == null || !target.isAlive()) {
+            target = attacker.getLastHurtMob();
+        }
+        if (target == null || !target.isAlive()) {
+            target = attacker.getLastHurtByMob();
+        }
+
+        return target != null && target.isAlive() ? target : null;
     }
 }

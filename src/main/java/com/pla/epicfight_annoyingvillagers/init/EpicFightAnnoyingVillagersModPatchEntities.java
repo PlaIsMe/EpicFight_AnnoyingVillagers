@@ -13,6 +13,7 @@ import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -76,6 +77,10 @@ public final class EpicFightAnnoyingVillagersModPatchEntities {
         List<EntityType<? extends LivingEntity>> patchedTypes = new ArrayList<>(advancedNpcTypes());
         patchedTypes.add(AnnoyingVillagersModEntities.NULL_SKELETON.get());
         for (EntityType<? extends LivingEntity> type : patchedTypes) {
+            // Match the player base speed used by SmartNpc's 1.21.1 patch. Without
+            // this attribute Epic Fight falls back to 1.0, stretching fist clips
+            // (whose basis speed is 2.2-2.5) and holding their final keyframes.
+            event.add(type, Attributes.ATTACK_SPEED, 4.0D);
             event.add(type, EpicFightAttributes.WEIGHT);
             event.add(type, EpicFightAttributes.ARMOR_NEGATION);
             event.add(type, EpicFightAttributes.IMPACT);

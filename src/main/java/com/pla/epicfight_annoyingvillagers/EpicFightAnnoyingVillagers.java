@@ -30,6 +30,10 @@ public class EpicFightAnnoyingVillagers {
         SkillCategory.ENUM_MANAGER.registerEnumCls(MODID, AVSkillCategories.class);
         SkillSlot.ENUM_MANAGER.registerEnumCls(MODID, AVSkillSlots.class);
         modEventBus.addListener(this::commonSetup);
+        // Epic Fight 21 scales every LivingEntityPatch attack animation from the
+        // entity's vanilla ATTACK_SPEED attribute. Register the patched mob
+        // attributes on the mod bus, where EntityAttributeModificationEvent fires.
+        modEventBus.addListener(EpicFightAnnoyingVillagersModPatchEntities::addEpicFightAttributes);
         EpicFightEventHooks.Registry.WEAPON_CAPABILITY_PRESET.registerEvent(
                 AVWeaponCapabilityPresets::register, MODID);
         EpicFightEventHooks.Registry.ENTITY_PATCH.registerEvent(

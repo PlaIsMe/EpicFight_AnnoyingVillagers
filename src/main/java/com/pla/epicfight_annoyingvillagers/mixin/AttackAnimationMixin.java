@@ -4,14 +4,10 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.pla.annoyingvillagers.entity.FloatingLookBlockEntity;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import yesman.epicfight.api.animation.types.AttackAnimation;
-import yesman.epicfight.api.utils.math.MathUtils;
 import yesman.epicfight.world.capabilities.entitypatch.LivingEntityPatch;
 import yesman.epicfight.world.damagesource.EpicFightDamageSource;
 
@@ -64,21 +60,8 @@ public abstract class AttackAnimationMixin {
             return;
         }
 
-        LivingEntity attacker = attackerPatch.getOriginal();
-        if (!annoyingvillagers$canBeSeen(attacker, target)) {
-            return;
-        }
-
         EpicFightDamageSource damageSource = this.getEpicFightDamageSource(attackerPatch, target, phase);
         target.hurt(damageSource, 1.0F);
         attackerPatch.getCurrentlyAttackTriedEntities().add(target);
-    }
-
-    private static boolean annoyingvillagers$canBeSeen(LivingEntity attacker, Entity target) {
-        AABB targetBox = target.getBoundingBox();
-        double distance = target.position().distanceTo(attacker.getEyePosition())
-                + targetBox.getCenter().distanceTo(new Vec3(targetBox.maxX, targetBox.maxY, targetBox.maxZ));
-
-        return MathUtils.canBeSeen(target, attacker, distance);
     }
 }

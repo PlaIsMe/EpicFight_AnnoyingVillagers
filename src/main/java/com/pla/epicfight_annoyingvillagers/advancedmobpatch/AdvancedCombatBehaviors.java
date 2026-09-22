@@ -346,7 +346,10 @@ public final class AdvancedCombatBehaviors<T extends MobPatch<?>> {
             }
             if (this.behaviorRoot.waitForAnimationCompletion) {
                 var animationPlayer = patch.getAnimator().getPlayerFor(null);
-                return animationPlayer == null || animationPlayer.isEmpty();
+                // Epic Fight marks a clip ended before ServerAnimator replaces it
+                // with EMPTY_ANIMATION. Treat that state as complete immediately so
+                // compatibility actions never retain their final pose for an extra cycle.
+                return animationPlayer == null || animationPlayer.isEmpty() || animationPlayer.isEnd();
             }
             // Match CECombatBehaviors.running(): child animations chain at the advertised
             // basic-attack window; a terminal animation completes when inaction is released.
