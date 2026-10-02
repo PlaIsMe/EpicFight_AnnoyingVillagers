@@ -7,6 +7,8 @@
   "mixins": [
     "AttackAnimationMixin",
     "BasicAttackMixin",
+    "ExecutionHandlerMixin",
+    "ExecutionTaskMixin",
     "GuardSkillMixin",
     "ImpactGuardSkillMixin",
     "LivingEntityPatchMixin",
@@ -40,6 +42,7 @@
     "annoyingvillagers.BlueDemonTridentItemMixin",
     "annoyingvillagers.BurstProtectionUtilMixin",
     "annoyingvillagers.ChrisEntityMixin",
+    "annoyingvillagers.CommonUtilMixin",
     "annoyingvillagers.DemoniacVoltageReaverItemMixin",
     "annoyingvillagers.DiamondAttractorSwordItemMixin",
     "annoyingvillagers.DragonBeamEntityMixin",

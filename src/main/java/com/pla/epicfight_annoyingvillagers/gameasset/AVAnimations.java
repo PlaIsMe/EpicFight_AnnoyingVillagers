@@ -10,6 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.ModList;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.property.AnimationEvent;
 import yesman.epicfight.api.animation.property.AnimationProperty;
@@ -89,6 +90,9 @@ public class AVAnimations {
         AnimsAVSpear.build(builder);
         AnimsAVFist.build(builder);
         AnimsEnderAegis.build(builder);
+        if (ModList.get().isLoaded("combat_evolution")) {
+            AnimsAVExecute.build(builder);
+        }
         AnimsKick.build(builder);
         AnimsEmote.build(builder);
         AnimsEpicFightAwaken.build(builder);

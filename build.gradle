@@ -66,38 +66,7 @@ neoForge {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            exclude { details ->
-                def path = details.path.replace('\\', '/')
-
-                // Combat Evolution has no 1.21.1 port. Keep its legacy sources in the
-                // repository, but do not compile them into this NeoForge build.
-                if (path.startsWith('com/pla/epicfight_annoyingvillagers/compat/combat_evolution/')) return true
-                if (path.startsWith('com/pla/epicfight_annoyingvillagers/combatbehaviour/')) return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/mixin/ExecutionHandlerMixin.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/mixin/ExecutionTaskMixin.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/mixin/annoyingvillagers/CommonUtilMixin.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/util/MobPatchCommon.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/event/ExecuteEvent.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/task/MobExecutionTask.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/gameasset/AnimsAVExecute.java') return true
-                if (path == 'com/pla/epicfight_annoyingvillagers/gameasset/AVExecutionType.java') return true
-
-                return false
-            }
-        }
-        resources {
-            srcDir 'src/generated/resources'
-
-            // Execution animations depend on Combat Evolution's animation types and
-            // must stay out of the 1.21.1 artifact together with their Java holders.
-            exclude 'assets/epicfight_annoyingvillagers/animmodels/animations/biped/av_execute/**'
-        }
-    }
-}
-
+sourceSets.main.resources { srcDirs = ['src/main/resources', 'src/generated/resources'] }
 configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
@@ -121,6 +90,7 @@ dependencies {
     compileOnly 'curse.maven:epic-fight-avalon-1268823:7420442'
     implementation 'curse.maven:epicfight-clash-blade-1408812:8937844'
 
+    implementation "curse.maven:combat-evolution-1377795:9015627"
     compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.5.0'))
 }
 

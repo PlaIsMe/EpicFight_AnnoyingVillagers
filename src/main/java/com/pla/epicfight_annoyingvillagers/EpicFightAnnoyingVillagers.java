@@ -4,6 +4,7 @@ package com.pla.epicfight_annoyingvillagers;
 import com.pla.annoyingvillagers.init.*;
 import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
+import com.pla.epicfight_annoyingvillagers.event.ExecuteEvent;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillCategories;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillDataKeys;
 import com.pla.epicfight_annoyingvillagers.gameasset.AVSkillSlots;
@@ -12,6 +13,7 @@ import com.pla.epicfight_annoyingvillagers.init.EpicFightAnnoyingVillagersModPat
 import com.pla.epicfight_annoyingvillagers.network.NetworkRegister;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -39,6 +41,9 @@ public class EpicFightAnnoyingVillagers {
         EpicFightEventHooks.Registry.ENTITY_PATCH.registerEvent(
                 EpicFightAnnoyingVillagersModPatchEntities::setPatch, MODID);
         modEventBus.addListener(NetworkRegister::register);
+        if (ModList.get().isLoaded("combat_evolution")) {
+            modEventBus.addListener(ExecuteEvent::registerExecution);
+        }
         modContainer.registerConfig(ModConfig.Type.COMMON, EpicFightAnnoyingVillagersConfig.SPEC, "epicfight_annoyingvillagers-server.toml");
         AVSkillDataKeys.DATA_KEYS.register(modEventBus);
         AVSkills.SKILLS.register(modEventBus);

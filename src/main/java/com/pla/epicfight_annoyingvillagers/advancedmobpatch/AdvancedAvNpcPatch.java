@@ -11,6 +11,7 @@ import com.pla.annoyingvillagers.entity.goal.RigShieldGuardGoal;
 import com.pla.annoyingvillagers.rig.RigAnimationController;
 import com.pla.epicfight_annoyingvillagers.capabilities.AVWeaponCapabilityPresets;
 import com.pla.epicfight_annoyingvillagers.capabilities.WeaponCapabilityPresetTracking;
+import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolutionBehaviorProvider;
 import com.pla.epicfight_annoyingvillagers.gameasset.*;
 import com.pla.epicfight_annoyingvillagers.util.AvNpcAnimationCompat;
 import net.minecraft.world.entity.PathfinderMob;
@@ -19,6 +20,7 @@ import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.item.Item;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.component.DataComponents;
+import net.neoforged.fml.ModList;
 import yesman.epicfight.api.animation.Animator;
 import yesman.epicfight.api.animation.AnimationManager;
 import yesman.epicfight.api.animation.LivingMotions;
@@ -132,6 +134,9 @@ public class AdvancedAvNpcPatch<T extends PathfinderMob> extends AdvancedMobPatc
     protected void addCustomBehaviorRoots(AdvancedCombatBehaviors.Builder<MobPatch<?>> builder,
                                           CapabilityItem mainHandCap,
                                           CapabilityItem offHandCap, Style style) {
+        if (ModList.get().isLoaded("combat_evolution")) {
+            CombatEvolutionBehaviorProvider.addTo(builder);
+        }
 
         addDodgeBehaviorRoot(builder);
 

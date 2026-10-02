@@ -79,8 +79,8 @@ public class CombatEvolution {
                 }
             }
 
-            executor.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100, 1, true, false));
-            target.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100, 1, true, false));
+            executor.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, 100, 1, true, false));
+            target.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, 100, 1, true, false));
             executor.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4));
 
             if (executorPatch != null && targetPatch != null) {
@@ -362,6 +362,18 @@ public class CombatEvolution {
     }
 
     public static void addFullStunImmunity(PlayerPatch<?> playerPatch) {
-        (playerPatch.getOriginal()).forceAddEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100), playerPatch.getOriginal());
+        (playerPatch.getOriginal()).forceAddEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, 100), playerPatch.getOriginal());
+    }
+
+    public static void addFullStunImmunity(Mob mob, int duration, int pAmplifier) {
+        mob.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, duration, pAmplifier));
+    }
+
+    public static boolean isTargetGuardBreak(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
+        return ExecutionHandler.isTargetGuardBreak(dynamicAnimation, livingEntityPatch);
+    }
+
+    public static boolean isExecutionHitAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation) {
+        return dynamicAnimation.get() instanceof ExecutionHitAnimation;
     }
 }

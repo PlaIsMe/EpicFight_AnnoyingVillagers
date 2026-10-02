@@ -38,8 +38,8 @@ public class MobExecutionTask extends TickTask {
         LivingEntityPatch<?> executorPatch = EpicFightCapabilities.getEntityPatch(executor, LivingEntityPatch.class);
         LivingEntityPatch<?> targetPatch = EpicFightCapabilities.getEntityPatch(target, LivingEntityPatch.class);
 
-        executor.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100, 1, true, false));
-        target.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY.get(), 100, 1, true, false));
+        executor.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, 100, 1, true, false));
+        target.addEffect(new MobEffectInstance(CEMobEffects.FULL_STUN_IMMUNITY, 100, 1, true, false));
         executor.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4));
 
         if (executorPatch != null && targetPatch != null) {

@@ -1,6 +1,5 @@
 package com.pla.epicfight_annoyingvillagers.gameasset;
 
-import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.shelmarow.combat_evolution.gameassets.animation.ExecutionAttackAnimation;
@@ -35,7 +34,7 @@ public class AnimsAVExecute {
     public static AnimationManager.AnimationAccessor<ExecutionAttackAnimation> SHIELD_EXECUTE;
     public static AnimationManager.AnimationAccessor<ExecutionHitAnimation> SHIELD_EXECUTE_HIT;
 
-    private static final ExtraDamageInstance.ExtraDamage TARGET_MAX_HEALTH = new ExtraDamageInstance.ExtraDamage((attacker, itemstack, target, baseDamage, params) -> params[0] + target.getMaxHealth() * params[1], (itemstack, tooltips, baseDamage, params) -> {
+    private static final ExtraDamageInstance.ExtraDamage TARGET_MAX_HEALTH = new ExtraDamageInstance.ExtraDamage((attacker, itemstack, target, baseDamage, params) -> params[0] + target.getMaxHealth() * params[1], (level, itemstack, tooltips, baseDamage, params) -> {
     });
 
     public static void build(AnimationManager.AnimationBuilder builder) {

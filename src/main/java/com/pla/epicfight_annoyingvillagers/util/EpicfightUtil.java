@@ -4,6 +4,7 @@ import com.pla.annoyingvillagers.task.DelayedTask;
 import com.pla.annoyingvillagers.util.ScreenShakeUtil;
 import com.pla.epicfight_annoyingvillagers.EpicFightAnnoyingVillagers;
 import com.pla.epicfight_annoyingvillagers.capabilities.MobStamina;
+import com.pla.epicfight_annoyingvillagers.compat.combat_evolution.CombatEvolution;
 import com.pla.epicfight_annoyingvillagers.config.EpicFightAnnoyingVillagersConfig;
 import com.pla.epicfight_annoyingvillagers.network.ClientboundEpicFightCameraFx;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -158,16 +159,22 @@ public class EpicfightUtil {
 
     public static boolean isLongHitAnimationNotExecutedAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
         return dynamicAnimation.get() instanceof KnockdownAnimation
-                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation));
+                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation))
+                || (ModList.get().isLoaded("combat_evolution")
+                && (CombatEvolution.isTargetGuardBreak(dynamicAnimation, livingEntityPatch) || CombatEvolution.isExecutionHitAnimation(dynamicAnimation)));
     }
 
     public static boolean isLongHitAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
         return dynamicAnimation.get() instanceof KnockdownAnimation
-                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation));
+                || (ModList.get().isLoaded("efn") && EpicFightNightFallUtil.isEFNStun(dynamicAnimation)
+                || (ModList.get().isLoaded("combat_evolution")
+                && (CombatEvolution.isTargetGuardBreak(dynamicAnimation, livingEntityPatch) || CombatEvolution.isExecutionHitAnimation(dynamicAnimation))));
     }
 
     public static boolean isDamagableHitAnimation(AssetAccessor<? extends StaticAnimation> dynamicAnimation, LivingEntityPatch<?> livingEntityPatch) {
-        return dynamicAnimation.get() instanceof KnockdownAnimation;
+        return dynamicAnimation.get() instanceof KnockdownAnimation
+                || (ModList.get().isLoaded("combat_evolution")
+                && (CombatEvolution.isTargetGuardBreak(dynamicAnimation, livingEntityPatch) || CombatEvolution.isExecutionHitAnimation(dynamicAnimation)));
     }
 
     public static void stopAnimationSynchronized(LivingEntity entity, AssetAccessor<? extends StaticAnimation> animation) {
