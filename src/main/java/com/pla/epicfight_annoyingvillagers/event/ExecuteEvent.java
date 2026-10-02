@@ -51,16 +51,16 @@ public class ExecuteEvent {
 
     @SubscribeEvent
     public static void registerExecution(RegisterCustomExecutionEvent event){
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.OBSIDIAN_WEAPON.getId(), AVExecutionType.STRANGLE);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_WEAPON.getId(), AVExecutionType.STRANGLE);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.OBSIDIAN_WEAPON.getId(), AVExecutionType.STRANGLE);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_WEAPON.getId(), AVExecutionType.STRANGLE);
         event.registerExecutionByItem(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_PILLAR.getId(), AVExecutionType.STRANGLE);
         event.registerExecutionByItem(AnnoyingVillagersModItems.SHADOW_OBSIDIAN_SWORD.getId(), AVExecutionType.STRANGLE);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.BEDROCK_WEAPON.getId(), AVExecutionType.STRANGLE);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.NULL_WEAPON.getId(), AVExecutionType.STRANGLE);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.GOLDEN_MOON_BLADE.getId(), AVExecutionType.WRESTLING);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.DIAMOND_MOON_BLADE.getId(), AVExecutionType.WRESTLING);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.DIAMOND_ARMBLADE.getId(), AVExecutionType.WRESTLING_BACK);
-        event.RegisterExecutionByItem(AnnoyingVillagersModItems.DIAMOND_CLAW.getId(), AVExecutionType.WRESTLING_BACK);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.BEDROCK_WEAPON.getId(), AVExecutionType.STRANGLE);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.NULL_WEAPON.getId(), AVExecutionType.STRANGLE);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.GOLDEN_MOON_BLADE.getId(), AVExecutionType.WRESTLING);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.DIAMOND_MOON_BLADE.getId(), AVExecutionType.WRESTLING);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.DIAMOND_ARMBLADE.getId(), AVExecutionType.WRESTLING_BACK);
+        event.registerExecutionByItem(AnnoyingVillagersModItems.DIAMOND_CLAW.getId(), AVExecutionType.WRESTLING_BACK);
         listAvSwords.forEach(avSword -> {
             event.registerExecutionByItem(avSword, CapabilityItem.Styles.ONE_HAND, (item, livingEntityPatch) -> {
                 WeaponCategory weaponCategory = livingEntityPatch.getHoldingItemCapability(InteractionHand.OFF_HAND).getWeaponCategory();
