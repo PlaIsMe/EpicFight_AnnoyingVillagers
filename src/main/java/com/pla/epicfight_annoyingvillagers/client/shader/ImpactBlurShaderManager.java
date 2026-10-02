@@ -1,11 +1,11 @@
 package com.pla.epicfight_annoyingvillagers.client.shader;
 
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.pla.annoyingvillagers.AnnoyingVillagers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.PostPass;
 import com.pla.epicfight_annoyingvillagers.mixin.client.PostChainAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -76,22 +76,32 @@ public final class ImpactBlurShaderManager {
                 startTime = ticks;
             }
 
-            if (progress >= 1.0F) {
-                active = false;
-            }
-
             if (!Minecraft.getInstance().isPaused()) {
                 duration = ticks + partialTick - startTime;
                 progress = duration / totalTime;
             }
 
+            if (progress >= 1.0F) {
+                active = false;
+                return;
+            }
+
+            resize();
             EffectInstance effect = ((PostChainAccessor) (Object) chain)
                     .epicFightAnnoyingVillagers$getPasses().getFirst().getEffect();
             effect.safeGetUniform("center").set(0.5F, 0.5F);
             effect.safeGetUniform("strength").set(strength);
             effect.safeGetUniform("intensity").set(progress);
             effect.safeGetUniform("samples").set(10);
-            chain.process(partialTick);
+            // Match vanilla post-processing state and restore the target for later rendering.
+            RenderSystem.disableBlend();
+            RenderSystem.disableDepthTest();
+            RenderSystem.resetTextureMatrix();
+            try {
+                chain.process(partialTick);
+            } finally {
+                Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
+            }
         }
 
         resize();
