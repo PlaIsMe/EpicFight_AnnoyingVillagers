@@ -83,7 +83,7 @@ public class AVSkills {
     }
 
     static {
-        ENDER_AEGIS = register("ender_aegis", id -> WeaponInnateSkill.createWeaponInnateBuilder(EnderAegisSkill::new).build(id));
+        ENDER_AEGIS = register("ender_aegis", id -> WeaponInnateSkill.createWeaponInnateBuilder(EnderAegisSkill::new).setActivateType(Skill.ActivateType.ONE_SHOT).build(id));
         ENDER_GLAIVE = register("ender_glaive", id -> WeaponInnateSkill.createWeaponInnateBuilder(EnderGlaiveSkill::new).build(id));
         DEMONIAC_VOLTAGE_REAVER = register("demoniac_voltage_reaver", id -> WeaponInnateSkill.createWeaponInnateBuilder(DemoniacVoltageReaverSkill::new).build(id));
         OBSIDIAN_SLEDGEHAMMER = register("obsidian_sledgehammer", id -> WeaponInnateSkill.createWeaponInnateBuilder(ObsidianSledgeHammerSkill::new).build(id));
