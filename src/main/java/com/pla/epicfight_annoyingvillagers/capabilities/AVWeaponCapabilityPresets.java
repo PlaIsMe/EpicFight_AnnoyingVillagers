@@ -302,8 +302,8 @@ public class AVWeaponCapabilityPresets {
                             (itemstack) -> AVSkills.LEGENDARY_SWORD)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.IDLE, AnimsLegendarySword.LEGENDARY_SWORD_IDLE)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.WALK, WOMAnimations.TORMENT_BERSERK_WALK)
-                    .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, WOMAnimations.TORMENT_RUN)
-                    .livingMotionModifier(Styles.COMMON, LivingMotions.CHASE, WOMAnimations.TORMENT_RUN)
+                    .livingMotionModifier(Styles.COMMON, LivingMotions.RUN, AnimsLegendarySword.LEGENDARY_SWORD_RUN)
+                    .livingMotionModifier(Styles.COMMON, LivingMotions.CHASE, AnimsLegendarySword.LEGENDARY_SWORD_RUN)
                     .livingMotionModifier(Styles.COMMON, LivingMotions.BLOCK, AnimsLegendarySword.LEGENDARY_SWORD_GUARD)
                     .weaponCombinationPredicator(
                             (livingentitypatch) -> livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof BlueDemonTridentItem || livingentitypatch.getOriginal().getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof WoopieTheSwordItem);

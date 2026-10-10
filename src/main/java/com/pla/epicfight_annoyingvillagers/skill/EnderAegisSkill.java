@@ -75,9 +75,26 @@ public class EnderAegisSkill extends WeaponInnateSkill {
     @Override
     public void executeOnServer(SkillContainer container, FriendlyByteBuf args) {
         if (!this.isActivated(container)) {
+            // Reset both the stored charge and the gauge, including creative casts.
+            this.setStackSynchronize(container, 0);
+            this.setConsumptionSynchronize(container, 0.0F);
             super.executeOnServer(container, args);
+            ItemStack itemStack = container.getExecutor().getOriginal().getMainHandItem();
+            if (itemStack.getItem() instanceof EnderAegisItem) {
+                EnderAegisItem.setSecondForm(itemStack, true);
+            }
             container.getExecutor().playAnimationSynchronized(AnimsEnderAegis.ENDER_AEGIS_INNATE, 0.0F);
         }
+    }
+
+    public static boolean isPerformingInnate(Player player) {
+        PlayerPatch<?> patch = EpicFightCapabilities.getEntityPatch(player, PlayerPatch.class);
+        if (patch == null || patch.getAnimator() == null) {
+            return false;
+        }
+
+        AnimationPlayer animationPlayer = patch.getAnimator().getPlayerFor(null);
+        return animationPlayer != null && animationPlayer.getRealAnimation() == AnimsEnderAegis.ENDER_AEGIS_INNATE;
     }
 
     @Override
@@ -162,13 +179,16 @@ public class EnderAegisSkill extends WeaponInnateSkill {
     @Override
     public void updateContainer(SkillContainer container) {
         super.updateContainer(container);
+        if (container.getExecutor().isLogicalClient()) {
+            return;
+        }
         Player player = container.getExecutor().getOriginal();
         ItemStack itemStack = player.getMainHandItem();
         if (!(itemStack.getItem() instanceof EnderAegisItem)) {
             return;
         }
 
-        if (container.getStack() >= 1) {
+        if (EnderAegisItem.isSecondForm(itemStack)) {
             if (!itemStack.getOrCreateTag().getBoolean(EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG)) {
                 player.playSound(AnnoyingVillagersModSounds.ELITE_HEROBRINE_WEAPON_SCREAMING.get(), 0.5F, 1.0F);
                 itemStack.getOrCreateTag().putBoolean(EnderAegisItem.AWAKEN_SOUND_PLAYED_TAG, true);

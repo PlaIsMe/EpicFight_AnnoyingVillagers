@@ -182,10 +182,10 @@ public class AnimsAVSpear {
                                 AnimationEvent.InTimeEvent.create(0.6F, reascer.wom.gameasset.ReuseableEvents.FAST_SPINING_AGONY, AnimationEvent.Side.CLIENT),
                                 AnimationEvent.InTimeEvent.create(0.7F, reascer.wom.gameasset.ReuseableEvents.FAST_SPINING_AGONY, AnimationEvent.Side.CLIENT)));
 
-        BLACKSCRATCHER_IDLE = builder.nextAccessor("biped/pla/blackscratcher_idle",
+        BLACKSCRATCHER_IDLE = builder.nextAccessor("biped/av_spear/blackscratcher_idle",
                 accessor -> new StaticAnimation(true, accessor, humanoidArmature));
 
-        BLACKSCRATCHER_ATTACK = builder.nextAccessor("biped/pla/blackscratcher_attack.",
+        BLACKSCRATCHER_ATTACK = builder.nextAccessor("biped/av_spear/blackscratcher_attack.",
                 accessor -> new BasicAttackAnimation(0.08F, 0.05F, 0.15F, 0.2F, null, humanoidArmature.get().toolR, accessor, humanoidArmature)
                         .addProperty(AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER, ValueModifier.multiplier(1.5F))
                         .addProperty(AnimationProperty.AttackPhaseProperty.IMPACT_MODIFIER, ValueModifier.multiplier(1.5F)));
