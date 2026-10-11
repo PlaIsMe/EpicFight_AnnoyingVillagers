@@ -309,7 +309,7 @@ public class NullWeaponSkill extends WeaponInnateSkill {
         serverLevel.getEntitiesOfClass(
                 NullSkeletonEntity.class,
                 player.getBoundingBox().inflate(128.0D),
-                nullSkeleton -> nullSkeleton.isOwnedBy(player)
+                nullSkeleton -> nullSkeleton.isAlive() && nullSkeleton.isOwnedBy(player)
         ).forEach(NullSkeletonEntity::kill);
     }
 
