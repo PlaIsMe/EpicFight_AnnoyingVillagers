@@ -79,8 +79,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'libs:AnnoyingVillagers-1.21.1:2.0.0'
-    implementation 'libs:SmartNpc-1.21.1:2.0.0'
+    implementation "curse.maven:annoying-villagers-1717848:9036961"
+    implementation "curse.maven:smart-npc-1709932:8964220"
     compileOnly 'curse.maven:aaa-particles-979809:8402890'
 
     implementation 'curse.maven:epic-fight-mod-405076:8175609'
