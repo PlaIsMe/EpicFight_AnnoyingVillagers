@@ -161,35 +161,16 @@ public class NullWeaponSkill extends WeaponInnateSkill {
                 }
             }
         });
-        container.getExecutor().getEventListener().addEventListener(
-                PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID, (event) -> {
-                    Player player = container.getExecutor().getOriginal();
-                    Skill skill = event.getSkillContainer().getSkill();
-
-                    if (skill.getCategory() == SkillCategories.GUARD){
-                        for (String key : NULL_WEAPON_KEYS) {
-                            if (player.getPersistentData().hasUUID(key) && player.level() instanceof ServerLevel serverLevel) {
-                                UUID uuid = player.getPersistentData().getUUID(key);
-                                Entity entity = serverLevel.getEntity(uuid);
-
-                                if (entity instanceof NullWeapon nullWeapon
-                                        && !nullWeapon.isReleased()) {
-                                    nullWeapon.setSpinning(true);
-                                }
-                            }
-                        }
-                    }
-                });
     }
 
     @Override
     public void onRemoved(SkillContainer container) {
         if (!container.getExecutor().isLogicalClient()
                 && container.getExecutor().getOriginal().level() instanceof ServerLevel serverLevel) {
+            setGuardSpinning(serverLevel, container.getExecutor().getOriginal().getPersistentData(), false);
             killOwnedNullSkeletons(serverLevel, container.getExecutor().getOriginal());
         }
         container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.TAKE_DAMAGE_EVENT_ATTACK, EVENT_UUID);
-        container.getExecutor().getEventListener().removeListener(PlayerEventListener.EventType.SKILL_CAST_EVENT, EVENT_UUID);
     }
 
     @Override
@@ -259,6 +240,15 @@ public class NullWeaponSkill extends WeaponInnateSkill {
         return null;
     }
 
+    private static void setGuardSpinning(ServerLevel serverLevel, CompoundTag data, boolean guarding) {
+        for (String key : NULL_WEAPON_KEYS) {
+            NullWeapon nullWeapon = getTrackedWeapon(serverLevel, data, key);
+            if (nullWeapon != null) {
+                nullWeapon.setSpinning(guarding && !nullWeapon.isReleased());
+            }
+        }
+    }
+
     private static void releaseAvailableWeapons(ServerLevel serverLevel, CompoundTag data, int stack) {
         int available = getClampedStack(stack);
         for (int i = 0; i < available; i++) {
@@ -326,6 +316,17 @@ public class NullWeaponSkill extends WeaponInnateSkill {
     @Override
     public void updateContainer(SkillContainer container) {
         super.updateContainer(container);
+        if (!container.getExecutor().isLogicalClient()
+                && container.getExecutor().getOriginal().level() instanceof ServerLevel serverLevel) {
+            PlayerPatch<?> playerPatch = container.getExecutor();
+            Player player = playerPatch.getOriginal();
+            boolean guarding = player.isAlive() && playerPatch.isEpicFightMode()
+                    && player.getMainHandItem().getItem() instanceof NullWeaponItem
+                    && playerPatch.getHoldingSkill() instanceof Skill heldSkill
+                    && heldSkill.getCategory() == SkillCategories.GUARD;
+            setGuardSpinning(serverLevel, player.getPersistentData(), guarding);
+        }
+
         if (container.getExecutor().getValidItemInHand(InteractionHand.MAIN_HAND) != null) {
             LivingEntityPatch<?> livingEntityPatch = container.getExecutor();
             if (livingEntityPatch == null) return;
