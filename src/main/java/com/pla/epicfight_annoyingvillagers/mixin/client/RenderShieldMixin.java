@@ -25,12 +25,10 @@ public abstract class RenderShieldMixin {
     private BakedModel resolveEnderAegisForm(BakedModel original, ItemStack stack, LivingEntityPatch<?> patch,
                                             InteractionHand hand, OpenMatrix4f[] poses, MultiBufferSource buffer,
                                             PoseStack poseStack, int packedLight, float partialTicks) {
-        if (!(stack.getItem() instanceof EnderAegisItem)) {
-            return original;
+        if (stack.getItem() instanceof EnderAegisItem && EnderAegisItem.isSecondForm(stack)) {
+            return Minecraft.getInstance().getItemRenderer().getModel(stack, patch.getOriginal().level(), null, patch.getOriginal().getId());
         }
 
-        // RenderShield reads the base model directly, bypassing SecondForm and blocking overrides.
-        return Minecraft.getInstance().getItemRenderer().getModel(
-                stack, patch.getOriginal().level(), patch.getOriginal(), patch.getOriginal().getId());
+        return original;
     }
 }
