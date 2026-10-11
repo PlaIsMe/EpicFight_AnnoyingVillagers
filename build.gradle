@@ -90,7 +90,7 @@ dependencies {
     compileOnly 'curse.maven:epic-fight-avalon-1268823:7420442'
     implementation 'curse.maven:epicfight-clash-blade-1408812:8937844'
 
-    implementation "curse.maven:combat-evolution-1377795:9015627"
+    compileOnly "curse.maven:combat-evolution-1377795:9015627"
     compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.5.0'))
 }
 

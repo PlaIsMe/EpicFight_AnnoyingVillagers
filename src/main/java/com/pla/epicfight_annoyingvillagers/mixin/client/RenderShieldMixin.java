@@ -3,9 +3,11 @@ package com.pla.epicfight_annoyingvillagers.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.pla.annoyingvillagers.item.EnderAegisItem;
+import com.pla.epicfight_annoyingvillagers.event.ClientModelPredicateEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,12 +27,10 @@ public abstract class RenderShieldMixin {
     private BakedModel resolveEnderAegisForm(BakedModel original, ItemStack stack, LivingEntityPatch<?> patch,
                                             InteractionHand hand, OpenMatrix4f[] poses, MultiBufferSource buffer,
                                             PoseStack poseStack, int packedLight, float partialTicks) {
-        if (!(stack.getItem() instanceof EnderAegisItem)) {
-            return original;
+        if (stack.getItem() instanceof EnderAegisItem && EnderAegisItem.isSecondForm(stack)) {
+            return Minecraft.getInstance().getItemRenderer().getModel(stack, patch.getOriginal().level(), null, patch.getOriginal().getId());
         }
 
-        // RenderShield reads the base model directly, bypassing SecondForm and blocking overrides.
-        return Minecraft.getInstance().getItemRenderer().getModel(
-                stack, patch.getOriginal().level(), patch.getOriginal(), patch.getOriginal().getId());
+        return original;
     }
 }
